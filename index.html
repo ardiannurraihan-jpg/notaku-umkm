@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NotaKu — Generator Nota UMKM Profesional</title>
   
-  <!-- Google tag (gtag.js) -- HARUS ADA DI SINI -->
+  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BW47VZ45RG"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -14,11 +14,13 @@
     gtag('config', 'G-BW47VZ45RG');
   </script>
   
+  <!-- Google Search Console Verification -->
+  <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" />
+  
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <!-- Chart.js untuk statistik -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -51,7 +53,6 @@
       <div class="form-panel">
         <h2 class="panel-title">⚙ Isi Data Nota</h2>
 
-        <!-- Info Toko -->
         <div class="form-group">
           <label class="group-label">🏪 Info Toko / Usaha</label>
           <input type="text" id="storeName" placeholder="Nama Toko / Usaha Anda" />
@@ -59,14 +60,12 @@
           <input type="text" id="storePhone" placeholder="No. HP / WA (opsional)" />
         </div>
 
-        <!-- Info Pembeli -->
         <div class="form-group">
           <label class="group-label">👤 Info Pembeli</label>
           <input type="text" id="buyerName" placeholder="Nama Pembeli" />
           <input type="text" id="buyerPhone" placeholder="No. HP Pembeli (opsional)" />
         </div>
 
-        <!-- Tanggal & No Nota -->
         <div class="form-group">
           <label class="group-label">📋 Detail Nota</label>
           <div class="input-row">
@@ -75,7 +74,6 @@
           </div>
         </div>
 
-        <!-- Pilih Template -->
         <div class="form-group">
           <label class="group-label">🎨 Pilih Template Nota</label>
           <div class="template-selector">
@@ -85,21 +83,18 @@
           </div>
         </div>
 
-        <!-- Items -->
         <div class="form-group">
           <label class="group-label">🛍 Daftar Produk</label>
           <div id="itemsList"></div>
           <button class="add-item-btn" onclick="addItem()">+ Tambah Produk</button>
         </div>
 
-        <!-- Produk Tersimpan -->
         <div class="form-group">
           <label class="group-label">⭐ Produk Favorit</label>
           <div id="savedProducts" class="saved-products"></div>
           <button class="add-item-btn small" onclick="showSaveProductModal()">💾 Simpan Produk Sekarang</button>
         </div>
 
-        <!-- Diskon & Pajak -->
         <div class="form-group">
           <label class="group-label">💰 Diskon & Catatan</label>
           <div class="input-row">
@@ -127,7 +122,6 @@
           <p>Isi form di sebelah kiri<br/>dan klik <strong>Generate Nota</strong></p>
         </div>
 
-        <!-- INVOICE TEMPLATE CLASSIC -->
         <div id="invoicePreview" class="invoice-template template-classic" style="display:none">
           <div class="inv-header">
             <div class="inv-store">
@@ -152,29 +146,16 @@
 
           <table class="inv-table">
             <thead>
-              <tr>
-                <th>Produk / Jasa</th>
-                <th>Qty</th>
-                <th>Harga</th>
-                <th>Subtotal</th>
-              </tr>
+              <tr><th>Produk / Jasa</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr>
             </thead>
             <tbody id="inv-items"></tbody>
           </table>
 
           <div class="inv-summary">
-            <div class="inv-summary-row" id="inv-subtotalRow">
-              <span>Subtotal</span><span id="inv-subtotal"></span>
-            </div>
-            <div class="inv-summary-row discount" id="inv-discountRow" style="display:none">
-              <span>Diskon</span><span id="inv-discount"></span>
-            </div>
-            <div class="inv-summary-row tax" id="inv-taxRow" style="display:none">
-              <span>Pajak</span><span id="inv-tax"></span>
-            </div>
-            <div class="inv-summary-row total">
-              <span>TOTAL</span><span id="inv-total"></span>
-            </div>
+            <div class="inv-summary-row"><span>Subtotal</span><span id="inv-subtotal"></span></div>
+            <div class="inv-summary-row discount" id="inv-discountRow" style="display:none"><span>Diskon</span><span id="inv-discount"></span></div>
+            <div class="inv-summary-row tax" id="inv-taxRow" style="display:none"><span>Pajak</span><span id="inv-tax"></span></div>
+            <div class="inv-summary-row total"><span>TOTAL</span><span id="inv-total"></span></div>
           </div>
 
           <div class="inv-notes" id="inv-notesSection" style="display:none">
@@ -194,12 +175,9 @@
           </div>
 
           <div class="inv-watermark" id="watermark">NotaKu.id</div>
-          <div class="inv-powered">
-            Dibuat dengan <strong>NotaKu.id</strong> — Generator Nota Gratis untuk UMKM Indonesia
-          </div>
+          <div class="inv-powered">Dibuat dengan <strong>NotaKu.id</strong> — Generator Nota Gratis untuk UMKM Indonesia</div>
         </div>
       </div>
-
     </div>
 
     <!-- STATISTIK PANEL -->
@@ -207,35 +185,49 @@
       <div class="stats-container">
         <h2 class="panel-title">📊 Statistik Penjualan</h2>
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Total Transaksi</div>
-            <div class="stat-value" id="totalTransactions">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Pendapatan</div>
-            <div class="stat-value" id="totalRevenue">Rp 0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Rata-rata Transaksi</div>
-            <div class="stat-value" id="avgTransaction">Rp 0</div>
-          </div>
+          <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="totalTransactions">0</div></div>
+          <div class="stat-card"><div class="stat-label">Total Pendapatan</div><div class="stat-value" id="totalRevenue">Rp 0</div></div>
+          <div class="stat-card"><div class="stat-label">Rata-rata Transaksi</div><div class="stat-value" id="avgTransaction">Rp 0</div></div>
         </div>
         <canvas id="revenueChart" style="max-height: 300px; margin-top: 1rem;"></canvas>
         <button class="reset-stats-btn" onclick="resetStats()">Reset Statistik</button>
       </div>
     </div>
 
-    <!-- PREMIUM SECTION -->
+    <!-- PREMIUM SECTION - REAL SYSTEM DENGAN REKENING -->
     <div class="premium-section">
       <div class="premium-container">
         <div class="premium-badge">✨ PREMIUM</div>
         <h3>Hapus Watermark & Dapatkan Template Eksklusif</h3>
-        <p>Dukung pengembangan NotaKu dengan berlangganan premium! <br/>Hanya <strong>Rp 49.000/bulan</strong> atau <strong>Rp 499.000/tahun</strong></p>
-        <button class="premium-btn" onclick="showPremiumModal()">Upgrade ke Premium →</button>
         
-        <!-- FORM AKTIVASI PREMIUM (HARUS DI DALAM PREMIUM SECTION) -->
+        <!-- Pilihan Paket Premium -->
+        <div style="display: flex; gap: 1rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap;">
+          <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; text-align: center; min-width: 180px;">
+            <h4 style="font-size: 1.3rem;">Bulanan</h4>
+            <p style="font-size: 1.8rem; color: var(--gold); font-weight: bold;">Rp 49.000</p>
+            <button class="premium-btn-small" onclick="showPaymentInfo('bulanan', 49000)" style="background: var(--gold); border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: bold;">Pilih</button>
+          </div>
+          <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; text-align: center; min-width: 180px; position: relative;">
+            <div style="position: absolute; top: -10px; right: 10px; background: var(--rust); padding: 2px 10px; border-radius: 20px; font-size: 11px;">HEMAT 15%</div>
+            <h4 style="font-size: 1.3rem;">Tahunan</h4>
+            <p style="font-size: 1.8rem; color: var(--gold); font-weight: bold;">Rp 499.000</p>
+            <button class="premium-btn-small" onclick="showPaymentInfo('tahunan', 499000)" style="background: var(--gold); border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: bold;">Pilih</button>
+          </div>
+        </div>
+        
+        <!-- Informasi Pembayaran (muncul saat klik Pilih) -->
+        <div id="paymentInfo" style="display: none; background: rgba(0,0,0,0.3); padding: 1.2rem; border-radius: 12px; margin: 1rem 0;">
+          <h4 style="color: var(--gold); margin-bottom: 0.5rem;">💳 Transfer ke Rekening Berikut:</h4>
+          <p style="font-size: 1.2rem; font-family: monospace; background: #1a1208; padding: 0.5rem; border-radius: 6px; display: inline-block;">BRI: 3593 0100 9186 508</p>
+          <p>a.n. <strong>Ardian Nurraihan</strong></p>
+          <p>Nominal: <strong id="paymentAmount">Rp 0</strong></p>
+          <p style="font-size: 0.8rem; margin-top: 0.5rem;">📱 Setelah transfer, kirim bukti ke WhatsApp: <strong>0812-3456-7890</strong><br>Kode premium akan diberikan dalam 1x24 jam</p>
+          <button onclick="copyPaymentInfo()" style="background: var(--gold); border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; margin-top: 0.5rem;">📋 Copy No Rekening</button>
+        </div>
+        
+        <!-- Form Aktivasi Premium -->
         <div id="premiumActivation" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
-          <h4 style="color: var(--gold);">🔑 Punya kode premium?</h4>
+          <h4 style="color: var(--gold);">🔑 Sudah punya kode premium?</h4>
           <div style="display: flex; gap: 0.5rem; max-width: 300px; margin: 0 auto;">
             <input type="text" id="premiumKey" placeholder="Masukkan kode premium" style="flex:1; padding: 0.5rem; border-radius: 4px; border: none;">
             <button onclick="activatePremium()" style="background: var(--gold); border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Aktivasi</button>
@@ -243,7 +235,7 @@
           <div id="premiumStatus" style="font-size: 0.8rem; margin-top: 0.5rem; color: #a89a87;"></div>
         </div>
         
-        <p class="premium-note">*Simulasi untuk persiapan monetisasi</p>
+        <p class="premium-note" style="margin-top: 1rem;">*Premium aktif 30 hari untuk paket bulanan, 365 hari untuk tahunan</p>
       </div>
     </div>
   </main>
@@ -271,19 +263,10 @@
         <li>✓ Prioritas support</li>
       </ul>
       <div class="premium-plans">
-        <div class="plan">
-          <h4>Bulanan</h4>
-          <p class="price">Rp 49.000</p>
-          <button onclick="alert('Simulasi: Premium Bulanan')">Pilih</button>
-        </div>
-        <div class="plan">
-          <h4>Tahunan</h4>
-          <p class="price">Rp 499.000</p>
-          <p class="save-badge">Hemat 15%</p>
-          <button onclick="alert('Simulasi: Premium Tahunan')">Pilih</button>
-        </div>
+        <div class="plan"><h4>Bulanan</h4><p class="price">Rp 49.000</p><button onclick="showPaymentInfo('bulanan', 49000); closePremiumModal();">Pilih</button></div>
+        <div class="plan"><h4>Tahunan</h4><p class="price">Rp 499.000</p><p class="save-badge">Hemat 15%</p><button onclick="showPaymentInfo('tahunan', 499000); closePremiumModal();">Pilih</button></div>
       </div>
-      <p class="premium-note">*Ini adalah simulasi untuk persiapan monetisasi</p>
+      <p class="premium-note">*Transfer ke rekening BRI 3593 0100 9186 508 a.n. Ardian Nurraihan</p>
     </div>
   </div>
 
@@ -295,7 +278,6 @@
     </div>
   </footer>
 
-  <!-- PASTIKAN URUTAN SCRIPT: premium.js DULU, baru script.js -->
   <script src="premium.js"></script>
   <script src="script.js"></script>
 </body>
