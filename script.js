@@ -497,3 +497,26 @@ function copyPaymentInfo() {
         });
     }
 }
+// Tambahkan fungsi ini di script.js
+function exportStats() {
+  if (transactionHistory.length === 0) {
+    alert('Belum ada data transaksi untuk diexport.');
+    return;
+  }
+  
+  let csvContent = "Tanggal,Total (Rp)\n";
+  transactionHistory.forEach(t => {
+    const date = new Date(t.date).toLocaleDateString('id-ID');
+    csvContent += `${date},${t.total}\n`;
+  });
+  
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `notaku-stats-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  alert('✅ Data statistik sudah diexport ke CSV!');
+}
