@@ -28,6 +28,11 @@ const PREMIUM_CONFIG = {
     const until = localStorage.getItem('notaku_premium_until');
     if (!until) return true;
     return new Date(until) < new Date();
+  },
+  
+  // Hapus watermark jika premium
+  shouldHideWatermark: function() {
+    return this.isPremium() && !this.isExpired();
   }
 };
 
