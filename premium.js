@@ -1,19 +1,15 @@
-// premium.js - Sistem License Key sederhana
+// premium.js - Sistem License Key
 const PREMIUM_CONFIG = {
-  // License keys yang valid (ganti dengan kode Anda sendiri)
+  // License keys yang valid (akan ditambah manual oleh admin)
   validKeys: [
-    "DEMO-PREMIUM-2025",
-    "UMKM-PRO-001",
-    "NOTAKU-GRATIS-001"
+    "DEMO-PREMIUM-2025"
   ],
   
-  // Cek apakah user premium
   isPremium: function() {
     const saved = localStorage.getItem('notaku_premium_key');
     return saved && this.validKeys.includes(saved);
   },
   
-  // Aktivasi premium
   activate: function(key) {
     if (this.validKeys.includes(key)) {
       localStorage.setItem('notaku_premium_key', key);
@@ -23,18 +19,18 @@ const PREMIUM_CONFIG = {
     return false;
   },
   
-  // Cek masa aktif
   isExpired: function() {
     const until = localStorage.getItem('notaku_premium_until');
     if (!until) return true;
     return new Date(until) < new Date();
   },
   
-  // Hapus watermark jika premium
-  shouldHideWatermark: function() {
-    return this.isPremium() && !this.isExpired();
+  getRemainingDays: function() {
+    const until = localStorage.getItem('notaku_premium_until');
+    if (!until) return 0;
+    const diff = new Date(until) - new Date();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 };
 
-// Export untuk digunakan di script lain
 window.PremiumAPI = PREMIUM_CONFIG;
