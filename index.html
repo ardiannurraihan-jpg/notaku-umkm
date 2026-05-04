@@ -55,319 +55,317 @@
 </head>
 <body>
 
-  <!-- HERO -->
-  <header class="hero">
-    <div class="hero-bg"></div>
-    <nav class="navbar">
-      <div class="logo">Nota<span>Ku</span></div>
-      <div class="nav-tag">UMKM Indonesia 🇮🇩</div>
-    </nav>
-    <div class="hero-content">
-      <div class="badge">✦ Gratis Selamanya</div>
-      <h1>Buat Nota<br/><em>Profesional</em><br/>Dalam Detik</h1>
-      <p>Simpan produk favorit, pilih template, cetak massal, dan pantau penjualan!</p>
-      <a href="#app" class="cta-btn">Buat Nota Sekarang ↓</a>
-    </div>
-    <div class="hero-deco">
-      <div class="deco-card">Rp 250.000</div>
-      <div class="deco-card small">✓ Lunas</div>
-      <div class="deco-card tiny">PDF Ready</div>
-    </div>
-  </header>
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <nav class="navbar">
+    <div class="logo">Nota<span>Ku</span></div>
+    <div class="nav-tag">UMKM Indonesia 🇮🇩</div>
+  </nav>
+  <div class="hero-content">
+    <div class="badge">✦ Gratis Selamanya</div>
+    <h1>Buat Nota<br/><em>Profesional</em><br/>Dalam Detik</h1>
+    <p>Simpan produk favorit, pilih template, cetak massal, dan pantau penjualan!</p>
+    <a href="#app" class="cta-btn">Buat Nota Sekarang ↓</a>
+  </div>
+  <div class="hero-deco">
+    <div class="deco-card">Rp 250.000</div>
+    <div class="deco-card small">✓ Lunas</div>
+    <div class="deco-card tiny">PDF Ready</div>
+  </div>
+</header>
 
-  <!-- APP -->
-  <main id="app" class="app-section">
-    <div class="app-container">
+<!-- APP -->
+<main id="app" class="app-section">
+  <div class="app-container">
 
-      <!-- FORM PANEL -->
-      <div class="form-panel">
-        <h2 class="panel-title">⚙ Isi Data Nota</h2>
+    <!-- FORM PANEL -->
+    <div class="form-panel">
+      <h2 class="panel-title">⚙ Isi Data Nota</h2>
 
-        <div class="form-group">
-          <label class="group-label">🏪 Info Toko / Usaha</label>
-          <input type="text" id="storeName" placeholder="Nama Toko / Usaha Anda" />
-          <input type="text" id="storeAddress" placeholder="Alamat (opsional)" />
-          <input type="text" id="storePhone" placeholder="No. HP / WA (opsional)" />
-        </div>
-
-        <div class="form-group">
-          <label class="group-label">👤 Info Pembeli</label>
-          <input type="text" id="buyerName" placeholder="Nama Pembeli" />
-          <input type="text" id="buyerPhone" placeholder="No. HP Pembeli (opsional)" />
-        </div>
-
-        <div class="form-group">
-          <label class="group-label">📋 Detail Nota</label>
-          <div class="input-row">
-            <input type="text" id="invoiceNumber" placeholder="No. Nota (otomatis)" />
-            <input type="date" id="invoiceDate" />
-          </div>
-        </div>
-
-        <!-- Pilih Template dengan Premium Exclusive -->
-        <div class="form-group">
-          <label class="group-label">🎨 Pilih Template Nota</label>
-          <div class="template-selector">
-            <!-- FREE TEMPLATES -->
-            <div class="template-group">
-              <div class="template-group-label">📋 GRATIS</div>
-              <div class="template-buttons">
-                <button class="template-btn active" data-template="classic">Classic</button>
-                <button class="template-btn" data-template="modern">Modern</button>
-                <button class="template-btn" data-template="minimal">Minimal</button>
-              </div>
-            </div>
-            
-            <!-- PREMIUM TEMPLATES (hanya untuk member premium) -->
-            <div id="premiumTemplateGroup" style="display: none;">
-              <div class="template-group-label" style="margin-top: 0.8rem;">👑 PREMIUM EXCLUSIVE</div>
-              <div class="template-buttons">
-                <button class="template-btn premium-template" data-template="premium-luxury">💎 Luxury Gold</button>
-                <button class="template-btn premium-template" data-template="premium-elegant">🦢 Elegant Silk</button>
-                <button class="template-btn premium-template" data-template="premium-dark">🌙 Dark Executive</button>
-                <button class="template-btn premium-template" data-template="premium-art">🎨 Art Deco</button>
-                <button class="template-btn premium-template" data-template="premium-nature">🍃 Nature Fresh</button>
-              </div>
-            </div>
-          </div>
-          <div id="premiumTemplateNote" style="font-size: 0.7rem; color: var(--gold); margin-top: 0.5rem; display: none;">
-            ⭐ Kamu mendapatkan 5 template eksklusif sebagai member Premium!
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="group-label">🛍 Daftar Produk</label>
-          <div id="itemsList"></div>
-          <button class="add-item-btn" onclick="addItem()">+ Tambah Produk</button>
-        </div>
-
-        <div class="form-group">
-          <label class="group-label">⭐ Produk Favorit</label>
-          <div id="savedProducts" class="saved-products"></div>
-          <button class="add-item-btn small" onclick="showSaveProductModal()">💾 Simpan Produk Sekarang</button>
-        </div>
-
-        <div class="form-group">
-          <label class="group-label">💰 Diskon & Catatan</label>
-          <div class="input-row">
-            <input type="number" id="discount" placeholder="Diskon (Rp)" min="0" value="0" />
-            <input type="number" id="tax" placeholder="Pajak (%)" min="0" max="100" value="0" />
-          </div>
-          <textarea id="notes" placeholder="Catatan tambahan (terima kasih, syarat pengembalian, dll)"></textarea>
-        </div>
-
-        <button class="generate-btn" onclick="generateInvoice()">✦ Generate Nota</button>
+      <div class="form-group">
+        <label class="group-label">🏪 Info Toko / Usaha</label>
+        <input type="text" id="storeName" placeholder="Nama Toko / Usaha Anda" />
+        <input type="text" id="storeAddress" placeholder="Alamat (opsional)" />
+        <input type="text" id="storePhone" placeholder="No. HP / WA (opsional)" />
       </div>
 
-      <!-- PREVIEW PANEL -->
-      <div class="preview-panel">
-        <div class="preview-header">
-          <h2 class="panel-title">👁 Preview Nota</h2>
-          <div class="preview-actions" id="previewActions" style="display:none">
-            <button class="action-btn" onclick="downloadPDF()">⬇ Download PDF</button>
-            <button class="action-btn secondary" onclick="printInvoice()">🖨 Print</button>
+      <div class="form-group">
+        <label class="group-label">👤 Info Pembeli</label>
+        <input type="text" id="buyerName" placeholder="Nama Pembeli" />
+        <input type="text" id="buyerPhone" placeholder="No. HP Pembeli (opsional)" />
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">📋 Detail Nota</label>
+        <div class="input-row">
+          <input type="text" id="invoiceNumber" placeholder="No. Nota (otomatis)" />
+          <input type="date" id="invoiceDate" />
+        </div>
+      </div>
+
+      <!-- Pilih Template -->
+      <div class="form-group">
+        <label class="group-label">🎨 Pilih Template Nota</label>
+        <div class="template-selector">
+          <!-- FREE TEMPLATES -->
+          <div class="template-group">
+            <div class="template-group-label">📋 GRATIS</div>
+            <div class="template-buttons">
+              <button class="template-btn active" data-template="classic">Classic</button>
+              <button class="template-btn" data-template="modern">Modern</button>
+              <button class="template-btn" data-template="minimal">Minimal</button>
+            </div>
+          </div>
+          
+          <!-- PREMIUM TEMPLATES -->
+          <div id="premiumTemplateGroup" style="display: none;">
+            <div class="template-group-label" style="margin-top: 0.8rem;">👑 PREMIUM EXCLUSIVE</div>
+            <div class="template-buttons">
+              <button class="template-btn premium-template" data-template="premium-luxury">💎 Luxury Gold</button>
+              <button class="template-btn premium-template" data-template="premium-elegant">🦢 Elegant Silk</button>
+              <button class="template-btn premium-template" data-template="premium-dark">🌙 Dark Executive</button>
+              <button class="template-btn premium-template" data-template="premium-art">🎨 Art Deco</button>
+              <button class="template-btn premium-template" data-template="premium-nature">🍃 Nature Fresh</button>
+            </div>
+          </div>
+        </div>
+        <div id="premiumTemplateNote" style="font-size: 0.7rem; color: var(--gold); margin-top: 0.5rem; display: none;">
+          ⭐ Kamu mendapatkan 5 template eksklusif sebagai member Premium!
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">🛍 Daftar Produk</label>
+        <div id="itemsList"></div>
+        <button class="add-item-btn" onclick="addItem()">+ Tambah Produk</button>
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">⭐ Produk Favorit</label>
+        <div id="savedProducts" class="saved-products"></div>
+        <button class="add-item-btn small" onclick="showSaveProductModal()">💾 Simpan Produk Sekarang</button>
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">💰 Diskon & Catatan</label>
+        <div class="input-row">
+          <input type="number" id="discount" placeholder="Diskon (Rp)" min="0" value="0" />
+          <input type="number" id="tax" placeholder="Pajak (%)" min="0" max="100" value="0" />
+        </div>
+        <textarea id="notes" placeholder="Catatan tambahan (terima kasih, syarat pengembalian, dll)"></textarea>
+      </div>
+
+      <button class="generate-btn" onclick="generateInvoice()">✦ Generate Nota</button>
+    </div>
+
+    <!-- PREVIEW PANEL -->
+    <div class="preview-panel">
+      <div class="preview-header">
+        <h2 class="panel-title">👁 Preview Nota</h2>
+        <div class="preview-actions" id="previewActions" style="display:none">
+          <button class="action-btn" onclick="downloadPDF()">⬇ Download PDF</button>
+          <button class="action-btn secondary" onclick="printInvoice()">🖨 Print</button>
+        </div>
+      </div>
+
+      <div class="preview-placeholder" id="previewPlaceholder">
+        <div class="placeholder-icon">🧾</div>
+        <p>Isi form di sebelah kiri<br/>dan klik <strong>Generate Nota</strong></p>
+      </div>
+
+      <div id="invoicePreview" class="invoice-template template-classic" style="display:none">
+        <div class="inv-header">
+          <div class="inv-store">
+            <div class="inv-store-name" id="inv-storeName"></div>
+            <div class="inv-store-sub" id="inv-storeAddress"></div>
+            <div class="inv-store-sub" id="inv-storePhone"></div>
+          </div>
+          <div class="inv-meta">
+            <div class="inv-label">NOTA</div>
+            <div class="inv-num" id="inv-number"></div>
+            <div class="inv-date" id="inv-date"></div>
           </div>
         </div>
 
-        <div class="preview-placeholder" id="previewPlaceholder">
-          <div class="placeholder-icon">🧾</div>
-          <p>Isi form di sebelah kiri<br/>dan klik <strong>Generate Nota</strong></p>
+        <div class="inv-divider"></div>
+
+        <div class="inv-buyer">
+          <div class="inv-buyer-label">Kepada Yth.</div>
+          <div class="inv-buyer-name" id="inv-buyerName"></div>
+          <div class="inv-buyer-sub" id="inv-buyerPhone"></div>
         </div>
 
-        <div id="invoicePreview" class="invoice-template template-classic" style="display:none">
-          <div class="inv-header">
-            <div class="inv-store">
-              <div class="inv-store-name" id="inv-storeName"></div>
-              <div class="inv-store-sub" id="inv-storeAddress"></div>
-              <div class="inv-store-sub" id="inv-storePhone"></div>
-            </div>
-            <div class="inv-meta">
-              <div class="inv-label">NOTA</div>
-              <div class="inv-num" id="inv-number"></div>
-              <div class="inv-date" id="inv-date"></div>
-            </div>
+        <table class="inv-table">
+          <thead>
+            <tr><th>Produk / Jasa</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody id="inv-items"></tbody>
+        </table>
+
+        <div class="inv-summary">
+          <div class="inv-summary-row"><span>Subtotal</span><span id="inv-subtotal"></span></div>
+          <div class="inv-summary-row discount" id="inv-discountRow" style="display:none"><span>Diskon</span><span id="inv-discount"></span></div>
+          <div class="inv-summary-row tax" id="inv-taxRow" style="display:none"><span>Pajak</span><span id="inv-tax"></span></div>
+          <div class="inv-summary-row total"><span>TOTAL</span><span id="inv-total"></span></div>
+        </div>
+
+        <div class="inv-notes" id="inv-notesSection" style="display:none">
+          <div class="inv-notes-label">Catatan:</div>
+          <div id="inv-notes"></div>
+        </div>
+
+        <div class="inv-footer">
+          <div class="inv-footer-left">
+            <div>Hormat kami,</div>
+            <div class="inv-sig-space"></div>
+            <div id="inv-sigName"></div>
           </div>
-
-          <div class="inv-divider"></div>
-
-          <div class="inv-buyer">
-            <div class="inv-buyer-label">Kepada Yth.</div>
-            <div class="inv-buyer-name" id="inv-buyerName"></div>
-            <div class="inv-buyer-sub" id="inv-buyerPhone"></div>
+          <div class="inv-footer-right">
+            <div class="inv-stamp" id="inv-stamp">LUNAS</div>
           </div>
+        </div>
 
-          <table class="inv-table">
-            <thead>
-              <tr><th>Produk / Jasa</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr>
-            </thead>
-            <tbody id="inv-items"></tbody>
-          </table>
+        <div class="inv-watermark" id="watermark">NotaKu.id</div>
+        <div class="inv-powered">Dibuat dengan <strong>NotaKu.id</strong> — Generator Nota Gratis untuk UMKM Indonesia</div>
+      </div>
+    </div>
+  </div>
 
-          <div class="inv-summary">
-            <div class="inv-summary-row"><span>Subtotal</span><span id="inv-subtotal"></span></div>
-            <div class="inv-summary-row discount" id="inv-discountRow" style="display:none"><span>Diskon</span><span id="inv-discount"></span></div>
-            <div class="inv-summary-row tax" id="inv-taxRow" style="display:none"><span>Pajak</span><span id="inv-tax"></span></div>
-            <div class="inv-summary-row total"><span>TOTAL</span><span id="inv-total"></span></div>
-          </div>
+  <!-- STATISTIK PANEL -->
+  <div class="stats-section">
+    <div class="stats-container">
+      <h2 class="panel-title">📊 Statistik Penjualan</h2>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="totalTransactions">0</div></div>
+        <div class="stat-card"><div class="stat-label">Total Pendapatan</div><div class="stat-value" id="totalRevenue">Rp 0</div></div>
+        <div class="stat-card"><div class="stat-label">Rata-rata Transaksi</div><div class="stat-value" id="avgTransaction">Rp 0</div></div>
+      </div>
+      <canvas id="revenueChart" style="max-height: 300px; margin-top: 1rem;"></canvas>
+      <button class="reset-stats-btn" onclick="resetStats()">Reset Statistik</button>
+    </div>
+  </div>
 
-          <div class="inv-notes" id="inv-notesSection" style="display:none">
-            <div class="inv-notes-label">Catatan:</div>
-            <div id="inv-notes"></div>
-          </div>
+  <!-- PREMIUM SECTION -->
+  <div class="premium-section">
+    <div class="premium-container">
+      <div class="premium-badge">✨ PREMIUM</div>
+      <h3>Hapus Watermark & Dapatkan 5 Template Eksklusif!</h3>
+      
+      <div class="premium-packages">
+        <div class="premium-package">
+          <h4>Bulanan</h4>
+          <p class="price">Rp 49.000</p>
+          <button class="premium-btn-small" onclick="showPaymentInfo('bulanan', 49000)">Pilih</button>
+        </div>
+        <div class="premium-package premium-package-yearly">
+          <div class="save-badge">HEMAT 15%</div>
+          <h4>Tahunan</h4>
+          <p class="price">Rp 499.000</p>
+          <button class="premium-btn-small" onclick="showPaymentInfo('tahunan', 499000)">Pilih</button>
+        </div>
+      </div>
+      
+      <div id="paymentInfo" class="payment-info" style="display: none;">
+        <h4>💳 Transfer ke Rekening Berikut:</h4>
+        <p class="bank-account">BRI: 3593 0100 9186 508</p>
+        <p>a.n. <strong>Ardian Nurraihan</strong></p>
+        <p>Nominal: <strong id="paymentAmount">Rp 0</strong></p>
+        <p class="wa-confirm">📱 Setelah transfer, kirim bukti ke WhatsApp: 
+          <a href="https://wa.me/6282134858510?text=Halo%20Admin%2C%20saya%20sudah%20transfer%20untuk%20premium%20NotaKu">0821-3485-8510</a>
+        </p>
+        <button class="copy-btn" onclick="copyPaymentInfo()">📋 Copy No Rekening</button>
+      </div>
+      
+      <div class="premium-activation">
+        <h4>🔑 Sudah punya kode premium?</h4>
+        <div class="activation-input">
+          <input type="text" id="premiumKey" placeholder="Masukkan kode premium">
+          <button onclick="activatePremium()">Aktivasi</button>
+        </div>
+        <div id="premiumStatus" class="premium-status"></div>
+      </div>
 
-          <div class="inv-footer">
-            <div class="inv-footer-left">
-              <div>Hormat kami,</div>
-              <div class="inv-sig-space"></div>
-              <div id="inv-sigName"></div>
-            </div>
-            <div class="inv-footer-right">
-              <div class="inv-stamp" id="inv-stamp">LUNAS</div>
-            </div>
-          </div>
+      <div class="guarantee-box">
+        <div class="guarantee-icon">💰</div>
+        <div class="guarantee-text">
+          <strong>100% Garansi Uang Kembali</strong><br>
+          Jika kode premium tidak dikirim dalam 24 jam setelah transfer terbukti, uang Anda akan dikembalikan penuh.
+        </div>
+      </div>
 
-          <div class="inv-watermark" id="watermark">NotaKu.id</div>
-          <div class="inv-powered">Dibuat dengan <strong>NotaKu.id</strong> — Generator Nota Gratis untuk UMKM Indonesia</div>
+      <div class="security-badges">
+        <span>🔒 Koneksi Aman (HTTPS)</span>
+        <span>✅ Rekening Terverifikasi</span>
+        <span>⭐ 50+ UMKM Percaya</span>
+      </div>
+
+      <p class="premium-note">⭐ Premium: Hapus watermark + 5 template eksklusif (Luxury Gold, Elegant Silk, Dark Executive, Art Deco, Nature Fresh)</p>
+    </div>
+  </div>
+
+  <!-- TRUST SECTION -->
+  <div class="trust-section">
+    <div class="trust-container">
+      <h3>🔒 Kenapa Anda Bisa Percaya NotaKu?</h3>
+      <div class="trust-grid">
+        <div class="trust-card">
+          <div class="trust-icon">✅</div>
+          <h4>Sudah Digunakan 50+ UMKM</h4>
+          <p>Pelaku usaha di berbagai kota sudah menggunakan NotaKu.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">📱</div>
+          <h4>Admin Respon Cepat</h4>
+          <p>Kode premium dikirim dalam <strong>1x24 jam</strong> (biasanya <1 jam).</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">💰</div>
+          <h4>Garansi Uang Kembali</h4>
+          <p>Jika tidak mendapat kode dalam 24 jam, uang dikembalikan 100%.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">🏦</div>
+          <h4>Rekening Terverifikasi</h4>
+          <p>BRI 3593 0100 9186 508 a.n. Ardian Nurraihan.</p>
         </div>
       </div>
     </div>
+  </div>
+</main>
 
-    <!-- STATISTIK PANEL -->
-    <div class="stats-section">
-      <div class="stats-container">
-        <h2 class="panel-title">📊 Statistik Penjualan</h2>
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="totalTransactions">0</div></div>
-          <div class="stat-card"><div class="stat-label">Total Pendapatan</div><div class="stat-value" id="totalRevenue">Rp 0</div></div>
-          <div class="stat-card"><div class="stat-label">Rata-rata Transaksi</div><div class="stat-value" id="avgTransaction">Rp 0</div></div>
-        </div>
-        <canvas id="revenueChart" style="max-height: 300px; margin-top: 1rem;"></canvas>
-        <button class="reset-stats-btn" onclick="resetStats()">Reset Statistik</button>
-      </div>
-    </div>
-
-    <!-- PREMIUM SECTION - REAL SYSTEM DENGAN REKENING -->
-    <div class="premium-section">
-      <div class="premium-container">
-        <div class="premium-badge">✨ PREMIUM</div>
-        <h3>Hapus Watermark & Dapatkan 5 Template Eksklusif!</h3>
-        
-        <div style="display: flex; gap: 1rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap;">
-          <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; text-align: center; min-width: 180px;">
-            <h4 style="font-size: 1.3rem;">Bulanan</h4>
-            <p style="font-size: 1.8rem; color: var(--gold); font-weight: bold;">Rp 49.000</p>
-            <button class="premium-btn-small" onclick="showPaymentInfo('bulanan', 49000)" style="background: var(--gold); border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: bold;">Pilih</button>
-          </div>
-          <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; text-align: center; min-width: 180px; position: relative;">
-            <div style="position: absolute; top: -10px; right: 10px; background: var(--rust); padding: 2px 10px; border-radius: 20px; font-size: 11px;">HEMAT 15%</div>
-            <h4 style="font-size: 1.3rem;">Tahunan</h4>
-            <p style="font-size: 1.8rem; color: var(--gold); font-weight: bold;">Rp 499.000</p>
-            <button class="premium-btn-small" onclick="showPaymentInfo('tahunan', 499000)" style="background: var(--gold); border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: bold;">Pilih</button>
-          </div>
-        </div>
-        
-        <div id="paymentInfo" style="display: none; background: rgba(0,0,0,0.3); padding: 1.2rem; border-radius: 12px; margin: 1rem 0;">
-          <h4 style="color: var(--gold); margin-bottom: 0.5rem;">💳 Transfer ke Rekening Berikut:</h4>
-          <p style="font-size: 1.2rem; font-family: monospace; background: #1a1208; padding: 0.5rem; border-radius: 6px; display: inline-block;">BRI: 3593 0100 9186 508</p>
-          <p>a.n. <strong>Ardian Nurraihan</strong></p>
-          <p>Nominal: <strong id="paymentAmount">Rp 0</strong></p>
-          <p style="font-size: 0.8rem; margin-top: 0.5rem;">📱 Setelah transfer, kirim bukti ke WhatsApp: 
-            <a href="https://wa.me/6282134858510?text=Halo%20Admin%2C%20saya%20sudah%20transfer%20untuk%20premium%20NotaKu" 
-               style="color:var(--gold); text-decoration:underline;">0821-3485-8510</a>
-          </p>
-          <button onclick="copyPaymentInfo()" style="background: var(--gold); border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; margin-top: 0.5rem;">📋 Copy No Rekening</button>
-        </div>
-        
-        <div id="premiumActivation" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
-          <h4 style="color: var(--gold);">🔑 Sudah punya kode premium?</h4>
-          <div style="display: flex; gap: 0.5rem; max-width: 300px; margin: 0 auto;">
-            <input type="text" id="premiumKey" placeholder="Masukkan kode premium" style="flex:1; padding: 0.5rem; border-radius: 4px; border: none;">
-            <button onclick="activatePremium()" style="background: var(--gold); border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Aktivasi</button>
-          </div>
-          <div id="premiumStatus" style="font-size: 0.8rem; margin-top: 0.5rem; color: #a89a87;"></div>
-        </div>
-        <!-- Garansi Uang Kembali -->
-<div class="guarantee-box" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; margin: 1rem 0; text-align: left;">
-  <div style="display: flex; align-items: center; gap: 0.8rem;">
-    <div style="font-size: 2rem;">💰</div>
-    <div>
-      <strong style="color: var(--gold);">100% Garansi Uang Kembali</strong><br>
-      <span style="font-size: 0.8rem;">Jika kode premium tidak dikirim dalam 24 jam setelah transfer terbukti, uang Anda akan dikembalikan penuh.</span>
-    </div>
+<!-- MODALS -->
+<div id="saveProductModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeSaveProductModal()">&times;</span>
+    <h3>💾 Simpan Produk</h3>
+    <input type="text" id="saveProductName" placeholder="Nama Produk" />
+    <input type="number" id="saveProductPrice" placeholder="Harga (Rp)" />
+    <button onclick="saveProduct()">Simpan Produk</button>
   </div>
 </div>
 
-<!-- Badge Keamanan -->
-<div class="security-badges" style="display: flex; justify-content: center; gap: 1.5rem; margin: 1rem 0; flex-wrap: wrap;">
-  <span style="display: flex; align-items: center; gap: 0.3rem;">🔒 Koneksi Aman (HTTPS)</span>
-  <span style="display: flex; align-items: center; gap: 0.3rem;">✅ Rekening Terverifikasi</span>
-  <span style="display: flex; align-items: center; gap: 0.3rem;">⭐ 50+ UMKM Percaya</span>
+<div id="premiumModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePremiumModal()">&times;</span>
+    <h3>✨ Upgrade ke Premium</h3>
+    <p>Fitur Premium:</p>
+    <ul>
+      <li>✓ Hapus watermark "NotaKu.id"</li>
+      <li>✓ 5 template eksklusif mewah</li>
+      <li>✓ Tampilan nota lebih profesional</li>
+      <li>✓ Prioritas support</li>
+    </ul>
+    <div class="premium-plans">
+      <div class="plan"><h4>Bulanan</h4><p class="price">Rp 49.000</p><button onclick="showPaymentInfo('bulanan', 49000); closePremiumModal();">Pilih</button></div>
+      <div class="plan"><h4>Tahunan</h4><p class="price">Rp 499.000</p><p class="save-badge">Hemat 15%</p><button onclick="showPaymentInfo('tahunan', 499000); closePremiumModal();">Pilih</button></div>
+    </div>
+    <p class="premium-note">*Transfer ke rekening BRI 3593 0100 9186 508 a.n. Ardian Nurraihan</p>
+  </div>
 </div>
-        <p class="premium-note" style="margin-top: 1rem;">⭐ Premium: Hapus watermark + 5 template eksklusif (Luxury Gold, Elegant Silk, Dark Executive, Art Deco, Nature Fresh)</p>
-      </div>
-    </div>
 
-    <!-- ========== TRUST SECTION ========== -->
-    <div class="trust-section">
-      <div class="trust-container">
-        <h3>🔒 Kenapa Anda Bisa Percaya NotaKu?</h3>
-        <div class="trust-grid">
-          <div class="trust-card">
-            <div class="trust-icon">✅</div>
-            <h4>Sudah Digunakan 50+ UMKM</h4>
-            <p>Pelaku usaha di berbagai kota sudah menggunakan NotaKu untuk membuat nota profesional.</p>
-          </div>
-          <div class="trust-card">
-            <div class="trust-icon">📱</div>
-            <h4>Admin Respon Cepat</h4>
-            <p>Kirim bukti transfer, kode premium akan dikirim dalam <strong>1x24 jam</strong> (biasanya <1 jam).</p>
-          </div>
-          <div class="trust-card">
-            <div class="trust-icon">💰</div>
-            <h4>Garansi Uang Kembali</h4>
-            <p>Jika tidak mendapat kode dalam 24 jam, uang Anda akan dikembalikan 100%.</p>
-          </div>
-          <div class="trust-card">
-            <div class="trust-icon">🏦</div>
-            <h4>Transfer ke Rekening Terverifikasi</h4>
-            <p>BRI 3593 0100 9186 508 a.n. Ardian Nurraihan (rekening pribadi terverifikasi).</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- MODALS -->
-  <div id="saveProductModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeSaveProductModal()">&times;</span>
-      <h3>💾 Simpan Produk</h3>
-      <input type="text" id="saveProductName" placeholder="Nama Produk" />
-      <input type="number" id="saveProductPrice" placeholder="Harga (Rp)" />
-      <button onclick="saveProduct()">Simpan Produk</button>
-    </div>
-  </div>
-
-  <div id="premiumModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closePremiumModal()">&times;</span>
-      <h3>✨ Upgrade ke Premium</h3>
-      <p>Fitur Premium:</p>
-      <ul>
-        <li>✓ Hapus watermark "NotaKu.id"</li>
-        <li>✓ 5 template eksklusif mewah</li>
-        <li>✓ Tampilan nota lebih profesional</li>
-        <li>✓ Prioritas support</li>
-      </ul>
-      <div class="premium-plans">
-        <div class="plan"><h4>Bulanan</h4><p class="price">Rp 49.000</p><button onclick="showPaymentInfo('bulanan', 49000); closePremiumModal();">Pilih</button></div>
-        <div class="plan"><h4>Tahunan</h4><p class="price">Rp 499.000</p><p class="save-badge">Hemat 15%</p><button onclick="showPaymentInfo('tahunan', 499000); closePremiumModal();">Pilih</button></div>
-      </div>
-      <p class="premium-note">*Transfer ke rekening BRI 3593 0100 9186 508 a.n. Ardian Nurraihan</p>
-    </div>
-  </div>
-
-  <footer class="footer">
+<!-- FOOTER -->
+<footer class="footer">
   <div class="footer-content">
     <div class="footer-logo">Nota<span>Ku</span></div>
     <p>Gratis untuk semua UMKM Indonesia 🇮🇩</p>
@@ -380,7 +378,7 @@
   </div>
 </footer>
 
-  <script src="premium.js"></script>
-  <script src="script.js"></script>
+<script src="premium.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
