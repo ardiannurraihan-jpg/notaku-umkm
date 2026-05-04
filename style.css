@@ -1313,3 +1313,9 @@ textarea {
   color: #e8b84b;
   text-decoration: underline;
 }
+
+/* Security Badges */
+.security-badges span {
+  font-size: 0.75rem;
+  color: #a89a87;
+}
