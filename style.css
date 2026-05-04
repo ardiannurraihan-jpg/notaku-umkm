@@ -568,9 +568,26 @@ textarea {
 
 /* Template Selector */
 .template-selector {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.template-group {
+  margin-bottom: 0.5rem;
+}
+
+.template-group-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.05em;
+}
+
+.template-buttons {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .template-btn {
@@ -593,6 +610,17 @@ textarea {
 
 .template-btn:hover {
   border-color: var(--gold);
+}
+
+.premium-template {
+  background: linear-gradient(135deg, #2a1f0a, #1a1208);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+}
+
+.premium-template:hover {
+  background: linear-gradient(135deg, #3d2a0a, #2a1f0a);
+  transform: translateY(-2px);
 }
 
 /* Saved Products */
@@ -743,6 +771,57 @@ textarea {
   opacity: 0.7;
 }
 
+/* Trust Section */
+.trust-section {
+  max-width: 1200px;
+  margin: 3rem auto 0;
+  padding: 0 1rem;
+}
+
+.trust-container {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.trust-container h3 {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: var(--ink);
+}
+
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.trust-card {
+  background: var(--paper);
+  border-radius: 8px;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.trust-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.trust-card h4 {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.trust-card p {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
 /* Modal */
 .modal {
   display: none;
@@ -881,40 +960,15 @@ textarea {
   .stats-grid {
     grid-template-columns: 1fr;
   }
+  
+  .trust-grid {
+    grid-template-columns: 1fr;
+  }
 }
+
 /* ========================================
    TEMPLATE PREMIUM EXCLUSIVE
    ======================================== */
-
-/* Template Group Styling */
-.template-group {
-  margin-bottom: 0.5rem;
-}
-
-.template-group-label {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--muted);
-  margin-bottom: 0.3rem;
-  letter-spacing: 0.05em;
-}
-
-.template-buttons {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.premium-template {
-  background: linear-gradient(135deg, #2a1f0a, #1a1208);
-  color: var(--gold);
-  border: 1px solid var(--gold);
-}
-
-.premium-template:hover {
-  background: linear-gradient(135deg, #3d2a0a, #2a1f0a);
-  transform: translateY(-2px);
-}
 
 /* ===== TEMPLATE 1: PREMIUM LUXURY GOLD ===== */
 .template-premium-luxury {
@@ -1215,56 +1269,7 @@ textarea {
   color: var(--gold);
   font-weight: bold;
 }
-/* Trust Section */
-.trust-section {
-  max-width: 1200px;
-  margin: 3rem auto 0;
-  padding: 0 1rem;
-}
 
-.trust-container {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-}
-
-.trust-container h3 {
-  font-family: var(--font-head);
-  font-size: 1.3rem;
-  margin-bottom: 1.5rem;
-  color: var(--ink);
-}
-
-.trust-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
-
-.trust-card {
-  background: var(--paper);
-  border-radius: 8px;
-  padding: 1.2rem;
-  text-align: center;
-}
-
-.trust-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.trust-card h4 {
-  font-family: var(--font-head);
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.trust-card p {
-  font-size: 0.8rem;
-  color: var(--muted);
-}
 /* Fix untuk PDF biar rapi */
 .invoice-template {
   width: 100%;
