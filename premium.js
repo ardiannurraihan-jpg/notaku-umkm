@@ -3,8 +3,6 @@ const PREMIUM_CONFIG = {
   // License keys yang valid (ganti dengan kode Anda sendiri)
   validKeys: [
     "DEMO-PREMIUM-2025",
-    "UMKM-PRO-001",
-    "NOTAKU-GRATIS-001"
   ],
   
   // Cek apakah user premium
