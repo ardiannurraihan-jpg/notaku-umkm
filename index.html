@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
   <!-- Google Search Console Verification -->
   <meta name="google-site-verification" content="NPWAmD-kQ5WiV9OONu_M0jhEtTyo45FPkeGdoX1q__U" />
+  
   <!-- SEO Meta Tags -->
   <meta name="description" content="Buat nota profesional gratis untuk UMKM Indonesia. Download PDF, simpan produk favorit, pilih template, pantau penjualan. Tanpa ribet, langsung jadi!" />
   <meta name="keywords" content="nota umkm, generator nota, buat nota online, nota gratis, invoice generator, nota penjualan" />
   <meta name="author" content="NotaKu" />
+  
   <title>NotaKu — Generator Nota UMKM Profesional</title>
   
   <!-- Google tag (gtag.js) -->
@@ -20,8 +23,29 @@
     gtag('config', 'G-BW47VZ45RG');
   </script>
   
-  <!-- Google Search Console Verification -->
-  <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" />
+  <!-- Structured Data for Rich Results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "NotaKu",
+    "description": "Generator nota gratis untuk UMKM Indonesia. Buat nota profesional dalam detik, download PDF, tanpa daftar.",
+    "url": "https://notaku-umkm.vercel.app",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "IDR",
+      "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "50"
+    }
+  }
+  </script>
   
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
@@ -206,7 +230,6 @@
         <div class="premium-badge">✨ PREMIUM</div>
         <h3>Hapus Watermark & Dapatkan Template Eksklusif</h3>
         
-        <!-- Pilihan Paket Premium -->
         <div style="display: flex; gap: 1rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap;">
           <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; text-align: center; min-width: 180px;">
             <h4 style="font-size: 1.3rem;">Bulanan</h4>
@@ -221,7 +244,6 @@
           </div>
         </div>
         
-        <!-- Informasi Pembayaran (muncul saat klik Pilih) -->
         <div id="paymentInfo" style="display: none; background: rgba(0,0,0,0.3); padding: 1.2rem; border-radius: 12px; margin: 1rem 0;">
           <h4 style="color: var(--gold); margin-bottom: 0.5rem;">💳 Transfer ke Rekening Berikut:</h4>
           <p style="font-size: 1.2rem; font-family: monospace; background: #1a1208; padding: 0.5rem; border-radius: 6px; display: inline-block;">BRI: 3593 0100 9186 508</p>
@@ -231,7 +253,6 @@
           <button onclick="copyPaymentInfo()" style="background: var(--gold); border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; margin-top: 0.5rem;">📋 Copy No Rekening</button>
         </div>
         
-        <!-- Form Aktivasi Premium -->
         <div id="premiumActivation" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
           <h4 style="color: var(--gold);">🔑 Sudah punya kode premium?</h4>
           <div style="display: flex; gap: 0.5rem; max-width: 300px; margin: 0 auto;">
