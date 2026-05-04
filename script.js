@@ -421,6 +421,8 @@ function printInvoice() {
     </html>
   `);
   printWin.document.close();
+}
+
 // ========== FUNGSI PREMIUM REAL ==========
 function showPaymentInfo(paket, nominal) {
     const paymentDiv = document.getElementById('paymentInfo');
