@@ -421,17 +421,33 @@ function printInvoice() {
     </html>
   `);
   printWin.document.close();
-}
-// Fungsi untuk menampilkan info pembayaran
+// ========== FUNGSI PREMIUM REAL ==========
 function showPaymentInfo(paket, nominal) {
     const paymentDiv = document.getElementById('paymentInfo');
     const amountSpan = document.getElementById('paymentAmount');
     amountSpan.textContent = `Rp ${nominal.toLocaleString('id-ID')}`;
     paymentDiv.style.display = 'block';
     paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    // Track event ke Google Analytics
+    if (typeof gtag === 'function') {
+        gtag('event', 'view_payment_info', {
+            'event_category': 'premium',
+            'event_label': paket,
+            'value': nominal
+        });
+    }
 }
 
 function copyPaymentInfo() {
-    navigator.clipboard.writeText('359301009186508');
-    alert('Nomor rekening sudah di-copy!');
+    const rekening = '359301009186508';
+    navigator.clipboard.writeText(rekening);
+    alert('✅ Nomor rekening sudah di-copy: ' + rekening);
+    
+    if (typeof gtag === 'function') {
+        gtag('event', 'copy_rekening', {
+            'event_category': 'premium',
+            'event_label': 'BRI'
+        });
+    }
 }
