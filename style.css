@@ -1215,3 +1215,53 @@ textarea {
   color: var(--gold);
   font-weight: bold;
 }
+/* Trust Section */
+.trust-section {
+  max-width: 1200px;
+  margin: 3rem auto 0;
+  padding: 0 1rem;
+}
+
+.trust-container {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.trust-container h3 {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: var(--ink);
+}
+
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.trust-card {
+  background: var(--paper);
+  border-radius: 8px;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.trust-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.trust-card h4 {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.trust-card p {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
