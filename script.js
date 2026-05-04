@@ -422,3 +422,16 @@ function printInvoice() {
   `);
   printWin.document.close();
 }
+// Fungsi untuk menampilkan info pembayaran
+function showPaymentInfo(paket, nominal) {
+    const paymentDiv = document.getElementById('paymentInfo');
+    const amountSpan = document.getElementById('paymentAmount');
+    amountSpan.textContent = `Rp ${nominal.toLocaleString('id-ID')}`;
+    paymentDiv.style.display = 'block';
+    paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyPaymentInfo() {
+    navigator.clipboard.writeText('359301009186508');
+    alert('Nomor rekening sudah di-copy!');
+}
