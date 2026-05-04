@@ -1265,3 +1265,26 @@ textarea {
   font-size: 0.8rem;
   color: var(--muted);
 }
+/* Fix untuk PDF biar rapi */
+.invoice-template {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.inv-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.inv-table th:nth-child(1), 
+.inv-table td:nth-child(1) { width: 40%; }
+
+.inv-table th:nth-child(2), 
+.inv-table td:nth-child(2) { width: 15%; text-align: center; }
+
+.inv-table th:nth-child(3), 
+.inv-table td:nth-child(3) { width: 20%; }
+
+.inv-table th:nth-child(4), 
+.inv-table td:nth-child(4) { width: 25%; text-align: right; }
