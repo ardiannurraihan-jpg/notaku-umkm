@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /premium.js
+Disallow: /script.js
+Disallow: /style.css
+
 Sitemap: https://notaku-umkm.vercel.app/sitemap.xml
