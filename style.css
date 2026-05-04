@@ -1293,3 +1293,23 @@ textarea {
 
 .inv-table th:nth-child(4), 
 .inv-table td:nth-child(4) { width: 25%; text-align: right; }
+/* Footer Links */
+.footer-links {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: #c9952a;
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: #e8b84b;
+  text-decoration: underline;
+}
