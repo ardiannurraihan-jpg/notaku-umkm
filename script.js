@@ -390,7 +390,7 @@ function generateInvoice() {
   document.getElementById('invoicePreview').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ── DOWNLOAD PDF ───────────────────────────
+// ── DOWNLOAD PDF (OPTIMIZED FOR HP) ──
 async function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const invoice = document.getElementById('invoicePreview');
@@ -400,33 +400,65 @@ async function downloadPDF() {
   btn.textContent = '⏳ Menyiapkan...';
   btn.disabled = true;
   
-  // Sementara hilangkan efek shadow & border radius untuk canvas lebih rapi
+  // Simpan style asli sementara
   const originalStyle = {
-    boxShadow: invoice.style.boxShadow,
-    borderRadius: invoice.style.borderRadius
+    width: invoice.style.width,
+    maxWidth: invoice.style.maxWidth,
+    margin: invoice.style.margin,
+    transform: invoice.style.transform
   };
-  invoice.style.boxShadow = 'none';
+  
+  // Set style untuk capture yang optimal
+  invoice.style.width = '100%';
+  invoice.style.maxWidth = '600px';
+  invoice.style.margin = '0 auto';
+  invoice.style.transform = 'scale(1)';
   
   try {
-    // Tunggu sebentar agar rendering stabil
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    // Ambil ukuran asli elemen
+    const originalWidth = invoice.offsetWidth;
+    const originalHeight = invoice.offsetHeight;
+    
+    // Hitung scale yang tepat untuk A5 (148mm x 210mm)
+    const targetWidth = 600; // lebar target dalam pixel
+    const scale = targetWidth / originalWidth;
     
     const canvas = await html2canvas(invoice, {
-      scale: 3,  // Tingkatkan scale untuk kualitas lebih baik
+      scale: scale * 2,  // Scale dinamis
       useCORS: true,
       backgroundColor: '#ffffff',
       logging: false,
-      windowWidth: invoice.scrollWidth,
-      windowHeight: invoice.scrollHeight
+      windowWidth: originalWidth,
+      windowHeight: originalHeight,
+      onclone: (clonedDoc, element) => {
+        // Pastikan cloned element juga rapi
+        element.style.width = '100%';
+        element.style.maxWidth = '600px';
+        element.style.margin = '0 auto';
+      }
     });
     
-    const imgData = canvas.toDataURL('image/png', 1.0);
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
     
-    const pdfWidth = pdf.internal.pageSize.getWidth();
+    // Gunakan format A5 (148mm x 210mm) - landscape lebih nyaman di HP?
+    // Coba portrait dulu
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a5'
+    });
+    
+    const pdfWidth = pdf.internal.pageSize.getWidth();  // 148 mm
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
     
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+    // Tambahkan margin kecil agar tidak kepotong
+    const margin = 5; // margin 5mm
+    const contentWidth = pdfWidth - (margin * 2);
+    const contentHeight = (canvas.height * contentWidth) / canvas.width;
+    
+    pdf.addImage(imgData, 'JPEG', margin, margin, contentWidth, contentHeight, undefined, 'FAST');
     
     const filename = `nota-${document.getElementById('invoiceNumber').value.replace(/\//g, '-')}.pdf`;
     pdf.save(filename);
@@ -437,7 +469,10 @@ async function downloadPDF() {
   }
   
   // Kembalikan style asli
-  invoice.style.boxShadow = originalStyle.boxShadow;
+  invoice.style.width = originalStyle.width;
+  invoice.style.maxWidth = originalStyle.maxWidth;
+  invoice.style.margin = originalStyle.margin;
+  invoice.style.transform = originalStyle.transform;
   
   btn.textContent = originalText;
   btn.disabled = false;
