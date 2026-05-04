@@ -241,6 +241,14 @@ function generateInvoice() {
   if (items.length === 0) {
     alert('Tambahkan minimal 1 produk dulu!');
     return;
+    // Kirim event ke Google Analytics
+if (typeof gtag === 'function') {
+  gtag('event', 'generate_invoice', {
+    'event_category': 'engagement',
+    'event_label': document.getElementById('storeName').value || 'Toko',
+    'value': total
+  });
+}
   }
   
   const storeName    = document.getElementById('storeName').value.trim() || 'Nama Toko';
