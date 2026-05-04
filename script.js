@@ -19,36 +19,64 @@ function loadData() {
   }
 }
 
+// Tampilkan template premium untuk user premium
+function showPremiumTemplates() {
+    const premiumGroup = document.getElementById('premiumTemplateGroup');
+    const premiumNote = document.getElementById('premiumTemplateNote');
+    
+    if (!premiumGroup) return;
+    
+    if (window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired()) {
+        premiumGroup.style.display = 'block';
+        if (premiumNote) premiumNote.style.display = 'block';
+    } else {
+        premiumGroup.style.display = 'none';
+        if (premiumNote) premiumNote.style.display = 'none';
+        
+        // Jika user mencoba pilih template premium, reset ke classic
+        const premiumTemplates = ['premium-luxury', 'premium-elegant', 'premium-dark', 'premium-art', 'premium-nature'];
+        if (premiumTemplates.includes(currentTemplate)) {
+            currentTemplate = 'classic';
+            const classicBtn = document.querySelector('.template-btn[data-template="classic"]');
+            if (classicBtn) classicBtn.classList.add('active');
+            const invoicePreview = document.getElementById('invoicePreview');
+            if (invoicePreview) invoicePreview.className = `invoice-template template-classic`;
+        }
+    }
+}
+
 // Cek status premium saat load
 function checkPremiumStatus() {
   if (!window.PremiumAPI) return;
   
   const isPremium = window.PremiumAPI.isPremium();
+  const isExpired = window.PremiumAPI.isExpired();
   const watermark = document.getElementById('watermark');
-  const activationDiv = document.getElementById('premiumActivation');
   const statusDiv = document.getElementById('premiumStatus');
   
-  if (isPremium && !window.PremiumAPI.isExpired()) {
+  if (isPremium && !isExpired) {
     if (watermark) watermark.style.display = 'none';
-    if (activationDiv) activationDiv.style.display = 'block';
     if (statusDiv) {
       const until = localStorage.getItem('notaku_premium_until');
-      statusDiv.innerHTML = `✨ Premium aktif sampai ${new Date(until).toLocaleDateString('id-ID')}`;
+      const remainingDays = window.PremiumAPI.getRemainingDays ? window.PremiumAPI.getRemainingDays() : 0;
+      statusDiv.innerHTML = `👑 Premium aktif sampai ${new Date(until).toLocaleDateString('id-ID')} (${remainingDays} hari lagi)<br>✨ Kamu mendapatkan 5 template eksklusif!`;
     }
   } else {
     if (watermark) watermark.style.display = 'block';
-    if (activationDiv) activationDiv.style.display = 'block';
     if (statusDiv && !isPremium) {
-      statusDiv.innerHTML = '🔒 Gunakan kode premium untuk menghilangkan watermark';
+      statusDiv.innerHTML = '🔒 Upgrade ke Premium untuk:<br>✓ Hapus watermark<br>✓ 5 template eksklusif mewah<br>✓ Nota lebih profesional';
     }
   }
+  
+  // TAMPILKAN TEMPLATE PREMIUM
+  showPremiumTemplates();
 }
 
 // Aktivasi premium
 function activatePremium() {
   const key = document.getElementById('premiumKey').value;
   if (window.PremiumAPI && window.PremiumAPI.activate(key)) {
-    alert('✅ Premium berhasil diaktifkan!');
+    alert('✅ Premium berhasil diaktifkan! Kamu sekarang mendapatkan 5 template eksklusif!');
     checkPremiumStatus();
     location.reload();
   } else {
@@ -149,7 +177,7 @@ window.addEventListener('DOMContentLoaded', () => {
   addItem();
   addItem();
   loadData();
-  checkPremiumStatus(); // Tambahkan ini
+  checkPremiumStatus();
   
   // Template selector
   document.querySelectorAll('.template-btn').forEach(btn => {
@@ -296,7 +324,7 @@ function generateInvoice() {
   const taxAmt   = Math.round(subtotal * taxPct / 100);
   const total    = subtotal - discount + taxAmt;
   
-  // 🔥 KIRIM EVENT KE GOOGLE ANALYTICS (Pindahkan ke sini)
+  // Kirim event ke Google Analytics
   if (typeof gtag === 'function') {
     gtag('event', 'generate_invoice', {
       'event_category': 'engagement',
@@ -431,7 +459,6 @@ function showPaymentInfo(paket, nominal) {
     paymentDiv.style.display = 'block';
     paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     
-    // Track event ke Google Analytics
     if (typeof gtag === 'function') {
         gtag('event', 'view_payment_info', {
             'event_category': 'premium',
