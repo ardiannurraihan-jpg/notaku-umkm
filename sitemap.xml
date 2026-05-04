@@ -1,7 +1,9 @@
-User-agent: *
-Allow: /
-Disallow: /premium.js
-Disallow: /script.js
-Disallow: /style.css
-
-Sitemap: https://notaku-umkm.vercel.app/sitemap.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://notaku-umkm.vercel.app/</loc>
+    <lastmod>2025-05-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
