@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NotaKu — Generator Nota UMKM Profesional</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Chart.js untuk statistik -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <nav class="navbar">
+      <div class="logo">Nota<span>Ku</span></div>
+      <div class="nav-tag">UMKM Indonesia 🇮🇩</div>
+    </nav>
+    <div class="hero-content">
+      <div class="badge">✦ Gratis Selamanya</div>
+      <h1>Buat Nota<br/><em>Profesional</em><br/>Dalam Detik</h1>
+      <p>Simpan produk favorit, pilih template, cetak massal, dan pantau penjualan!</p>
+      <a href="#app" class="cta-btn">Buat Nota Sekarang ↓</a>
+    </div>
+    <div class="hero-deco">
+      <div class="deco-card">Rp 250.000</div>
+      <div class="deco-card small">✓ Lunas</div>
+      <div class="deco-card tiny">PDF Ready</div>
+    </div>
+  </header>
+
+  <!-- APP -->
+  <main id="app" class="app-section">
+    <div class="app-container">
+
+      <!-- FORM PANEL -->
+      <div class="form-panel">
+        <h2 class="panel-title">⚙ Isi Data Nota</h2>
+
+        <!-- Info Toko -->
+        <div class="form-group">
+          <label class="group-label">🏪 Info Toko / Usaha</label>
+          <input type="text" id="storeName" placeholder="Nama Toko / Usaha Anda" />
+          <input type="text" id="storeAddress" placeholder="Alamat (opsional)" />
+          <input type="text" id="storePhone" placeholder="No. HP / WA (opsional)" />
+        </div>
+
+        <!-- Info Pembeli -->
+        <div class="form-group">
+          <label class="group-label">👤 Info Pembeli</label>
+          <input type="text" id="buyerName" placeholder="Nama Pembeli" />
+          <input type="text" id="buyerPhone" placeholder="No. HP Pembeli (opsional)" />
+        </div>
+
+        <!-- Tanggal & No Nota -->
+        <div class="form-group">
+          <label class="group-label">📋 Detail Nota</label>
+          <div class="input-row">
+            <input type="text" id="invoiceNumber" placeholder="No. Nota (otomatis)" />
+            <input type="date" id="invoiceDate" />
+          </div>
+        </div>
+
+        <!-- Pilih Template -->
+        <div class="form-group">
+          <label class="group-label">🎨 Pilih Template Nota</label>
+          <div class="template-selector">
+            <button class="template-btn active" data-template="classic">Classic</button>
+            <button class="template-btn" data-template="modern">Modern</button>
+            <button class="template-btn" data-template="minimal">Minimal</button>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="form-group">
+          <label class="group-label">🛍 Daftar Produk</label>
+          <div id="itemsList"></div>
+          <button class="add-item-btn" onclick="addItem()">+ Tambah Produk</button>
+        </div>
+
+        <!-- Produk Tersimpan -->
+        <div class="form-group">
+          <label class="group-label">⭐ Produk Favorit</label>
+          <div id="savedProducts" class="saved-products"></div>
+          <button class="add-item-btn small" onclick="showSaveProductModal()">💾 Simpan Produk Sekarang</button>
+        </div>
+
+        <!-- Diskon & Pajak -->
+        <div class="form-group">
+          <label class="group-label">💰 Diskon & Catatan</label>
+          <div class="input-row">
+            <input type="number" id="discount" placeholder="Diskon (Rp)" min="0" value="0" />
+            <input type="number" id="tax" placeholder="Pajak (%)" min="0" max="100" value="0" />
+          </div>
+          <textarea id="notes" placeholder="Catatan tambahan (terima kasih, syarat pengembalian, dll)"></textarea>
+        </div>
+
+        <button class="generate-btn" onclick="generateInvoice()">✦ Generate Nota</button>
+      </div>
+
+      <!-- PREVIEW PANEL -->
+      <div class="preview-panel">
+        <div class="preview-header">
+          <h2 class="panel-title">👁 Preview Nota</h2>
+          <div class="preview-actions" id="previewActions" style="display:none">
+            <button class="action-btn" onclick="downloadPDF()">⬇ Download PDF</button>
+            <button class="action-btn secondary" onclick="printInvoice()">🖨 Print</button>
+          </div>
+        </div>
+
+        <div class="preview-placeholder" id="previewPlaceholder">
+          <div class="placeholder-icon">🧾</div>
+          <p>Isi form di sebelah kiri<br/>dan klik <strong>Generate Nota</strong></p>
+        </div>
+
+        <!-- INVOICE TEMPLATE CLASSIC -->
+        <div id="invoicePreview" class="invoice-template template-classic" style="display:none">
+          <div class="inv-header">
+            <div class="inv-store">
+              <div class="inv-store-name" id="inv-storeName"></div>
+              <div class="inv-store-sub" id="inv-storeAddress"></div>
+              <div class="inv-store-sub" id="inv-storePhone"></div>
+            </div>
+            <div class="inv-meta">
+              <div class="inv-label">NOTA</div>
+              <div class="inv-num" id="inv-number"></div>
+              <div class="inv-date" id="inv-date"></div>
+            </div>
+          </div>
+
+          <div class="inv-divider"></div>
+
+          <div class="inv-buyer">
+            <div class="inv-buyer-label">Kepada Yth.</div>
+            <div class="inv-buyer-name" id="inv-buyerName"></div>
+            <div class="inv-buyer-sub" id="inv-buyerPhone"></div>
+          </div>
+
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Produk / Jasa</th>
+                <th>Qty</th>
+                <th>Harga</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody id="inv-items"></tbody>
+          </table>
+
+          <div class="inv-summary">
+            <div class="inv-summary-row" id="inv-subtotalRow">
+              <span>Subtotal</span><span id="inv-subtotal"></span>
+            </div>
+            <div class="inv-summary-row discount" id="inv-discountRow" style="display:none">
+              <span>Diskon</span><span id="inv-discount"></span>
+            </div>
+            <div class="inv-summary-row tax" id="inv-taxRow" style="display:none">
+              <span>Pajak</span><span id="inv-tax"></span>
+            </div>
+            <div class="inv-summary-row total">
+              <span>TOTAL</span><span id="inv-total"></span>
+            </div>
+          </div>
+
+          <div class="inv-notes" id="inv-notesSection" style="display:none">
+            <div class="inv-notes-label">Catatan:</div>
+            <div id="inv-notes"></div>
+          </div>
+
+          <div class="inv-footer">
+            <div class="inv-footer-left">
+              <div>Hormat kami,</div>
+              <div class="inv-sig-space"></div>
+              <div id="inv-sigName"></div>
+            </div>
+            <div class="inv-footer-right">
+              <div class="inv-stamp" id="inv-stamp">LUNAS</div>
+            </div>
+          </div>
+
+          <div class="inv-watermark" id="watermark">NotaKu.id</div>
+          <div class="inv-powered">
+            Dibuat dengan <strong>NotaKu.id</strong> — Generator Nota Gratis untuk UMKM Indonesia
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- STATISTIK PANEL -->
+    <div class="stats-section">
+      <div class="stats-container">
+        <h2 class="panel-title">📊 Statistik Penjualan</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Transaksi</div>
+            <div class="stat-value" id="totalTransactions">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Pendapatan</div>
+            <div class="stat-value" id="totalRevenue">Rp 0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Rata-rata Transaksi</div>
+            <div class="stat-value" id="avgTransaction">Rp 0</div>
+          </div>
+        </div>
+        <canvas id="revenueChart" style="max-height: 300px; margin-top: 1rem;"></canvas>
+        <button class="reset-stats-btn" onclick="resetStats()">Reset Statistik</button>
+      </div>
+    </div>
+
+    <!-- PREMIUM SECTION -->
+    <div class="premium-section">
+      <div class="premium-container">
+        <div class="premium-badge">✨ PREMIUM</div>
+        <h3>Hapus Watermark & Dapatkan Template Eksklusif</h3>
+        <p>Dukung pengembangan NotaKu dengan berlangganan premium! <br/>Hanya <strong>Rp 49.000/bulan</strong> atau <strong>Rp 499.000/tahun</strong></p>
+        <button class="premium-btn" onclick="showPremiumModal()">Upgrade ke Premium →</button>
+        <p class="premium-note">*Simulasi untuk persiapan monetisasi</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODALS -->
+  <div id="saveProductModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeSaveProductModal()">&times;</span>
+      <h3>💾 Simpan Produk</h3>
+      <input type="text" id="saveProductName" placeholder="Nama Produk" />
+      <input type="number" id="saveProductPrice" placeholder="Harga (Rp)" />
+      <button onclick="saveProduct()">Simpan Produk</button>
+    </div>
+  </div>
+
+  <div id="premiumModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closePremiumModal()">&times;</span>
+      <h3>✨ Upgrade ke Premium</h3>
+      <p>Fitur Premium:</p>
+      <ul>
+        <li>✓ Hapus watermark "NotaKu.id"</li>
+        <li>✓ 5 template eksklusif</li>
+        <li>✓ Export data statistik</li>
+        <li>✓ Prioritas support</li>
+      </ul>
+      <div class="premium-plans">
+        <div class="plan">
+          <h4>Bulanan</h4>
+          <p class="price">Rp 49.000</p>
+          <button onclick="alert('Simulasi: Premium Bulanan')">Pilih</button>
+        </div>
+        <div class="plan">
+          <h4>Tahunan</h4>
+          <p class="price">Rp 499.000</p>
+          <p class="save-badge">Hemat 15%</p>
+          <button onclick="alert('Simulasi: Premium Tahunan')">Pilih</button>
+        </div>
+      </div>
+      <p class="premium-note">*Ini adalah simulasi untuk persiapan monetisasi</p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">Nota<span>Ku</span></div>
+      <p>Gratis untuk semua UMKM Indonesia 🇮🇩</p>
+      <p class="footer-small">© 2025 NotaKu · Tidak ada data yang disimpan · 100% privasi terjaga</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
