@@ -400,27 +400,44 @@ async function downloadPDF() {
   btn.textContent = '⏳ Menyiapkan...';
   btn.disabled = true;
   
+  // Sementara hilangkan efek shadow & border radius untuk canvas lebih rapi
+  const originalStyle = {
+    boxShadow: invoice.style.boxShadow,
+    borderRadius: invoice.style.borderRadius
+  };
+  invoice.style.boxShadow = 'none';
+  
   try {
+    // Tunggu sebentar agar rendering stabil
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const canvas = await html2canvas(invoice, {
-      scale: 2,
+      scale: 3,  // Tingkatkan scale untuk kualitas lebih baik
       useCORS: true,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: invoice.scrollWidth,
+      windowHeight: invoice.scrollHeight
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const imgData = canvas.toDataURL('image/png', 1.0);
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
     
-    const pdfWidth  = pdf.internal.pageSize.getWidth();
+    const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
     
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
     
     const filename = `nota-${document.getElementById('invoiceNumber').value.replace(/\//g, '-')}.pdf`;
     pdf.save(filename);
+    
   } catch (e) {
-    alert('Gagal generate PDF. Coba lagi.');
-    console.error(e);
+    console.error('PDF Error:', e);
+    alert('Gagal generate PDF. Silakan coba lagi atau gunakan fitur Print.');
   }
+  
+  // Kembalikan style asli
+  invoice.style.boxShadow = originalStyle.boxShadow;
   
   btn.textContent = originalText;
   btn.disabled = false;
