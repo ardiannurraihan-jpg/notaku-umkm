@@ -104,12 +104,34 @@
           </div>
         </div>
 
+        <!-- Pilih Template dengan Premium Exclusive -->
         <div class="form-group">
           <label class="group-label">🎨 Pilih Template Nota</label>
           <div class="template-selector">
-            <button class="template-btn active" data-template="classic">Classic</button>
-            <button class="template-btn" data-template="modern">Modern</button>
-            <button class="template-btn" data-template="minimal">Minimal</button>
+            <!-- FREE TEMPLATES -->
+            <div class="template-group">
+              <div class="template-group-label">📋 GRATIS</div>
+              <div class="template-buttons">
+                <button class="template-btn active" data-template="classic">Classic</button>
+                <button class="template-btn" data-template="modern">Modern</button>
+                <button class="template-btn" data-template="minimal">Minimal</button>
+              </div>
+            </div>
+            
+            <!-- PREMIUM TEMPLATES (hanya untuk member premium) -->
+            <div id="premiumTemplateGroup" style="display: none;">
+              <div class="template-group-label" style="margin-top: 0.8rem;">👑 PREMIUM EXCLUSIVE</div>
+              <div class="template-buttons">
+                <button class="template-btn premium-template" data-template="premium-luxury">💎 Luxury Gold</button>
+                <button class="template-btn premium-template" data-template="premium-elegant">🦢 Elegant Silk</button>
+                <button class="template-btn premium-template" data-template="premium-dark">🌙 Dark Executive</button>
+                <button class="template-btn premium-template" data-template="premium-art">🎨 Art Deco</button>
+                <button class="template-btn premium-template" data-template="premium-nature">🍃 Nature Fresh</button>
+              </div>
+            </div>
+          </div>
+          <div id="premiumTemplateNote" style="font-size: 0.7rem; color: var(--gold); margin-top: 0.5rem; display: none;">
+            ⭐ Kamu mendapatkan 5 template eksklusif sebagai member Premium!
           </div>
         </div>
 
@@ -228,7 +250,7 @@
     <div class="premium-section">
       <div class="premium-container">
         <div class="premium-badge">✨ PREMIUM</div>
-        <h3>Hapus Watermark & Dapatkan Template Eksklusif</h3>
+        <h3>Hapus Watermark & Dapatkan 5 Template Eksklusif!</h3>
         
         <div style="display: flex; gap: 1rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap;">
           <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; text-align: center; min-width: 180px;">
@@ -262,7 +284,7 @@
           <div id="premiumStatus" style="font-size: 0.8rem; margin-top: 0.5rem; color: #a89a87;"></div>
         </div>
         
-        <p class="premium-note" style="margin-top: 1rem;">*Premium aktif 30 hari untuk paket bulanan, 365 hari untuk tahunan</p>
+        <p class="premium-note" style="margin-top: 1rem;">⭐ Premium: Hapus watermark + 5 template eksklusif (Luxury Gold, Elegant Silk, Dark Executive, Art Deco, Nature Fresh)</p>
       </div>
     </div>
   </main>
@@ -285,8 +307,8 @@
       <p>Fitur Premium:</p>
       <ul>
         <li>✓ Hapus watermark "NotaKu.id"</li>
-        <li>✓ 5 template eksklusif</li>
-        <li>✓ Export data statistik</li>
+        <li>✓ 5 template eksklusif mewah</li>
+        <li>✓ Tampilan nota lebih profesional</li>
         <li>✓ Prioritas support</li>
       </ul>
       <div class="premium-plans">
