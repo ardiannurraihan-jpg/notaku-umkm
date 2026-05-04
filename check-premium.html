@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cek Status Premium - NotaKu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Lora', serif;
+      background: #faf7f0;
+      color: #1a1208;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 500px;
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 20px rgba(26,18,8,0.1);
+      text-align: center;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      color: #c9952a;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: #7a6e5e;
+      margin-bottom: 1.5rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1.5px solid #ddd3bb;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      font-family: monospace;
+      text-align: center;
+    }
+    button {
+      background: #c9952a;
+      color: #1a1208;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #e8b84b;
+      transform: translateY(-2px);
+    }
+    .result {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 8px;
+      display: none;
+    }
+    .result.active {
+      display: block;
+    }
+    .premium-active {
+      background: #e8f5e8;
+      border: 1px solid #2a7a4b;
+      color: #2a7a4b;
+    }
+    .premium-inactive {
+      background: #fff3cd;
+      border: 1px solid #c9952a;
+      color: #856404;
+    }
+    .premium-expired {
+      background: #f8d7da;
+      border: 1px solid #c0431a;
+      color: #c0431a;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      color: #c9952a;
+      text-decoration: none;
+    }
+    hr { margin: 1rem 0; border: none; border-top: 1px solid #ddd3bb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Cek Status Premium</h1>
+    <p class="subtitle">Masukkan kode premium untuk melihat masa aktif</p>
+    
+    <input type="text" id="checkKey" placeholder="Contoh: NOTAKU-ABCD-EFGH" autocomplete="off">
+    <button onclick="checkStatus()">Cek Status</button>
+    
+    <div id="result" class="result"></div>
+    
+    <hr>
+    <a href="/" class="back-link">← Kembali ke NotaKu</a>
+  </div>
+
+  <script>
+    // Data license keys yang valid (sinkron dengan premium.js)
+    const validKeys = ["DEMO-PREMIUM-2025"];
+    
+    // Data tambahan (bisa ditambah dari localStorage admin)
+    let additionalKeys = [];
+    
+    // Load dari localStorage
+    try {
+      const saved = localStorage.getItem('notaku_all_license_keys');
+      if (saved) {
+        const keys = JSON.parse(saved);
+        additionalKeys = keys.filter(k => new Date(k.expiresAt) > new Date()).map(k => k.key);
+      }
+    } catch(e) {}
+    
+    const allValidKeys = [...validKeys, ...additionalKeys];
+    
+    function checkStatus() {
+      const key = document.getElementById('checkKey').value.trim().toUpperCase();
+      const resultDiv = document.getElementById('result');
+      
+      if (!key) {
+        resultDiv.className = 'result premium-inactive active';
+        resultDiv.innerHTML = '❌ Masukkan kode premium terlebih dahulu.';
+        return;
+      }
+      
+      // Cek apakah kode valid
+      if (allValidKeys.includes(key)) {
+        // Cek apakah sudah tersimpan di localStorage user
+        const savedKey = localStorage.getItem('notaku_premium_key');
+        const savedUntil = localStorage.getItem('notaku_premium_until');
+        
+        if (savedKey === key && savedUntil) {
+          const expiryDate = new Date(savedUntil);
+          const now = new Date();
+          
+          if (expiryDate > now) {
+            const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+            resultDiv.className = 'result premium-active active';
+            resultDiv.innerHTML = `
+              ✅ <strong>PREMIUM AKTIF</strong><br>
+              Kode: ${key}<br>
+              Masa aktif sampai: ${expiryDate.toLocaleDateString('id-ID')}<br>
+              Sisa: ${daysLeft} hari lagi
+            `;
+          } else {
+            resultDiv.className = 'result premium-expired active';
+            resultDiv.innerHTML = `
+              ⚠️ <strong>PREMIUM KADALUARSA</strong><br>
+              Kode: ${key}<br>
+              Masa aktif sudah berakhir pada: ${expiryDate.toLocaleDateString('id-ID')}<br>
+              Silakan perpanjang premium untuk kembali menikmati fitur eksklusif.
+            `;
+          }
+        } else {
+          // Kode valid tapi belum diaktivasi di browser ini
+          resultDiv.className = 'result premium-active active';
+          resultDiv.innerHTML = `
+            ✅ <strong>KODE VALID</strong><br>
+            Kode: ${key}<br>
+            Kode ini dapat digunakan untuk aktivasi premium.<br>
+            Masukkan kode di halaman utama NotaKu pada form "Sudah punya kode premium?".
+          `;
+        }
+      } else {
+        resultDiv.className = 'result premium-inactive active';
+        resultDiv.innerHTML = `
+          ❌ <strong>KODE TIDAK VALID</strong><br>
+          Kode "${key}" tidak ditemukan dalam sistem.<br>
+          Pastikan kode yang dimasukkan benar atau hubungi admin untuk mendapatkan kode premium.
+        `;
+      }
+    }
+    
+    // Allow enter key
+    document.getElementById('checkKey').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkStatus();
+    });
+  </script>
+</body>
+</html>
