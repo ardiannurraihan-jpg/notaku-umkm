@@ -564,6 +564,8 @@ textarea {
   .app-section { padding: 3rem 1rem; }
 }
 
+/* Tambahan untuk fitur baru */
+
 /* Template Selector */
 .template-selector {
   display: block;
@@ -945,6 +947,329 @@ textarea {
   color: var(--ink);
 }
 
+/* Responsive */
+@media (max-width: 768px) {
+  .premium-plans {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+    margin: 30% auto;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .trust-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   TEMPLATE PREMIUM EXCLUSIVE
+   ======================================== */
+
+/* ===== TEMPLATE 1: PREMIUM LUXURY GOLD ===== */
+.template-premium-luxury {
+  background: linear-gradient(135deg, #fff9ef, #fff);
+  border: 2px solid #c9952a;
+  box-shadow: 0 10px 30px rgba(201,149,42,0.15);
+}
+
+.template-premium-luxury .inv-header {
+  background: linear-gradient(135deg, #c9952a, #e8b84b, #c9952a);
+  color: #1a1208;
+  padding: 1.5rem;
+  margin: -2rem -2rem 1.5rem -2rem;
+  border-radius: 0 0 20px 20px;
+  position: relative;
+}
+
+.template-premium-luxury .inv-header::after {
+  content: "✦✦✦";
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff9ef;
+  padding: 0 1rem;
+  font-size: 0.8rem;
+  color: #c9952a;
+  letter-spacing: 5px;
+}
+
+.template-premium-luxury .inv-store-name {
+  font-size: 1.6rem;
+  text-shadow: 2px 2px 0 rgba(255,255,255,0.3);
+}
+
+.template-premium-luxury .inv-divider {
+  height: 2px;
+  background: repeating-linear-gradient(90deg, #c9952a, #c9952a 10px, #e8b84b 10px, #e8b84b 20px);
+}
+
+.template-premium-luxury .inv-table th {
+  background: linear-gradient(135deg, #f2ead8, #fff);
+  color: #c9952a;
+  font-weight: 700;
+}
+
+.template-premium-luxury .inv-summary-row.total {
+  background: linear-gradient(135deg, #c9952a, #e8b84b);
+  color: #1a1208;
+  padding: 0.5rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+/* ===== TEMPLATE 2: PREMIUM ELEGANT SILK ===== */
+.template-premium-elegant {
+  background: linear-gradient(135deg, #f9f5f0, #fff);
+  border: 1px solid #d4c5b0;
+}
+
+.template-premium-elegant .inv-header {
+  background: linear-gradient(135deg, #5c4b3a, #3d2a1a);
+  color: #e8d5b5;
+  padding: 1.5rem;
+  margin: -2rem -2rem 1.5rem -2rem;
+  border-radius: 0 0 30px 30px;
+  border-bottom: 3px solid #c9952a;
+}
+
+.template-premium-elegant .inv-store-name {
+  color: #e8d5b5;
+  font-style: italic;
+  letter-spacing: 0;
+}
+
+.template-premium-elegant .inv-meta .inv-label {
+  color: #c9952a;
+  font-size: 0.7rem;
+}
+
+.template-premium-elegant .inv-table {
+  border-collapse: separate;
+  border-spacing: 0 5px;
+}
+
+.template-premium-elegant .inv-table th {
+  background: #e8d5b5;
+  color: #3d2a1a;
+  padding: 0.8rem 0.5rem;
+  border-radius: 5px;
+}
+
+.template-premium-elegant .inv-table td {
+  background: #fefcf8;
+  border-radius: 5px;
+}
+
+.template-premium-elegant .inv-stamp {
+  background: linear-gradient(135deg, #c9952a, #e8b84b);
+  color: #fff;
+  border: none;
+  transform: rotate(-5deg);
+}
+
+/* ===== TEMPLATE 3: PREMIUM DARK EXECUTIVE ===== */
+.template-premium-dark {
+  background: #1a1a1a;
+  border: 1px solid #c9952a;
+  color: #e0e0e0;
+}
+
+.template-premium-dark .inv-header {
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+  border-bottom: 2px solid #c9952a;
+  padding: 1.5rem;
+  margin: -2rem -2rem 1.5rem -2rem;
+}
+
+.template-premium-dark .inv-store-name {
+  color: #c9952a;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.template-premium-dark .inv-store-sub {
+  color: #888;
+}
+
+.template-premium-dark .inv-label {
+  color: #c9952a;
+}
+
+.template-premium-dark .inv-num {
+  color: #e8b84b;
+}
+
+.template-premium-dark .inv-divider {
+  height: 1px;
+  background: #c9952a;
+  box-shadow: 0 0 5px #c9952a;
+}
+
+.template-premium-dark .inv-buyer-name {
+  color: #e8b84b;
+}
+
+.template-premium-dark .inv-table th {
+  background: #252525;
+  color: #c9952a;
+  border-bottom: 1px solid #c9952a;
+}
+
+.template-premium-dark .inv-table td {
+  border-bottom-color: #333;
+  color: #ccc;
+}
+
+.template-premium-dark .inv-summary-row.total {
+  background: linear-gradient(135deg, #c9952a, #e8b84b);
+  color: #1a1a1a;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.template-premium-dark .inv-notes {
+  background: #252525;
+  border-left-color: #c9952a;
+  color: #ccc;
+}
+
+.template-premium-dark .inv-footer {
+  border-top-color: #333;
+}
+
+/* ===== TEMPLATE 4: PREMIUM ART DECO ===== */
+.template-premium-art {
+  background: #fdfbf7;
+  border: 2px double #8b6914;
+}
+
+.template-premium-art .inv-header {
+  background: linear-gradient(135deg, #f5e6c8, #fdfbf7);
+  padding: 1.5rem;
+  margin: -2rem -2rem 1.5rem -2rem;
+  border-bottom: 3px double #8b6914;
+  position: relative;
+}
+
+.template-premium-art .inv-header::before {
+  content: "❖ ❖ ❖";
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fdfbf7;
+  padding: 0 1rem;
+  color: #8b6914;
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+}
+
+.template-premium-art .inv-store-name {
+  font-family: 'Georgia', serif;
+  color: #8b6914;
+  font-size: 1.6rem;
+}
+
+.template-premium-art .inv-divider {
+  height: 2px;
+  background: repeating-linear-gradient(90deg, #8b6914, #8b6914 5px, transparent 5px, transparent 15px);
+}
+
+.template-premium-art .inv-table th {
+  font-family: 'Georgia', serif;
+  color: #8b6914;
+  border-bottom: 2px dotted #8b6914;
+}
+
+.template-premium-art .inv-stamp {
+  border: 2px solid #8b6914;
+  color: #8b6914;
+  background: none;
+  font-style: italic;
+}
+
+/* ===== TEMPLATE 5: PREMIUM NATURE FRESH ===== */
+.template-premium-nature {
+  background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+  border: 1px solid #2a7a4b;
+}
+
+.template-premium-nature .inv-header {
+  background: linear-gradient(135deg, #2a7a4b, #3a9a5b);
+  color: #fff;
+  padding: 1.5rem;
+  margin: -2rem -2rem 1.5rem -2rem;
+  border-radius: 0 0 15px 15px;
+}
+
+.template-premium-nature .inv-store-name {
+  color: #fff;
+}
+
+.template-premium-nature .inv-store-sub {
+  color: #c8e8d0;
+}
+
+.template-premium-nature .inv-label {
+  color: #c8e8d0;
+}
+
+.template-premium-nature .inv-num {
+  color: #fff;
+}
+
+.template-premium-nature .inv-divider {
+  height: 2px;
+  background: #2a7a4b;
+  width: 50px;
+  margin: 1rem auto;
+}
+
+.template-premium-nature .inv-table th {
+  background: #d4ecd4;
+  color: #2a7a4b;
+}
+
+.template-premium-nature .inv-table td {
+  border-bottom-color: #c8e0c8;
+}
+
+.template-premium-nature .inv-summary-row.total {
+  background: #2a7a4b;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.template-premium-nature .inv-stamp {
+  background: #2a7a4b;
+  color: #fff;
+  border: none;
+  transform: rotate(0);
+}
+
+.template-premium-nature .inv-notes {
+  background: #d4ecd4;
+  border-left-color: #2a7a4b;
+}
+
+/* Badge premium pada template premium */
+.template-premium-luxury .inv-powered::before,
+.template-premium-elegant .inv-powered::before,
+.template-premium-dark .inv-powered::before,
+.template-premium-art .inv-powered::before,
+.template-premium-nature .inv-powered::before {
+  content: "👑 PREMIUM EXCLUSIVE • ";
+  color: var(--gold);
+  font-weight: bold;
+}
+
 /* Fix untuk PDF biar rapi */
 .invoice-template {
   width: 100%;
@@ -968,7 +1293,6 @@ textarea {
 
 .inv-table th:nth-child(4), 
 .inv-table td:nth-child(4) { width: 25%; text-align: right; }
-
 /* ========================================
    PREMIUM PACKAGES & COMPONENTS
    ======================================== */
@@ -1187,256 +1511,6 @@ textarea {
   text-decoration: underline;
 }
 
-/* ========================================
-   TEMPLATE PREMIUM EXCLUSIVE (MODERN 2025)
-   ======================================== */
-
-/* ===== TEMPLATE 1: GLASSMORPHISM ===== */
-.template-premium-glass {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(201, 149, 42, 0.3);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-}
-
-.template-premium-glass .inv-header {
-  background: linear-gradient(135deg, rgba(201, 149, 42, 0.08), rgba(255, 255, 255, 0));
-  padding: 1.5rem;
-  margin: -2rem -2rem 1rem -2rem;
-  border-radius: 16px 16px 0 0;
-  border-bottom: 1px solid rgba(201, 149, 42, 0.2);
-}
-
-.template-premium-glass .inv-store-name {
-  background: linear-gradient(135deg, #c9952a, #e8b84b);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-size: 1.5rem;
-}
-
-.template-premium-glass .inv-divider {
-  height: 2px;
-  background: linear-gradient(90deg, #c9952a, transparent);
-}
-
-.template-premium-glass .inv-table th {
-  color: #c9952a;
-  font-weight: 600;
-  border-bottom-color: rgba(201, 149, 42, 0.3);
-}
-
-/* ===== TEMPLATE 2: NEON DARK ===== */
-.template-premium-neon {
-  background: #0a0a0a;
-  border: 1px solid #c9952a;
-  box-shadow: 0 0 20px rgba(201, 149, 42, 0.1);
-  color: #e0e0e0;
-}
-
-.template-premium-neon .inv-header {
-  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
-  border-bottom: 2px solid #c9952a;
-  padding: 1.5rem;
-  margin: -2rem -2rem 1rem -2rem;
-  box-shadow: 0 2px 10px rgba(201, 149, 42, 0.2);
-}
-
-.template-premium-neon .inv-store-name {
-  color: #c9952a;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.template-premium-neon .inv-divider {
-  height: 1px;
-  background: linear-gradient(90deg, #c9952a, #333);
-}
-
-.template-premium-neon .inv-table th {
-  color: #c9952a;
-  border-bottom-color: #333;
-  font-weight: 600;
-}
-
-.template-premium-neon .inv-table td {
-  border-bottom-color: #1a1a1a;
-  color: #ccc;
-}
-
-.template-premium-neon .inv-summary-row.total {
-  background: linear-gradient(135deg, #c9952a, #e8b84b);
-  color: #0a0a0a;
-  padding: 0.5rem;
-  border-radius: 8px;
-}
-
-.template-premium-neon .inv-stamp {
-  background: #c9952a;
-  color: #0a0a0a;
-  border: none;
-  box-shadow: 0 0 10px #c9952a;
-}
-
-/* ===== TEMPLATE 3: SOFT GRADIENT ===== */
-.template-premium-gradient {
-  background: linear-gradient(135deg, #fff5f5, #f0f7ff);
-  border: none;
-  border-radius: 16px;
-}
-
-.template-premium-gradient .inv-header {
-  background: linear-gradient(135deg, #ffd4d4, #d4e8ff);
-  padding: 1.5rem;
-  margin: -2rem -2rem 1.5rem -2rem;
-  border-radius: 16px 16px 0 0;
-}
-
-.template-premium-gradient .inv-store-name {
-  color: #c9952a;
-  font-weight: 700;
-}
-
-.template-premium-gradient .inv-divider {
-  height: 2px;
-  background: linear-gradient(90deg, #c9952a, #ffd4d4, #d4e8ff);
-  border-radius: 999px;
-}
-
-.template-premium-gradient .inv-table th {
-  color: #c9952a;
-  font-weight: 600;
-  border-bottom-color: #ffd4d4;
-}
-
-.template-premium-gradient .inv-summary-row.total {
-  background: linear-gradient(135deg, #c9952a20, #ffd4d4);
-  border-radius: 8px;
-  padding: 0.5rem;
-}
-
-/* ===== TEMPLATE 4: MINIMAL CARD ===== */
-.template-premium-card {
-  background: #ffffff;
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-}
-
-.template-premium-card .inv-header {
-  padding: 0 0 1rem 0;
-  margin-bottom: 1rem;
-  border-bottom: 2px solid #c9952a;
-}
-
-.template-premium-card .inv-store-name {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #1a1208;
-}
-
-.template-premium-card .inv-meta .inv-label {
-  background: #c9952a10;
-  padding: 0.2rem 0.5rem;
-  border-radius: 20px;
-  color: #c9952a;
-}
-
-.template-premium-card .inv-table th {
-  color: #666;
-  font-weight: 500;
-  border-bottom: 1px solid #eee;
-}
-
-.template-premium-card .inv-table td {
-  border-bottom-color: #f5f5f5;
-}
-
-.template-premium-card .inv-summary-row.total {
-  background: #f8f8f8;
-  padding: 0.5rem;
-  border-radius: 12px;
-  margin-top: 0.5rem;
-}
-
-.template-premium-card .inv-stamp {
-  background: none;
-  border: 2px solid #c9952a;
-  color: #c9952a;
-  transform: rotate(0);
-}
-
-/* ===== TEMPLATE 5: FOREST ELEGANT ===== */
-.template-premium-forest {
-  background: linear-gradient(135deg, #f0f9f0, #ffffff);
-  border: 1px solid #2a7a4b30;
-  border-radius: 16px;
-}
-
-.template-premium-forest .inv-header {
-  background: linear-gradient(135deg, #2a7a4b, #3a9a5b);
-  color: #fff;
-  padding: 1.5rem;
-  margin: -2rem -2rem 1rem -2rem;
-  border-radius: 16px 16px 0 0;
-}
-
-.template-premium-forest .inv-store-name {
-  color: #fff;
-}
-
-.template-premium-forest .inv-store-sub {
-  color: #c8e8d0;
-}
-
-.template-premium-forest .inv-label {
-  color: #c8e8d0;
-}
-
-.template-premium-forest .inv-num {
-  color: #fff;
-}
-
-.template-premium-forest .inv-divider {
-  height: 2px;
-  background: linear-gradient(90deg, #2a7a4b, #c8e8d0);
-}
-
-.template-premium-forest .inv-table th {
-  color: #2a7a4b;
-  font-weight: 600;
-  border-bottom-color: #d4ecd4;
-}
-
-.template-premium-forest .inv-table td {
-  border-bottom-color: #e8f5e8;
-}
-
-.template-premium-forest .inv-summary-row.total {
-  background: #2a7a4b;
-  color: #fff;
-  padding: 0.5rem;
-  border-radius: 8px;
-}
-
-.template-premium-forest .inv-stamp {
-  background: #2a7a4b;
-  color: #fff;
-  border: none;
-}
-
-/* Badge premium pada template premium */
-.template-premium-glass .inv-powered::before,
-.template-premium-neon .inv-powered::before,
-.template-premium-gradient .inv-powered::before,
-.template-premium-card .inv-powered::before,
-.template-premium-forest .inv-powered::before {
-  content: "👑 PREMIUM EXCLUSIVE • ";
-  color: var(--gold);
-  font-weight: bold;
-}
-
 /* Responsive untuk premium packages */
 @media (max-width: 500px) {
   .premium-packages {
@@ -1466,24 +1540,5 @@ textarea {
   .footer-links {
     gap: 1rem;
     flex-direction: column;
-  }
-}
-
-/* Responsive tambahan untuk template premium */
-@media (max-width: 768px) {
-  .premium-plans {
-    grid-template-columns: 1fr;
-  }
-  
-  .modal-content {
-    margin: 30% auto;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .trust-grid {
-    grid-template-columns: 1fr;
   }
 }
