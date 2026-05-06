@@ -1,1227 +1,384 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Google Search Console Verification -->
-<meta name="google-site-verification" content="NPWAmD-kQ5WiV9OONu_M0jhEtTyo45FPkeGdoX1q__U" />
-
-<!-- SEO Meta Tags -->
-<meta name="description" content="Buat nota profesional gratis untuk UMKM Indonesia. Download PDF, simpan produk favorit, pilih template, pantau penjualan. Tanpa ribet, langsung jadi!" />
-<meta name="keywords" content="nota umkm, generator nota, buat nota online, nota gratis, invoice generator, nota penjualan" />
-<meta name="author" content="NotaKu" />
-
-<title>NotaKu — Generator Nota UMKM Profesional</title>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BW47VZ45RG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-BW47VZ45RG');
-</script>
-
-<!-- Structured Data for Rich Results -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "NotaKu",
-  "description": "Generator nota gratis untuk UMKM Indonesia. Buat nota profesional dalam detik, download PDF, tanpa daftar.",
-  "url": "https://notaku-umkm.vercel.app",
-  "applicationCategory": "BusinessApplication",
-  "operatingSystem": "All",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "IDR",
-    "availability": "https://schema.org/InStock"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "50"
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <!-- Google Search Console Verification -->
+  <meta name="google-site-verification" content="NPWAmD-kQ5WiV9OONu_M0jhEtTyo45FPkeGdoX1q__U" />
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Buat nota profesional gratis untuk UMKM Indonesia. Download PDF, simpan produk favorit, pilih template, pantau penjualan. Tanpa ribet, langsung jadi!" />
+  <meta name="keywords" content="nota umkm, generator nota, buat nota online, nota gratis, invoice generator, nota penjualan" />
+  <meta name="author" content="NotaKu" />
+  
+  <title>NotaKu — Generator Nota UMKM Profesional</title>
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BW47VZ45RG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-BW47VZ45RG');
+  </script>
+  
+  <!-- Structured Data for Rich Results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "NotaKu",
+    "description": "Generator nota gratis untuk UMKM Indonesia. Buat nota profesional dalam detik, download PDF, tanpa daftar.",
+    "url": "https://notaku-umkm.vercel.app",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "IDR",
+      "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "50"
+    }
   }
-}
-</script>
-
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-<style>
-:root {
-  --ink: #0f0d0a;
-  --paper: #faf8f4;
-  --cream: #f2ead8;
-  --gold: #c9952a;
-  --gold-l: #e8b84b;
-  --gold-xl: #f5d070;
-  --rust: #b83a15;
-  --green: #2a7a4b;
-  --muted: #8a7e6e;
-  --border: #e0d4bb;
-  --panel: #ffffff;
-  --font-h: 'Syne', sans-serif;
-  --font-b: 'Lora', serif;
-  --font-m: 'DM Mono', monospace;
-  --radius: 12px;
-  --shadow: 0 2px 20px rgba(15,13,10,0.08);
-  --shadow-lg: 0 8px 40px rgba(15,13,10,0.12);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; font-size: 14px; }
-body { font-family: var(--font-b); background: var(--paper); color: var(--ink); min-height: 100vh; }
-
-/* ── HEADER ── */
-.app-header {
-  background: var(--ink);
-  padding: 1rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.logo { font-family: var(--font-h); font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
-.logo span { color: var(--gold); }
-.header-pills { display: flex; gap: 0.5rem; }
-.pill {
-  font-family: var(--font-m);
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  border: 1px solid rgba(201,149,42,0.4);
-  color: var(--gold);
-  background: rgba(201,149,42,0.08);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.pill:hover, .pill.active { background: var(--gold); color: var(--ink); border-color: var(--gold); }
-
-/* ── LAYOUT ── */
-.app-body { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 52px); }
-
-/* ── SIDEBAR FORM ── */
-.sidebar {
-  background: var(--panel);
-  border-right: 1px solid var(--border);
-  overflow-y: auto;
-  max-height: calc(100vh - 52px);
-  position: sticky;
-  top: 52px;
-}
-
-.sidebar-section {
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-}
-.sidebar-section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.9rem 1.2rem;
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.15s;
-}
-.sidebar-section-header:hover { background: var(--paper); }
-.section-title {
-  font-family: var(--font-h);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.section-icon { font-size: 0.9rem; }
-.chevron { font-size: 0.7rem; color: var(--muted); transition: transform 0.2s; }
-.chevron.open { transform: rotate(180deg); }
-.sidebar-section-body { padding: 0 1.2rem 1.2rem; }
-.sidebar-section-body.hidden { display: none; }
-
-/* ── FORM ELEMENTS ── */
-.fg { margin-bottom: 0.9rem; }
-.fg:last-child { margin-bottom: 0; }
-label.lbl {
-  display: block;
-  font-family: var(--font-m);
-  font-size: 0.62rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 0.35rem;
-}
-input[type=text], input[type=number], input[type=date], input[type=email], textarea, select {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-family: var(--font-b);
-  font-size: 0.85rem;
-  color: var(--ink);
-  background: var(--paper);
-  transition: border-color 0.2s, background 0.2s;
-  appearance: none;
-}
-input:focus, textarea:focus, select:focus { outline: none; border-color: var(--gold); background: #fff; }
-textarea { resize: vertical; min-height: 64px; line-height: 1.5; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; }
-
-/* ── ITEMS TABLE ── */
-.items-header {
-  display: grid;
-  grid-template-columns: 2.5fr 0.8fr 1fr 1fr 28px;
-  gap: 0.3rem;
-  margin-bottom: 0.4rem;
-}
-.items-header span {
-  font-family: var(--font-m);
-  font-size: 0.58rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.item-row {
-  display: grid;
-  grid-template-columns: 2.5fr 0.8fr 1fr 1fr 28px;
-  gap: 0.3rem;
-  margin-bottom: 0.35rem;
-  align-items: center;
-  animation: slideIn 0.2s ease;
-}
-@keyframes slideIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-.item-row input { margin: 0; font-size: 0.8rem; padding: 0.5rem 0.6rem; }
-.del-btn {
-  background: none;
-  border: none;
-  color: #ccc;
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 0;
-  height: 32px;
-  width: 28px;
-  border-radius: 6px;
-  transition: all 0.15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.del-btn:hover { color: var(--rust); background: #b83a1510; }
-.add-row-btn {
-  width: 100%;
-  padding: 0.55rem;
-  border: 1.5px dashed var(--gold);
-  background: transparent;
-  color: var(--gold);
-  font-family: var(--font-h);
-  font-size: 0.78rem;
-  font-weight: 700;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 0.3rem;
-}
-.add-row-btn:hover { background: #c9952a10; }
-.subtotal-row {
-  font-family: var(--font-m);
-  font-size: 0.72rem;
-  color: var(--muted);
-  text-align: right;
-  padding: 0.2rem 2rem 0.2rem 0;
-}
-
-/* ── TEMPLATE PICKER ── */
-.tpl-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-.tpl-btn {
-  padding: 0.7rem 0.4rem;
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  background: var(--paper);
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.2s;
-  position: relative;
-}
-.tpl-btn:hover { border-color: var(--gold); }
-.tpl-btn.active { border-color: var(--gold); background: #c9952a10; }
-.tpl-btn .tpl-preview {
-  height: 36px;
-  border-radius: 4px;
-  margin-bottom: 0.4rem;
-  overflow: hidden;
-  position: relative;
-}
-.tpl-btn .tpl-name { font-family: var(--font-m); font-size: 0.62rem; color: var(--muted); }
-.tpl-btn.active .tpl-name { color: var(--gold); }
-.tpl-check {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 14px;
-  height: 14px;
-  background: var(--gold);
-  border-radius: 50%;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  color: var(--ink);
-}
-.tpl-btn.active .tpl-check { display: flex; }
-
-/* ── GENERATE BTN ── */
-.gen-btn {
-  width: calc(100% - 2.4rem);
-  margin: 1rem 1.2rem;
-  padding: 0.9rem;
-  background: var(--ink);
-  color: var(--gold);
-  font-family: var(--font-h);
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.gen-btn:hover { background: #1e1a12; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,149,42,0.2); }
-.gen-btn:active { transform: translateY(0); }
-
-/* ── PREVIEW AREA ── */
-.preview-area {
-  background: #f5f0e8;
-  overflow-y: auto;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.preview-toolbar {
-  width: 100%;
-  max-width: 680px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-.preview-label {
-  font-family: var(--font-h);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.toolbar-actions { display: flex; gap: 0.4rem; }
-.tool-btn {
-  padding: 0.5rem 0.9rem;
-  font-family: var(--font-h);
-  font-size: 0.75rem;
-  font-weight: 700;
-  border-radius: 7px;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 1.5px solid var(--border);
-  background: var(--panel);
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-.tool-btn:hover { background: var(--cream); }
-.tool-btn.primary { background: var(--gold); color: var(--ink); border-color: var(--gold); }
-.tool-btn.primary:hover { background: var(--gold-l); }
-
-/* ── INVOICE CARD ── */
-.invoice-wrap {
-  width: 100%;
-  max-width: 680px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  animation: fadeUp 0.3s ease;
-}
-@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── PLACEHOLDER ── */
-.placeholder {
-  width: 100%;
-  max-width: 680px;
-  padding: 5rem 2rem;
-  text-align: center;
-}
-.ph-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.3; }
-.ph-title { font-family: var(--font-h); font-size: 1.2rem; font-weight: 700; color: var(--muted); margin-bottom: 0.5rem; }
-.ph-text { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
-
-/* ── INVOICE TEMPLATES ── */
-.inv {
-  font-family: var(--font-b);
-  color: var(--ink);
-  font-size: 0.85rem;
-  line-height: 1.5;
-}
-.inv-head { padding: 2rem 2rem 1rem; }
-.inv-body { padding: 0 2rem 2rem; }
-.inv-logo-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
-.inv-brand-name { font-family: var(--font-h); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
-.inv-brand-sub { font-family: var(--font-m); font-size: 0.65rem; color: var(--muted); margin-top: 0.2rem; letter-spacing: 0.05em; }
-.inv-meta-right { text-align: right; }
-.inv-number-label { font-family: var(--font-m); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
-.inv-number { font-family: var(--font-h); font-size: 1.2rem; font-weight: 800; color: var(--gold); }
-.inv-date-info { font-family: var(--font-m); font-size: 0.7rem; color: var(--muted); margin-top: 0.25rem; }
-.inv-divider { height: 2px; background: linear-gradient(90deg, var(--gold), transparent); margin: 0.8rem 0; border-radius: 2px; }
-.inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-.inv-party-label { font-family: var(--font-m); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
-.inv-party-name { font-family: var(--font-h); font-size: 0.95rem; font-weight: 700; }
-.inv-party-detail { font-family: var(--font-m); font-size: 0.72rem; color: var(--muted); line-height: 1.6; }
-.inv-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; table-layout: fixed; }
-.inv-table th {
-  font-family: var(--font-m);
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  border-bottom: 1.5px solid var(--border);
-  padding: 0.5rem 0.4rem;
-  text-align: left;
-  font-weight: 500;
-}
-.inv-table th:last-child, .inv-table td:last-child { text-align: right; }
-.inv-table td { padding: 0.7rem 0.4rem; border-bottom: 1px solid #f0e8d8; vertical-align: top; }
-.inv-table tr:last-child td { border-bottom: none; }
-.inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 42%; }
-.inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 14%; text-align: center; }
-.inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 22%; }
-.inv-table th:nth-child(4), .inv-table td:nth-child(4) { width: 22%; text-align: right; }
-.inv-td-center { text-align: center !important; }
-.inv-totals { margin-top: 0.5rem; }
-.inv-total-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.3rem 0;
-  font-family: var(--font-m);
-  font-size: 0.78rem;
-  color: var(--muted);
-  border-bottom: 1px solid #f0e8d8;
-}
-.inv-total-row:last-child { border-bottom: none; }
-.inv-total-row.grand {
-  font-family: var(--font-h);
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--ink);
-  border-top: 2px solid var(--ink);
-  border-bottom: none;
-  margin-top: 0.4rem;
-  padding-top: 0.6rem;
-}
-.inv-total-row.discount-row { color: var(--rust); }
-.inv-notes-block {
-  background: var(--cream);
-  border-left: 3px solid var(--gold);
-  padding: 0.8rem 1rem;
-  border-radius: 0 6px 6px 0;
-  margin-top: 1.5rem;
-}
-.inv-notes-lbl { font-family: var(--font-m); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.3rem; }
-.inv-notes-text { font-size: 0.8rem; color: var(--muted); }
-.inv-footer-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px dashed var(--border);
-}
-.inv-sig-label { font-family: var(--font-m); font-size: 0.6rem; color: var(--muted); }
-.inv-sig-line { width: 100px; height: 1px; background: var(--border); margin: 2rem 0 0.3rem; }
-.inv-stamp {
-  font-family: var(--font-h);
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--green);
-  border: 2.5px solid var(--green);
-  padding: 0.35rem 0.9rem;
-  border-radius: 5px;
-  transform: rotate(-8deg);
-  display: inline-block;
-  opacity: 0.85;
-  letter-spacing: 0.1em;
-}
-.inv-watermark {
-  text-align: center;
-  font-family: var(--font-m);
-  font-size: 0.6rem;
-  color: #ddd5c5;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-}
-.inv-powered {
-  text-align: center;
-  font-family: var(--font-m);
-  font-size: 0.62rem;
-  color: #c8bfb0;
-  margin-top: 0.5rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid #f0e8d8;
-  letter-spacing: 0.06em;
-}
-
-/* ── TEMPLATE STYLES ── */
-.tpl-classic { background: #ffffff; }
-.tpl-dark { background: #141210; color: #e8e0d0; }
-.tpl-dark .inv-brand-name { color: var(--gold); text-transform: uppercase; letter-spacing: 0.06em; }
-.tpl-dark .inv-brand-sub { color: #6a5e4e; }
-.tpl-dark .inv-number { color: var(--gold-l); }
-.tpl-dark .inv-number-label, .tpl-dark .inv-date-info { color: #6a5e4e; }
-.tpl-dark .inv-party-label { color: #6a5e4e; }
-.tpl-dark .inv-party-name { color: var(--gold-l); }
-.tpl-dark .inv-party-detail { color: #8a7e6e; }
-.tpl-dark .inv-divider { background: var(--gold); box-shadow: 0 0 6px rgba(201,149,42,0.3); }
-.tpl-dark .inv-table th { color: var(--gold); background: #1e1a12; border-bottom-color: #333; }
-.tpl-dark .inv-table td { border-bottom-color: #1e1a12; color: #c8bfb0; }
-.tpl-dark .inv-total-row { color: #8a7e6e; border-bottom-color: #1e1a12; }
-.tpl-dark .inv-total-row.grand { color: var(--gold-l); border-top-color: var(--gold); }
-.tpl-dark .inv-notes-block { background: #1e1a12; border-left-color: var(--gold); }
-.tpl-dark .inv-notes-text { color: #8a7e6e; }
-.tpl-dark .inv-footer-row { border-top-color: #2a2418; }
-.tpl-dark .inv-sig-line { background: #333; }
-.tpl-dark .inv-powered { color: #3a3020; border-top-color: #1e1a12; }
-.tpl-minimal { background: #ffffff; }
-.tpl-minimal .inv-divider { height: 1px; background: var(--ink); }
-.tpl-minimal .inv-brand-name { font-size: 1.2rem; letter-spacing: 0.02em; }
-.tpl-minimal .inv-table th { border-bottom-color: var(--ink); color: var(--ink); font-weight: 700; }
-.tpl-minimal .inv-table td { border-bottom: none; }
-.tpl-minimal .inv-table tr { border-bottom: 1px solid #f0ecec; }
-.tpl-minimal .inv-number { color: var(--ink); font-size: 1rem; }
-.tpl-minimal .inv-total-row.grand { font-size: 1rem; }
-.tpl-luxury { background: linear-gradient(160deg, #fefaef, #fff9ec); border: 2px solid rgba(201,149,42,0.3); }
-.tpl-luxury .inv-head { background: linear-gradient(135deg, var(--gold), var(--gold-l)); padding-bottom: 2rem; border-radius: 8px 8px 0 0; }
-.tpl-luxury .inv-brand-name { color: var(--ink); font-size: 1.6rem; }
-.tpl-luxury .inv-brand-sub { color: rgba(15,13,10,0.6); }
-.tpl-luxury .inv-number-label { color: rgba(15,13,10,0.5); }
-.tpl-luxury .inv-number { color: var(--ink); }
-.tpl-luxury .inv-date-info { color: rgba(15,13,10,0.55); }
-.tpl-luxury .inv-divider { background: linear-gradient(90deg, rgba(201,149,42,0.6), transparent); height: 1px; }
-.tpl-luxury .inv-table th { background: rgba(201,149,42,0.08); color: #8b6914; }
-.tpl-luxury .inv-total-row.grand { color: var(--gold); border-top-color: var(--gold); }
-.tpl-nature { background: #f0f8f0; }
-.tpl-nature .inv-head { background: #2a7a4b; padding-bottom: 2rem; border-radius: 8px 8px 0 0; }
-.tpl-nature .inv-brand-name { color: #ffffff; }
-.tpl-nature .inv-brand-sub { color: #a8d8b8; }
-.tpl-nature .inv-number-label { color: #a8d8b8; }
-.tpl-nature .inv-number { color: #ffffff; }
-.tpl-nature .inv-date-info { color: #a8d8b8; }
-.tpl-nature .inv-divider { background: linear-gradient(90deg, var(--green), transparent); height: 2px; }
-.tpl-nature .inv-table th { background: #d4ecd4; color: var(--green); }
-.tpl-nature .inv-total-row.grand { color: var(--green); border-top-color: var(--green); }
-.tpl-nature .inv-notes-block { border-left-color: var(--green); background: #e0f0e0; }
-.tpl-nature .inv-notes-lbl { color: var(--green); }
-.tpl-nature .inv-stamp { color: #1a5a3b; border-color: #1a5a3b; }
-.tpl-artdeco { background: #fdfbf5; border: 2px double #8b6914; }
-.tpl-artdeco .inv-head { border-bottom: 3px double #8b6914; }
-.tpl-artdeco .inv-brand-name { font-family: 'Georgia', serif; color: #8b6914; font-size: 1.5rem; }
-.tpl-artdeco .inv-divider { background: repeating-linear-gradient(90deg, #8b6914, #8b6914 6px, transparent 6px, transparent 14px); height: 2px; }
-.tpl-artdeco .inv-number { color: #8b6914; }
-.tpl-artdeco .inv-table th { font-family: 'Georgia', serif; color: #8b6914; border-bottom: 2px dotted #8b6914; background: #fdf0d8; }
-.tpl-artdeco .inv-total-row.grand { color: #8b6914; border-top-color: #8b6914; }
-.tpl-artdeco .inv-stamp { color: #8b6914; border-color: #8b6914; border-style: double; }
-
-/* Premium Watermark */
-.inv-watermark {
-  display: block;
-}
-.premium-active .inv-watermark {
-  display: none;
-}
-
-/* Premium Section in Sidebar */
-.premium-sidebar {
-  background: linear-gradient(135deg, #2a1f0a, #0f0d0a);
-  margin: 1rem 1.2rem;
-  padding: 1rem;
-  border-radius: 12px;
-  color: #fff;
-  text-align: center;
-}
-.premium-sidebar .premium-badge {
-  display: inline-block;
-  background: var(--gold);
-  color: var(--ink);
-  padding: 0.2rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-.premium-sidebar h4 {
-  font-size: 0.9rem;
-  margin-bottom: 0.3rem;
-}
-.premium-sidebar p {
-  font-size: 0.7rem;
-  color: #a89a87;
-  margin-bottom: 0.5rem;
-}
-.premium-sidebar button {
-  background: var(--gold);
-  border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-.premium-sidebar button:hover {
-  background: var(--gold-l);
-}
-
-/* Premium Activation in Sidebar */
-.premium-activation-sidebar {
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255,255,255,0.2);
-}
-.premium-activation-sidebar input {
-  width: 100%;
-  padding: 0.4rem;
-  border-radius: 6px;
-  border: none;
-  margin-bottom: 0.3rem;
-}
-.premium-activation-sidebar button {
-  background: var(--gold);
-  border: none;
-  padding: 0.3rem;
-  border-radius: 6px;
-  width: 100%;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background: var(--ink);
-  color: var(--gold);
-  font-family: var(--font-h);
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.7rem 1.2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  z-index: 999;
-  transform: translateY(20px);
-  opacity: 0;
-  transition: all 0.3s;
-  pointer-events: none;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-
-/* Responsive */
-@media (max-width: 900px) {
-  .app-body { grid-template-columns: 1fr; }
-  .sidebar { position: static; max-height: none; }
-  .preview-area { padding: 1.5rem 1rem; }
-}
-</style>
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
-<header class="app-header">
-  <div class="logo">Nota<span>Ku</span> <span style="font-size:0.65rem;color:var(--muted);font-family:var(--font-m);font-weight:400;">PRO</span></div>
-  <div class="header-pills">
-    <span class="pill" onclick="switchTab('form')">✏ Form</span>
-    <span class="pill active" id="tab-preview" onclick="switchTab('preview')">👁 Preview</span>
-    <span class="pill" onclick="printInvoice()">⎙ Cetak</span>
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <nav class="navbar">
+    <div class="logo">Nota<span>Ku</span></div>
+    <div class="nav-tag">UMKM Indonesia 🇮🇩</div>
+  </nav>
+  <div class="hero-content">
+    <div class="badge">✦ Gratis Selamanya</div>
+    <h1>Buat Nota<br/><em>Profesional</em><br/>Dalam Detik</h1>
+    <p>Simpan produk favorit, pilih template, cetak massal, dan pantau penjualan!</p>
+    <a href="#app" class="cta-btn">Buat Nota Sekarang ↓</a>
+  </div>
+  <div class="hero-deco">
+    <div class="deco-card">Rp 250.000</div>
+    <div class="deco-card small">✓ Lunas</div>
+    <div class="deco-card tiny">PDF Ready</div>
   </div>
 </header>
 
-<div class="app-body">
+<!-- APP -->
+<main id="app" class="app-section">
+  <div class="app-container">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
+    <!-- FORM PANEL -->
+    <div class="form-panel">
+      <h2 class="panel-title">⚙ Isi Data Nota</h2>
 
-    <!-- Info Toko -->
-    <div class="sidebar-section">
-      <div class="sidebar-section-header" onclick="toggleSection(this)">
-        <span class="section-title"><span class="section-icon">🏪</span> Info Toko / Penjual</span>
-        <span class="chevron open">▼</span>
+      <div class="form-group">
+        <label class="group-label">🏪 Info Toko / Usaha</label>
+        <input type="text" id="storeName" placeholder="Nama Toko / Usaha Anda" />
+        <input type="text" id="storeAddress" placeholder="Alamat (opsional)" />
+        <input type="text" id="storePhone" placeholder="No. HP / WA (opsional)" />
       </div>
-      <div class="sidebar-section-body">
-        <div class="fg"><label class="lbl">Nama Toko / Bisnis</label><input type="text" id="storeName" placeholder="Toko Mawar Indah" value="Toko Mawar Indah"></div>
-        <div class="fg"><label class="lbl">Tagline / Sub-judul</label><input type="text" id="storeSub" placeholder="Fashion & Lifestyle" value="Fashion & Lifestyle"></div>
-        <div class="row2">
-          <div class="fg"><label class="lbl">No. Telp</label><input type="text" id="storePhone" placeholder="08xx-xxxx-xxxx"></div>
-          <div class="fg"><label class="lbl">Email</label><input type="email" id="storeEmail" placeholder="toko@email.com"></div>
+
+      <div class="form-group">
+        <label class="group-label">👤 Info Pembeli</label>
+        <input type="text" id="buyerName" placeholder="Nama Pembeli" />
+        <input type="text" id="buyerPhone" placeholder="No. HP Pembeli (opsional)" />
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">📋 Detail Nota</label>
+        <div class="input-row">
+          <input type="text" id="invoiceNumber" placeholder="No. Nota (otomatis)" />
+          <input type="date" id="invoiceDate" />
         </div>
-        <div class="fg"><label class="lbl">Alamat</label><textarea id="storeAddress" placeholder="Jl. Contoh No. 1, Jakarta" rows="2"></textarea></div>
       </div>
-    </div>
 
-    <!-- Info Pembeli -->
-    <div class="sidebar-section">
-      <div class="sidebar-section-header" onclick="toggleSection(this)">
-        <span class="section-title"><span class="section-icon">👤</span> Info Pembeli</span>
-        <span class="chevron open">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <div class="fg"><label class="lbl">Nama Pembeli</label><input type="text" id="buyerName" placeholder="Siti Rahayu" value="Siti Rahayu"></div>
-        <div class="fg"><label class="lbl">No. HP / Kontak</label><input type="text" id="buyerPhone" placeholder="08xx-xxxx-xxxx"></div>
-        <div class="fg"><label class="lbl">Alamat Pengiriman</label><textarea id="buyerAddress" placeholder="Jl. Pembeli No. 5, Bandung" rows="2"></textarea></div>
-      </div>
-    </div>
-
-    <!-- Invoice Info -->
-    <div class="sidebar-section">
-      <div class="sidebar-section-header" onclick="toggleSection(this)">
-        <span class="section-title"><span class="section-icon">📋</span> Info Invoice</span>
-        <span class="chevron open">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <div class="row2">
-          <div class="fg"><label class="lbl">No. Invoice</label><input type="text" id="invNum" value="INV-001"></div>
-          <div class="fg"><label class="lbl">Tanggal</label><input type="date" id="invDate"></div>
-        </div>
-        <div class="row2">
-          <div class="fg"><label class="lbl">Jatuh Tempo</label><input type="date" id="invDue"></div>
-          <div class="fg"><label class="lbl">Status</label>
-            <select id="invStatus">
-              <option value="LUNAS">LUNAS</option>
-              <option value="BELUM LUNAS">BELUM LUNAS</option>
-              <option value="DP">DP</option>
-              <option value="PROSES">PROSES</option>
-            </select>
+      <!-- Pilih Template -->
+      <div class="form-group">
+        <label class="group-label">🎨 Pilih Template Nota</label>
+        <div class="template-selector">
+          <!-- FREE TEMPLATES -->
+          <div class="template-group">
+            <div class="template-group-label">📋 GRATIS</div>
+            <div class="template-buttons">
+              <button class="template-btn active" data-template="classic">Classic</button>
+              <button class="template-btn" data-template="modern">Modern</button>
+              <button class="template-btn" data-template="minimal">Minimal</button>
+            </div>
+          </div>
+          
+          <!-- PREMIUM TEMPLATES -->
+          <div id="premiumTemplateGroup" style="display: none;">
+            <div class="template-group-label" style="margin-top: 0.8rem;">👑 PREMIUM EXCLUSIVE</div>
+            <div class="template-buttons">
+              <button class="template-btn premium-template" data-template="premium-luxury">💎 Luxury Gold</button>
+              <button class="template-btn premium-template" data-template="premium-elegant">🦢 Elegant Silk</button>
+              <button class="template-btn premium-template" data-template="premium-dark">🌙 Dark Executive</button>
+              <button class="template-btn premium-template" data-template="premium-art">🎨 Art Deco</button>
+              <button class="template-btn premium-template" data-template="premium-nature">🍃 Nature Fresh</button>
+            </div>
           </div>
         </div>
-        <div class="fg"><label class="lbl">Metode Pembayaran</label><input type="text" id="invPayMethod" placeholder="Transfer BCA, COD, dll." value="Transfer Bank"></div>
-      </div>
-    </div>
-
-    <!-- Daftar Produk -->
-    <div class="sidebar-section">
-      <div class="sidebar-section-header" onclick="toggleSection(this)">
-        <span class="section-title"><span class="section-icon">🛍</span> Daftar Produk</span>
-        <span class="chevron open">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <div class="items-header">
-          <span>Nama Produk</span><span style="text-align:center">Qty</span><span>Harga Satuan</span><span style="text-align:right">Subtotal</span><span></span>
-        </div>
-        <div id="itemsContainer"></div>
-        <button class="add-row-btn" onclick="addItem()">＋ Tambah Produk</button>
-      </div>
-    </div>
-
-    <!-- Kalkulasi -->
-    <div class="sidebar-section">
-      <div class="sidebar-section-header" onclick="toggleSection(this)">
-        <span class="section-title"><span class="section-icon">💰</span> Kalkulasi</span>
-        <span class="chevron open">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <div class="row3">
-          <div class="fg"><label class="lbl">Diskon (%)</label><input type="number" id="discount" value="0" min="0" max="100"></div>
-          <div class="fg"><label class="lbl">Pajak (%)</label><input type="number" id="tax" value="0" min="0" max="100"></div>
-          <div class="fg"><label class="lbl">Ongkir (Rp)</label><input type="number" id="shipping" value="0" min="0"></div>
-        </div>
-        <div class="fg"><label class="lbl">Catatan / Notes</label><textarea id="notes" placeholder="Terima kasih telah berbelanja! Barang yang sudah dibeli tidak dapat dikembalikan." rows="3"></textarea></div>
-      </div>
-    </div>
-
-    <!-- Template -->
-    <div class="sidebar-section">
-      <div class="sidebar-section-header" onclick="toggleSection(this)">
-        <span class="section-title"><span class="section-icon">🎨</span> Template & Gaya</span>
-        <span class="chevron open">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <div class="tpl-grid" id="templateGrid">
-          <button class="tpl-btn active" data-tpl="classic" onclick="setTemplate('classic',this)">
-            <div class="tpl-check">✓</div>
-            <div class="tpl-preview" style="background:#fff;border:1px solid #e0d4bb;"><div style="height:8px;background:#c9952a;margin-bottom:3px"></div><div style="padding:3px;"><div style="height:3px;background:#f0e8d8;margin:2px 0;border-radius:1px"></div><div style="height:3px;background:#f0e8d8;margin:2px 0;width:70%;border-radius:1px"></div></div></div>
-            <div class="tpl-name">Classic</div>
-          </button>
-          <button class="tpl-btn" data-tpl="dark" onclick="setTemplate('dark',this)">
-            <div class="tpl-check">✓</div>
-            <div class="tpl-preview" style="background:#141210;"><div style="height:8px;background:#c9952a;margin-bottom:3px"></div><div style="padding:3px;"><div style="height:3px;background:#2a2418;margin:2px 0;border-radius:1px"></div><div style="height:3px;background:#2a2418;margin:2px 0;width:70%;border-radius:1px"></div></div></div>
-            <div class="tpl-name">Dark</div>
-          </button>
-          <button class="tpl-btn" data-tpl="minimal" onclick="setTemplate('minimal',this)">
-            <div class="tpl-check">✓</div>
-            <div class="tpl-preview" style="background:#fff;border:1px solid #e0d4bb;"><div style="height:3px;background:#0f0d0a;margin-bottom:5px"></div><div style="padding:3px;"><div style="height:3px;background:#f0ecec;margin:2px 0;border-radius:1px"></div><div style="height:3px;background:#f0ecec;margin:2px 0;width:60%;border-radius:1px"></div></div></div>
-            <div class="tpl-name">Minimal</div>
-          </button>
-          <button class="tpl-btn" data-tpl="luxury" onclick="setTemplate('luxury',this)">
-            <div class="tpl-check">✓</div>
-            <div class="tpl-preview" style="background:linear-gradient(135deg,#fefaef,#fff9ec);border:1px solid rgba(201,149,42,0.3);"><div style="height:10px;background:linear-gradient(135deg,#c9952a,#e8b84b);margin-bottom:2px"></div><div style="padding:3px;"><div style="height:3px;background:#f0e8d8;margin:2px 0;border-radius:1px"></div><div style="height:3px;background:#f0e8d8;margin:2px 0;width:70%;border-radius:1px"></div></div></div>
-            <div class="tpl-name">Luxury</div>
-          </button>
-          <button class="tpl-btn" data-tpl="nature" onclick="setTemplate('nature',this)">
-            <div class="tpl-check">✓</div>
-            <div class="tpl-preview" style="background:#f0f8f0;border:1px solid #2a7a4b33;"><div style="height:10px;background:#2a7a4b;margin-bottom:2px"></div><div style="padding:3px;"><div style="height:3px;background:#d4ecd4;margin:2px 0;border-radius:1px"></div><div style="height:3px;background:#d4ecd4;margin:2px 0;width:65%;border-radius:1px"></div></div></div>
-            <div class="tpl-name">Nature</div>
-          </button>
-          <button class="tpl-btn" data-tpl="artdeco" onclick="setTemplate('artdeco',this)">
-            <div class="tpl-check">✓</div>
-            <div class="tpl-preview" style="background:#fdfbf5;border:2px double #8b6914;"><div style="height:5px;background:#8b6914;margin-bottom:4px"></div><div style="padding:3px;"><div style="height:3px;background:#fdf0d8;margin:2px 0;border-radius:1px"></div><div style="height:3px;background:#fdf0d8;margin:2px 0;width:70%;border-radius:1px"></div></div></div>
-            <div class="tpl-name">Art Deco</div>
-          </button>
+        <div id="premiumTemplateNote" style="font-size: 0.7rem; color: var(--gold); margin-top: 0.5rem; display: none;">
+          ⭐ Kamu mendapatkan 5 template eksklusif sebagai member Premium!
         </div>
       </div>
+
+      <div class="form-group">
+        <label class="group-label">🛍 Daftar Produk</label>
+        <div id="itemsList"></div>
+        <button class="add-item-btn" onclick="addItem()">+ Tambah Produk</button>
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">⭐ Produk Favorit</label>
+        <div id="savedProducts" class="saved-products"></div>
+        <button class="add-item-btn small" onclick="showSaveProductModal()">💾 Simpan Produk Sekarang</button>
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">💰 Diskon & Catatan</label>
+        <div class="input-row">
+          <input type="number" id="discount" placeholder="Diskon (Rp)" min="0" value="0" />
+          <input type="number" id="tax" placeholder="Pajak (%)" min="0" max="100" value="0" />
+        </div>
+        <textarea id="notes" placeholder="Catatan tambahan (terima kasih, syarat pengembalian, dll)"></textarea>
+      </div>
+
+      <button class="generate-btn" onclick="generateInvoice()">✦ Generate Nota</button>
     </div>
 
-    <!-- PREMIUM SECTION DI SIDEBAR -->
-    <div class="premium-sidebar" id="premiumSidebar">
+    <!-- PREVIEW PANEL -->
+    <div class="preview-panel">
+      <div class="preview-header">
+        <h2 class="panel-title">👁 Preview Nota</h2>
+        <div class="preview-actions" id="previewActions" style="display:none">
+          <button class="action-btn" onclick="downloadPDF()">⬇ Download PDF</button>
+          <button class="action-btn secondary" onclick="printInvoice()">🖨 Print</button>
+        </div>
+      </div>
+
+      <div class="preview-placeholder" id="previewPlaceholder">
+        <div class="placeholder-icon">🧾</div>
+        <p>Isi form di sebelah kiri<br/>dan klik <strong>Generate Nota</strong></p>
+      </div>
+
+      <div id="invoicePreview" class="invoice-template template-classic" style="display:none">
+        <div class="inv-header">
+          <div class="inv-store">
+            <div class="inv-store-name" id="inv-storeName"></div>
+            <div class="inv-store-sub" id="inv-storeAddress"></div>
+            <div class="inv-store-sub" id="inv-storePhone"></div>
+          </div>
+          <div class="inv-meta">
+            <div class="inv-label">NOTA</div>
+            <div class="inv-num" id="inv-number"></div>
+            <div class="inv-date" id="inv-date"></div>
+          </div>
+        </div>
+
+        <div class="inv-divider"></div>
+
+        <div class="inv-buyer">
+          <div class="inv-buyer-label">Kepada Yth.</div>
+          <div class="inv-buyer-name" id="inv-buyerName"></div>
+          <div class="inv-buyer-sub" id="inv-buyerPhone"></div>
+        </div>
+
+        <table class="inv-table">
+          <thead>
+            <tr><th>Produk / Jasa</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody id="inv-items"></tbody>
+        </table>
+
+        <div class="inv-summary">
+          <div class="inv-summary-row"><span>Subtotal</span><span id="inv-subtotal"></span></div>
+          <div class="inv-summary-row discount" id="inv-discountRow" style="display:none"><span>Diskon</span><span id="inv-discount"></span></div>
+          <div class="inv-summary-row tax" id="inv-taxRow" style="display:none"><span>Pajak</span><span id="inv-tax"></span></div>
+          <div class="inv-summary-row total"><span>TOTAL</span><span id="inv-total"></span></div>
+        </div>
+
+        <div class="inv-notes" id="inv-notesSection" style="display:none">
+          <div class="inv-notes-label">Catatan:</div>
+          <div id="inv-notes"></div>
+        </div>
+
+        <div class="inv-footer">
+          <div class="inv-footer-left">
+            <div>Hormat kami,</div>
+            <div class="inv-sig-space"></div>
+            <div id="inv-sigName"></div>
+          </div>
+          <div class="inv-footer-right">
+            <div class="inv-stamp" id="inv-stamp">LUNAS</div>
+          </div>
+        </div>
+
+        <div class="inv-watermark" id="watermark">NotaKu.id</div>
+        <div class="inv-powered">Dibuat dengan <strong>NotaKu.id</strong> — Generator Nota Gratis untuk UMKM Indonesia</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATISTIK PANEL -->
+  <div class="stats-section">
+    <div class="stats-container">
+      <h2 class="panel-title">📊 Statistik Penjualan</h2>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Transaksi</div><div class="stat-value" id="totalTransactions">0</div></div>
+        <div class="stat-card"><div class="stat-label">Total Pendapatan</div><div class="stat-value" id="totalRevenue">Rp 0</div></div>
+        <div class="stat-card"><div class="stat-label">Rata-rata Transaksi</div><div class="stat-value" id="avgTransaction">Rp 0</div></div>
+      </div>
+      <canvas id="revenueChart" style="max-height: 300px; margin-top: 1rem;"></canvas>
+      <button class="reset-stats-btn" onclick="resetStats()">Reset Statistik</button>
+    </div>
+  </div>
+
+  <!-- PREMIUM SECTION -->
+  <div class="premium-section">
+    <div class="premium-container">
       <div class="premium-badge">✨ PREMIUM</div>
-      <h4>Hapus Watermark & Template Mewah</h4>
-      <p>Dapatkan 6 template premium eksklusif</p>
-      <button onclick="showPaymentInfo('bulanan', 49000)">Upgrade →</button>
+      <h3>Hapus Watermark & Dapatkan 5 Template Eksklusif!</h3>
       
-      <div class="premium-activation-sidebar" id="premiumActivationSidebar">
-        <input type="text" id="premiumKey" placeholder="Masukkan kode premium">
-        <button onclick="activatePremium()">Aktivasi</button>
-        <div id="premiumStatusSidebar" style="font-size:0.7rem; margin-top:0.3rem;"></div>
+      <div class="premium-packages">
+        <div class="premium-package">
+          <h4>Bulanan</h4>
+          <p class="price">Rp 49.000</p>
+          <button class="premium-btn-small" onclick="showPaymentInfo('bulanan', 49000)">Pilih</button>
+        </div>
+        <div class="premium-package premium-package-yearly">
+          <div class="save-badge">HEMAT 15%</div>
+          <h4>Tahunan</h4>
+          <p class="price">Rp 499.000</p>
+          <button class="premium-btn-small" onclick="showPaymentInfo('tahunan', 499000)">Pilih</button>
+        </div>
+      </div>
+      
+      <div id="paymentInfo" class="payment-info" style="display: none;">
+        <h4>💳 Transfer ke Rekening Berikut:</h4>
+        <p class="bank-account">BRI: 3593 0100 9186 508</p>
+        <p>a.n. <strong>Ardian Nurraihan</strong></p>
+        <p>Nominal: <strong id="paymentAmount">Rp 0</strong></p>
+        <p class="wa-confirm">📱 Setelah transfer, kirim bukti ke WhatsApp: 
+          <a href="https://wa.me/6282134858510?text=Halo%20Admin%2C%20saya%20sudah%20transfer%20untuk%20premium%20NotaKu">0821-3485-8510</a>
+        </p>
+        <button class="copy-btn" onclick="copyPaymentInfo()">📋 Copy No Rekening</button>
+      </div>
+      
+      <div class="premium-activation">
+        <h4>🔑 Sudah punya kode premium?</h4>
+        <div class="activation-input">
+          <input type="text" id="premiumKey" placeholder="Masukkan kode premium">
+          <button onclick="activatePremium()">Aktivasi</button>
+        </div>
+        <div id="premiumStatus" class="premium-status"></div>
+      </div>
+
+      <div class="guarantee-box">
+        <div class="guarantee-icon">💰</div>
+        <div class="guarantee-text">
+          <strong>100% Garansi Uang Kembali</strong><br>
+          Jika kode premium tidak dikirim dalam 24 jam setelah transfer terbukti, uang Anda akan dikembalikan penuh.
+        </div>
+      </div>
+
+      <div class="security-badges">
+        <span>🔒 Koneksi Aman (HTTPS)</span>
+        <span>✅ Rekening Terverifikasi</span>
+        <span>⭐ 50+ UMKM Percaya</span>
+      </div>
+
+      <p class="premium-note">⭐ Premium: Hapus watermark + 5 template eksklusif (Luxury Gold, Elegant Silk, Dark Executive, Art Deco, Nature Fresh)</p>
+    </div>
+  </div>
+
+  <!-- TRUST SECTION -->
+  <div class="trust-section">
+    <div class="trust-container">
+      <h3>🔒 Kenapa Anda Bisa Percaya NotaKu?</h3>
+      <div class="trust-grid">
+        <div class="trust-card">
+          <div class="trust-icon">✅</div>
+          <h4>Sudah Digunakan 50+ UMKM</h4>
+          <p>Pelaku usaha di berbagai kota sudah menggunakan NotaKu.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">📱</div>
+          <h4>Admin Respon Cepat</h4>
+          <p>Kode premium dikirim dalam <strong>1x24 jam</strong> (biasanya <1 jam).</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">💰</div>
+          <h4>Garansi Uang Kembali</h4>
+          <p>Jika tidak mendapat kode dalam 24 jam, uang dikembalikan 100%.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon">🏦</div>
+          <h4>Rekening Terverifikasi</h4>
+          <p>BRI 3593 0100 9186 508 a.n. Ardian Nurraihan.</p>
+        </div>
       </div>
     </div>
+  </div>
+</main>
 
-    <button class="gen-btn" onclick="generateInvoice()">⚡ Generate Invoice</button>
-
-  </aside>
-
-  <!-- PREVIEW AREA -->
-  <main class="preview-area">
-    <div class="preview-toolbar">
-      <span class="preview-label">Preview Invoice</span>
-      <div class="toolbar-actions" id="toolbarActions" style="display:none">
-        <button class="tool-btn" onclick="copyInvoiceText()">📋 Copy</button>
-        <button class="tool-btn" onclick="printInvoice()">🖨 Cetak / PDF</button>
-        <button class="tool-btn primary" onclick="downloadPDF()">⬇ Download PDF</button>
-      </div>
-    </div>
-    <div id="invoiceOutput">
-      <div class="placeholder">
-        <div class="ph-icon">🧾</div>
-        <div class="ph-title">Invoice belum dibuat</div>
-        <div class="ph-text">Isi data di panel kiri lalu klik<br><strong>⚡ Generate Invoice</strong><br>untuk melihat pratinjau invoice</div>
-      </div>
-    </div>
-  </main>
+<!-- MODALS -->
+<div id="saveProductModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeSaveProductModal()">&times;</span>
+    <h3>💾 Simpan Produk</h3>
+    <input type="text" id="saveProductName" placeholder="Nama Produk" />
+    <input type="number" id="saveProductPrice" placeholder="Harga (Rp)" />
+    <button onclick="saveProduct()">Simpan Produk</button>
+  </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
-<script>
-// ========== STATE ==========
-let currentTemplate = 'classic';
-let itemCount = 0;
-let revenueChart = null;
-let transactionHistory = [];
-
-// ========== PREMIUM SYSTEM ==========
-const PREMIUM_CONFIG = {
-  validKeys: ["DEMO-PREMIUM-2025"],
-  isPremium: function() {
-    const saved = localStorage.getItem('notaku_premium_key');
-    return saved && this.validKeys.includes(saved);
-  },
-  activate: function(key) {
-    if (this.validKeys.includes(key)) {
-      localStorage.setItem('notaku_premium_key', key);
-      localStorage.setItem('notaku_premium_until', new Date(Date.now() + 30*24*60*60*1000).toISOString());
-      return true;
-    }
-    return false;
-  },
-  isExpired: function() {
-    const until = localStorage.getItem('notaku_premium_until');
-    if (!until) return true;
-    return new Date(until) < new Date();
-  },
-  getRemainingDays: function() {
-    const until = localStorage.getItem('notaku_premium_until');
-    if (!until) return 0;
-    const diff = new Date(until) - new Date();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  }
-};
-window.PremiumAPI = PREMIUM_CONFIG;
-
-function checkPremiumStatus() {
-  const isPremium = PREMIUM_CONFIG.isPremium() && !PREMIUM_CONFIG.isExpired();
-  const statusDiv = document.getElementById('premiumStatusSidebar');
-  const body = document.body;
-  
-  if (isPremium) {
-    const daysLeft = PREMIUM_CONFIG.getRemainingDays();
-    statusDiv.innerHTML = `✅ Premium aktif! Sisa ${daysLeft} hari. Watermark hilang.`;
-    body.classList.add('premium-active');
-  } else {
-    statusDiv.innerHTML = '🔒 Upgrade Premium untuk hilangkan watermark & dapatkan template eksklusif!';
-    body.classList.remove('premium-active');
-  }
-}
-
-function activatePremium() {
-  const key = document.getElementById('premiumKey').value;
-  if (PREMIUM_CONFIG.activate(key)) {
-    alert('✅ Premium berhasil diaktifkan! Watermark akan hilang.');
-    checkPremiumStatus();
-    location.reload();
-  } else {
-    alert('❌ Kode premium tidak valid. Hubungi admin di 0821-3485-8510');
-  }
-}
-
-function showPaymentInfo(paket, nominal) {
-  const msg = `💳 Transfer ke BRI: 3593 0100 9186 508\n a.n. Ardian Nurraihan\nNominal: Rp ${nominal.toLocaleString('id-ID')}\n\n📱 Kirim bukti ke WA: 0821-3485-8510\nKode premium akan dikirim dalam 1x24 jam. Ada garansi uang kembali 100%!`;
-  alert(msg);
-  if (typeof gtag === 'function') {
-    gtag('event', 'view_payment_info', { 'event_category': 'premium', 'event_label': paket, 'value': nominal });
-  }
-}
-
-function copyPaymentInfo() {
-  navigator.clipboard.writeText('359301009186508');
-  alert('✅ Nomor rekening BRI: 3593 0100 9186 508 sudah di-copy!');
-}
-
-// ========== HELPER FUNCTIONS ==========
-const fmt = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
-const today = new Date();
-const todayStr = today.toISOString().split('T')[0];
-const dueDate = new Date(today); dueDate.setDate(dueDate.getDate() + 7);
-document.getElementById('invDate').value = todayStr;
-document.getElementById('invDue').value = dueDate.toISOString().split('T')[0];
-
-function toggleSection(header) {
-  const body = header.nextElementSibling;
-  const chevron = header.querySelector('.chevron');
-  body.classList.toggle('hidden');
-  chevron.classList.toggle('open');
-}
-
-function switchTab(tab) {
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  if (tab === 'preview') {
-    document.querySelectorAll('.pill')[1].classList.add('active');
-    document.querySelector('.preview-area').scrollIntoView({ behavior: 'smooth' });
-  } else {
-    document.querySelectorAll('.pill')[0].classList.add('active');
-    document.querySelector('.sidebar').scrollIntoView({ behavior: 'smooth' });
-  }
-}
-
-function setTemplate(tpl, btn) {
-  currentTemplate = tpl;
-  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (document.querySelector('.invoice-wrap')) generateInvoice();
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ========== ITEMS MANAGEMENT ==========
-function addItem(name = '', qty = 1, price = 0) {
-  itemCount++;
-  const id = 'item_' + itemCount;
-  const div = document.createElement('div');
-  div.className = 'item-row';
-  div.id = id;
-  div.innerHTML = `
-    <input type="text" placeholder="Nama produk" value="${name}" onchange="updateSubtotals()">
-    <input type="number" value="${qty}" min="1" onchange="updateSubtotals()" style="text-align:center">
-    <input type="number" value="${price}" min="0" placeholder="0" onchange="updateSubtotals()">
-    <div class="subtotal-row" id="sub_${id}">${fmt(qty * price)}</div>
-    <button class="del-btn" onclick="removeItem('${id}')">✕</button>
-  `;
-  document.getElementById('itemsContainer').appendChild(div);
-  updateSubtotals();
-}
-
-function removeItem(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
-  updateSubtotals();
-}
-
-function updateSubtotals() {
-  document.querySelectorAll('.item-row').forEach(row => {
-    const inputs = row.querySelectorAll('input[type=number]');
-    if (inputs.length >= 2) {
-      const qty = parseFloat(inputs[0].value) || 0;
-      const price = parseFloat(inputs[1].value) || 0;
-      const subEl = row.querySelector('.subtotal-row');
-      if (subEl) subEl.textContent = fmt(qty * price);
-    }
-  });
-}
-
-function getItems() {
-  const items = [];
-  document.querySelectorAll('.item-row').forEach(row => {
-    const inputs = row.querySelectorAll('input');
-    const name = inputs[0].value.trim();
-    const qty = parseFloat(inputs[1].value) || 0;
-    const price = parseFloat(inputs[2].value) || 0;
-    if (name) items.push({ name, qty, price, total: qty * price });
-  });
-  return items;
-}
-
-// ========== GENERATE INVOICE ==========
-function generateInvoice() {
-  const storeName = document.getElementById('storeName').value || 'Nama Toko';
-  const storeSub = document.getElementById('storeSub').value || '';
-  const storePhone = document.getElementById('storePhone').value || '';
-  const storeEmail = document.getElementById('storeEmail').value || '';
-  const storeAddress = document.getElementById('storeAddress').value || '';
-  const buyerName = document.getElementById('buyerName').value || 'Nama Pembeli';
-  const buyerPhone = document.getElementById('buyerPhone').value || '';
-  const buyerAddress = document.getElementById('buyerAddress').value || '';
-  const invNum = document.getElementById('invNum').value || 'INV-001';
-  const invDate = document.getElementById('invDate').value;
-  const invDue = document.getElementById('invDue').value;
-  const invStatus = document.getElementById('invStatus').value;
-  const payMethod = document.getElementById('invPayMethod').value || '-';
-  const discount = parseFloat(document.getElementById('discount').value) || 0;
-  const tax = parseFloat(document.getElementById('tax').value) || 0;
-  const shipping = parseFloat(document.getElementById('shipping').value) || 0;
-  const notes = document.getElementById('notes').value || '';
-  const items = getItems();
-
-  const subtotal = items.reduce((s, i) => s + i.total, 0);
-  const discAmt = subtotal * discount / 100;
-  const afterDisc = subtotal - discAmt;
-  const taxAmt = afterDisc * tax / 100;
-  const total = afterDisc + taxAmt + shipping;
-
-  // Save ke statistik
-  saveTransaction(total);
-
-  const fmtDate = d => { if (!d) return '-'; const [y,m,dy] = d.split('-'); const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des']; return `${+dy} ${months[+m-1]} ${y}`; };
-
-  const itemRows = items.length ? items.map(i => `
-    <tr>
-      <td>${i.name}</td>
-      <td class="inv-td-center">${i.qty}</td>
-      <td>${fmt(i.price)}</td>
-      <td>${fmt(i.total)}</td>
-    </tr>`).join('') : `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem">Belum ada produk</td></tr>`;
-
-  const statusColor = invStatus === 'LUNAS' ? 'var(--green)' : invStatus === 'BELUM LUNAS' ? 'var(--rust)' : 'var(--gold)';
-  const isPremium = PREMIUM_CONFIG.isPremium() && !PREMIUM_CONFIG.isExpired();
-  const watermarkHtml = isPremium ? '' : '<div class="inv-watermark">NotaKu.id</div>';
-
-  const html = `
-  <div class="inv tpl-${currentTemplate}">
-    <div class="inv-head">
-      <div class="inv-logo-row">
-        <div>
-          <div class="inv-brand-name">${escapeHtml(storeName)}</div>
-          ${storeSub ? `<div class="inv-brand-sub">${escapeHtml(storeSub)}</div>` : ''}
-          ${storePhone || storeEmail ? `<div class="inv-brand-sub" style="margin-top:0.3rem">${[storePhone, storeEmail].filter(Boolean).join(' · ')}</div>` : ''}
-          ${storeAddress ? `<div class="inv-brand-sub">${escapeHtml(storeAddress.replace(/\n/g, ', '))}</div>` : ''}
-        </div>
-        <div class="inv-meta-right">
-          <div class="inv-number-label">INVOICE</div>
-          <div class="inv-number">${escapeHtml(invNum)}</div>
-          <div class="inv-date-info">📅 ${fmtDate(invDate)}</div>
-          ${invDue ? `<div class="inv-date-info">⏱ Jatuh tempo: ${fmtDate(invDue)}</div>` : ''}
-          <div class="inv-date-info" style="margin-top:0.4rem">💳 ${escapeHtml(payMethod)}</div>
-        </div>
-      </div>
-      <div class="inv-divider"></div>
-      <div class="inv-parties">
-        <div>
-          <div class="inv-party-label">Kepada</div>
-          <div class="inv-party-name">${escapeHtml(buyerName)}</div>
-          <div class="inv-party-detail">${[buyerPhone, buyerAddress.replace(/\n/g, ', ')].filter(Boolean).join('\n')}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="inv-party-label">Status</div>
-          <div style="font-family:var(--font-h);font-size:1rem;font-weight:800;color:${statusColor};letter-spacing:0.06em">${invStatus}</div>
-        </div>
-      </div>
+<div id="premiumModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePremiumModal()">&times;</span>
+    <h3>✨ Upgrade ke Premium</h3>
+    <p>Fitur Premium:</p>
+    <ul>
+      <li>✓ Hapus watermark "NotaKu.id"</li>
+      <li>✓ 5 template eksklusif mewah</li>
+      <li>✓ Tampilan nota lebih profesional</li>
+      <li>✓ Prioritas support</li>
+    </ul>
+    <div class="premium-plans">
+      <div class="plan"><h4>Bulanan</h4><p class="price">Rp 49.000</p><button onclick="showPaymentInfo('bulanan', 49000); closePremiumModal();">Pilih</button></div>
+      <div class="plan"><h4>Tahunan</h4><p class="price">Rp 499.000</p><p class="save-badge">Hemat 15%</p><button onclick="showPaymentInfo('tahunan', 499000); closePremiumModal();">Pilih</button></div>
     </div>
-    <div class="inv-body">
-      <table class="inv-table">
-        <thead><tr><th>Produk / Layanan</th><th style="text-align:center">Qty</th><th>Harga Satuan</th><th>Total</th></tr></thead>
-        <tbody>${itemRows}</tbody>
-      </table>
-      <div class="inv-totals">
-        <div class="inv-total-row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
-        ${discount > 0 ? `<div class="inv-total-row discount-row"><span>Diskon (${discount}%)</span><span>− ${fmt(discAmt)}</span></div>` : ''}
-        ${tax > 0 ? `<div class="inv-total-row"><span>Pajak (${tax}%)</span><span>+ ${fmt(taxAmt)}</span></div>` : ''}
-        ${shipping > 0 ? `<div class="inv-total-row"><span>Ongkos Kirim</span><span>+ ${fmt(shipping)}</span></div>` : ''}
-        <div class="inv-total-row grand"><span>TOTAL</span><span>${fmt(total)}</span></div>
-      </div>
-      ${notes ? `<div class="inv-notes-block"><div class="inv-notes-lbl">Catatan</div><div class="inv-notes-text">${escapeHtml(notes)}</div></div>` : ''}
-      <div class="inv-footer-row">
-        <div>
-          <div class="inv-sig-label">Tanda Tangan Penjual</div>
-          <div class="inv-sig-line"></div>
-          <div class="inv-sig-label">${escapeHtml(storeName)}</div>
-        </div>
-        <div class="inv-stamp">${invStatus}</div>
-      </div>
-      ${watermarkHtml}
-      <div class="inv-powered">NotaKu · Generator Nota Gratis untuk UMKM Indonesia 🇮🇩</div>
+    <p class="premium-note">*Transfer ke rekening BRI 3593 0100 9186 508 a.n. Ardian Nurraihan</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo">Nota<span>Ku</span></div>
+    <p>Gratis untuk semua UMKM Indonesia 🇮🇩</p>
+    <div class="footer-links">
+      <a href="/privacy.html">🔒 Kebijakan Privasi</a>
+      <a href="/terms.html">📋 Syarat & Ketentuan</a>
+      <a href="/check-premium.html">🔍 Cek Status Premium</a>
     </div>
-  </div>`;
+    <p class="footer-small">© 2025 NotaKu · Tidak ada data yang disimpan · 100% privasi terjaga</p>
+  </div>
+</footer>
 
-  const wrap = document.createElement('div');
-  wrap.className = 'invoice-wrap';
-  wrap.innerHTML = html;
-  const output = document.getElementById('invoiceOutput');
-  output.innerHTML = '';
-  output.appendChild(wrap);
-  document.getElementById('toolbarActions').style.display = 'flex';
-  showToast('Invoice berhasil dibuat! 🎉');
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
-}
-
-// ========== STATISTIK ==========
-function saveTransaction(total) {
-  const transaction = { date: new Date().toISOString(), total: total };
-  transactionHistory.push(transaction);
-  localStorage.setItem('notaku_stats', JSON.stringify(transactionHistory));
-  updateStats();
-}
-
-function updateStats() {
-  const totalTransactions = transactionHistory.length;
-  const totalRevenue = transactionHistory.reduce((sum, t) => sum + t.total, 0);
-  const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
-  
-  document.getElementById('totalTransactions').textContent = totalTransactions;
-  document.getElementById('totalRevenue').textContent = fmt(totalRevenue);
-  document.getElementById('avgTransaction').textContent = fmt(avgTransaction);
-  updateChart();
-}
-
-function updateChart() {
-  const last7Days = [];
-  const last7Revenue = [];
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-    last7Days.push(dateStr);
-    const revenue = transactionHistory.filter(t => t.date.split('T')[0] === dateStr).reduce((sum, t) => sum + t.total, 0);
-    last7Revenue.push(revenue);
-  }
-  if (revenueChart) revenueChart.destroy();
-  const ctx = document.getElementById('revenueChart').getContext('2d');
-  revenueChart = new Chart(ctx, {
-    type: 'line',
-    data: { labels: last7Days, datasets: [{ label: 'Pendapatan (Rp)', data: last7Revenue, borderColor: '#c9952a', backgroundColor: 'rgba(201,149,42,0.1)', tension: 0.4, fill: true }] },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
-  });
-}
-
-function resetStats() {
-  if (confirm('Reset semua statistik? Data tidak dapat dikembalikan!')) {
-    transactionHistory = [];
-    localStorage.removeItem('notaku_stats');
-    updateStats();
-  }
-}
-
-// ========== PRINT & PDF ==========
-function printInvoice() {
-  const wrap = document.querySelector('.invoice-wrap');
-  if (!wrap) { showToast('Buat invoice dulu!'); return; }
-  const w = window.open('', '_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>${document.querySelector('style').textContent} body { padding: 0; margin: 0; background: white; } .preview-area { padding: 1rem; } .toolbar-actions, .preview-toolbar { display: none; }</style></head><body>${wrap.outerHTML}</body></html>`);
-  w.document.close();
-  setTimeout(() => { w.focus(); w.print(); w.close(); }, 500);
-}
-
-async function downloadPDF() {
-  const { jsPDF } = window.jspdf;
-  const wrap = document.querySelector('.invoice-wrap');
-  if (!wrap) { showToast('Buat invoice dulu!'); return; }
-  const btn = event.target;
-  const originalText = btn.textContent;
-  btn.textContent = '⏳ Menyiapkan...';
-  btn.disabled = true;
-  try {
-    const canvas = await html2canvas(wrap, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`invoice-${document.getElementById('invNum').value || 'notaku'}.pdf`);
-    showToast('PDF berhasil diunduh!');
-  } catch (e) { alert('Gagal generate PDF'); }
-  btn.textContent = originalText;
-  btn.disabled = false;
-}
-
-function copyInvoiceText() {
-  const wrap = document.querySelector('.invoice-wrap');
-  if (!wrap) return;
-  const text = wrap.innerText.replace(/\n{3,}/g, '\n\n');
-  navigator.clipboard.writeText(text).then(() => showToast('Teks invoice disalin! 📋'));
-}
-
-// ========== LOAD STATS ==========
-function loadData() {
-  const stats = localStorage.getItem('notaku_stats');
-  if (stats) {
-    transactionHistory = JSON.parse(stats);
-    updateStats();
-  }
-}
-
-// ========== INIT ==========
-window.addEventListener('DOMContentLoaded', () => {
-  loadData();
-  checkPremiumStatus();
-  addItem('Kaos Polos Putih L', 3, 85000);
-  addItem('Celana Jeans Slim Fit', 1, 245000);
-  generateInvoice();
-});
-</script>
+<script src="premium.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
