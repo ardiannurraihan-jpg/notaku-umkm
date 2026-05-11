@@ -61,6 +61,7 @@
         UMKM Indonesia 🇮🇩
       </div>
       <a href="#premium" class="nav-premium-btn">✦ Premium</a>
+      <button id="darkModeToggle" class="nav-premium-btn dark-toggle" style="background: transparent; border: 1px solid rgba(201,149,42,0.4);">🌙 Mode</button>
     </div>
   </nav>
 
@@ -377,7 +378,10 @@
     <div class="glass-panel stats-container">
       <div class="stats-header">
         <h2 class="panel-title">Statistik Penjualan</h2>
-        <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="reset-stats-btn export-btn" onclick="exportStats()" style="background: #2a7a4b; border-color: #2a7a4b;">📊 Export CSV</button>
+          <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
+        </div>
       </div>
       <div class="stats-grid">
         <div class="stat-card">
