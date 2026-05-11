@@ -9,6 +9,60 @@ let currentTemplate = 'classic';
 let revenueChart = null;
 let transactionHistory = [];
 
+// ── SAVE & LOAD LAST INVOICE ────────────────
+function saveCurrentInvoice() {
+  const invoiceData = {
+    storeName: document.getElementById('storeName')?.value || '',
+    storeAddress: document.getElementById('storeAddress')?.value || '',
+    storePhone: document.getElementById('storePhone')?.value || '',
+    buyerName: document.getElementById('buyerName')?.value || '',
+    buyerPhone: document.getElementById('buyerPhone')?.value || '',
+    invoiceNumber: document.getElementById('invoiceNumber')?.value || '',
+    invoiceDate: document.getElementById('invoiceDate')?.value || '',
+    discount: document.getElementById('discount')?.value || '0',
+    tax: document.getElementById('tax')?.value || '0',
+    notes: document.getElementById('notes')?.value || '',
+    items: []
+  };
+
+  document.querySelectorAll('.item-row').forEach(row => {
+    const name = row.querySelector('.item-name')?.value || '';
+    const qty = row.querySelector('.item-qty')?.value || '1';
+    const price = row.querySelector('.item-price')?.value || '0';
+    if (name) invoiceData.items.push({ name, qty, price });
+  });
+
+  localStorage.setItem('notaku_last_invoice', JSON.stringify(invoiceData));
+}
+
+function loadLastInvoice() {
+  const savedData = localStorage.getItem('notaku_last_invoice');
+  if (!savedData) return;
+
+  try {
+    const data = JSON.parse(savedData);
+    document.getElementById('storeName') && (document.getElementById('storeName').value = data.storeName);
+    document.getElementById('storeAddress') && (document.getElementById('storeAddress').value = data.storeAddress);
+    document.getElementById('storePhone') && (document.getElementById('storePhone').value = data.storePhone);
+    document.getElementById('buyerName') && (document.getElementById('buyerName').value = data.buyerName);
+    document.getElementById('buyerPhone') && (document.getElementById('buyerPhone').value = data.buyerPhone);
+    document.getElementById('invoiceNumber') && (document.getElementById('invoiceNumber').value = data.invoiceNumber);
+    document.getElementById('invoiceDate') && (document.getElementById('invoiceDate').value = data.invoiceDate);
+    document.getElementById('discount') && (document.getElementById('discount').value = data.discount);
+    document.getElementById('tax') && (document.getElementById('tax').value = data.tax);
+    document.getElementById('notes') && (document.getElementById('notes').value = data.notes);
+
+    const itemsContainer = document.getElementById('itemsList');
+    if (itemsContainer && data.items && data.items.length) {
+      itemsContainer.innerHTML = '';
+      itemCount = 0;
+      data.items.forEach(item => {
+        addItem(item.name, parseFloat(item.qty), parseFloat(item.price));
+      });
+    }
+  } catch(e) { console.warn("Gagal memuat nota terakhir:", e); }
+}
+
 // ── LOAD DATA ────────────────────────────────
 function loadData() {
   // Produk tersimpan
@@ -129,7 +183,6 @@ function switchTemplate(templateName) {
 
 // ── TOAST NOTIFICATION ───────────────────────
 function showToast(message, type = 'info') {
-  // Hapus toast sebelumnya
   const existing = document.querySelector('.nk-toast');
   if (existing) existing.remove();
 
@@ -326,6 +379,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Load data tersimpan
   loadData();
+  loadLastInvoice();
 
   // Cek status premium
   checkPremiumStatus();
@@ -349,10 +403,25 @@ window.addEventListener('DOMContentLoaded', () => {
       switchTemplate(tpl);
     });
   });
+
+  // Dark Mode Toggle
+  const toggleBtn = document.getElementById('darkModeToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      toggleBtn.innerHTML = isDark ? '☀️ Terang' : '🌙 Mode';
+      localStorage.setItem('notaku_dark_mode', isDark);
+    });
+    if (localStorage.getItem('notaku_dark_mode') === 'true') {
+      document.body.classList.add('dark-mode');
+      toggleBtn.innerHTML = '☀️ Terang';
+    }
+  }
 });
 
 // ── ADD ITEM ROW ──────────────────────────────
-function addItem() {
+function addItem(name = '', qty = 1, price = 0) {
   itemCount++;
   const id   = itemCount;
   const list = document.getElementById('itemsList');
@@ -362,9 +431,9 @@ function addItem() {
   row.className = 'item-row';
   row.id = `item-${id}`;
   row.innerHTML = `
-    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  oninput="updateSubtotal(${id})" />
-    <input type="number" placeholder="Qty"                class="item-qty"   min="1" value="1" oninput="updateSubtotal(${id})" />
-    <input type="number" placeholder="Harga (Rp)"         class="item-price" min="0" oninput="updateSubtotal(${id})" />
+    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${name}" oninput="updateSubtotal(${id})" />
+    <input type="number" placeholder="Qty"                class="item-qty"   min="1" value="${qty}" oninput="updateSubtotal(${id})" />
+    <input type="number" placeholder="Harga (Rp)"         class="item-price" min="0" value="${price}" oninput="updateSubtotal(${id})" />
     <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
   `;
   list.appendChild(row);
@@ -412,7 +481,6 @@ function saveProduct() {
   }
 
   const products = JSON.parse(localStorage.getItem('notaku_products') || '[]');
-  // Cegah duplikat nama
   if (products.find(p => p.name.toLowerCase() === name.toLowerCase())) {
     showToast('⚠️ Produk dengan nama ini sudah tersimpan.', 'warn');
     return;
@@ -465,12 +533,7 @@ function deleteProduct(e, index) {
 }
 
 function addSavedProductToItems(name, price) {
-  addItem();
-  const items    = document.querySelectorAll('.item-row');
-  const lastItem = items[items.length - 1];
-  if (!lastItem) return;
-  lastItem.querySelector('.item-name').value  = name;
-  lastItem.querySelector('.item-price').value = price;
+  addItem(name, 1, price);
   showToast(`✅ "${name}" ditambahkan ke nota.`, 'success');
 }
 
@@ -484,6 +547,26 @@ function formatDate(str) {
   return new Date(str).toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric'
   });
+}
+
+// ── AUTO INCREMENT INVOICE NUMBER ─────────────
+function incrementInvoiceNumber() {
+  const invoiceField = document.getElementById('invoiceNumber');
+  if (!invoiceField) return;
+
+  let currentNumber = invoiceField.value;
+  const match = currentNumber.match(/\/(\d+)$/);
+  if (match) {
+    const lastNum = parseInt(match[1], 10);
+    const nextNum = (lastNum + 1).toString().padStart(match[1].length, '0');
+    const nextInvoice = currentNumber.replace(/\d+$/, nextNum);
+    invoiceField.value = nextInvoice;
+  } else {
+    const randomNum = Math.floor(Math.random() * 9000) + 1000;
+    const date = new Date();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    invoiceField.value = `INV/${date.getFullYear()}/${month}/${randomNum}`;
+  }
 }
 
 // ── GENERATE INVOICE ──────────────────────────
@@ -533,6 +616,7 @@ function generateInvoice() {
 
   // Simpan ke statistik
   saveTransaction(total);
+  saveCurrentInvoice();
 
   // ── Isi preview ────────────────────────────
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -589,6 +673,9 @@ function generateInvoice() {
   // Terapkan template aktif
   if (preview) preview.className = `invoice-template template-${currentTemplate}`;
 
+  // Auto increment nomor invoice
+  incrementInvoiceNumber();
+
   // Scroll ke preview
   if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -605,7 +692,6 @@ async function downloadPDF() {
   const originalHTML = btn ? btn.innerHTML : '';
   if (btn) { btn.innerHTML = '⏳ Menyiapkan…'; btn.disabled = true; }
 
-  // Simpan style asli
   const orig = {
     width:    invoice.style.width,
     maxWidth: invoice.style.maxWidth,
@@ -651,7 +737,6 @@ async function downloadPDF() {
     showToast('❌ Gagal membuat PDF. Coba gunakan fitur Print.', 'error');
   }
 
-  // Kembalikan style
   invoice.style.width    = orig.width;
   invoice.style.maxWidth = orig.maxWidth;
   invoice.style.margin   = orig.margin;
@@ -711,7 +796,6 @@ function copyPaymentInfo() {
       showToast('✅ No. rekening BRI berhasil di-copy!', 'success');
     });
   } else {
-    // Fallback
     const el = document.createElement('textarea');
     el.value = rekening;
     document.body.appendChild(el);
@@ -726,8 +810,7 @@ function copyPaymentInfo() {
   }
 }
 
-// ── STYLE TAMBAHAN UNTUK SAVED PRODUCTS ───────
-// Inject CSS inline untuk elemen dinamis
+// ── STYLE TAMBAHAN ───────────────────────────
 (function injectDynamicStyles() {
   const style = document.createElement('style');
   style.textContent = `
