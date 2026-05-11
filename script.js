@@ -1,137 +1,233 @@
-// ── STATE ──────────────────────────────────
+// ============================================
+//   NOTAKU — MAIN SCRIPT
+//   Supports 8 premium templates
+// ============================================
+
+// ── STATE ────────────────────────────────────
 let itemCount = 0;
 let currentTemplate = 'classic';
 let revenueChart = null;
 let transactionHistory = [];
 
-// Load data dari localStorage
+// ── LOAD DATA ────────────────────────────────
 function loadData() {
+  // Produk tersimpan
   const saved = localStorage.getItem('notaku_products');
   if (saved) {
-    const products = JSON.parse(saved);
-    displaySavedProducts(products);
+    try {
+      displaySavedProducts(JSON.parse(saved));
+    } catch (e) {
+      localStorage.removeItem('notaku_products');
+    }
   }
-  
+
+  // Statistik
   const stats = localStorage.getItem('notaku_stats');
   if (stats) {
-    transactionHistory = JSON.parse(stats);
-    updateStats();
+    try {
+      transactionHistory = JSON.parse(stats);
+      updateStats();
+    } catch (e) {
+      localStorage.removeItem('notaku_stats');
+    }
   }
 }
 
-// Tampilkan template premium untuk user premium
+// ── PREMIUM STATUS ───────────────────────────
 function showPremiumTemplates() {
-    const premiumGroup = document.getElementById('premiumTemplateGroup');
-    const premiumNote = document.getElementById('premiumTemplateNote');
-    
-    if (!premiumGroup) return;
-    
-    if (window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired()) {
-        premiumGroup.style.display = 'block';
-        if (premiumNote) premiumNote.style.display = 'block';
-    } else {
-        premiumGroup.style.display = 'none';
-        if (premiumNote) premiumNote.style.display = 'none';
-        
-        // Jika user mencoba pilih template premium, reset ke classic
-        const premiumTemplates = ['premium-luxury', 'premium-elegant', 'premium-dark', 'premium-art', 'premium-nature'];
-        if (premiumTemplates.includes(currentTemplate)) {
-            currentTemplate = 'classic';
-            const classicBtn = document.querySelector('.template-btn[data-template="classic"]');
-            if (classicBtn) classicBtn.classList.add('active');
-            const invoicePreview = document.getElementById('invoicePreview');
-            if (invoicePreview) invoicePreview.className = `invoice-template template-classic`;
-        }
+  const premiumGroup = document.getElementById('premiumTemplateGroup');
+  const premiumNote  = document.getElementById('premiumTemplateNote');
+  if (!premiumGroup) return;
+
+  const active = window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
+
+  if (active) {
+    premiumGroup.style.display = 'block';
+    if (premiumNote) premiumNote.style.display = 'block';
+  } else {
+    premiumGroup.style.display = 'none';
+    if (premiumNote) premiumNote.style.display = 'none';
+
+    // Reset ke classic kalau sedang pakai template premium
+    if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(currentTemplate)) {
+      switchTemplate('classic');
     }
+  }
 }
 
-// Cek status premium saat load
 function checkPremiumStatus() {
   if (!window.PremiumAPI) return;
-  
+
   const isPremium = window.PremiumAPI.isPremium();
   const isExpired = window.PremiumAPI.isExpired();
   const watermark = document.getElementById('watermark');
   const statusDiv = document.getElementById('premiumStatus');
-  
+
   if (isPremium && !isExpired) {
     if (watermark) watermark.style.display = 'none';
     if (statusDiv) {
-      const until = localStorage.getItem('notaku_premium_until');
-      const remainingDays = window.PremiumAPI.getRemainingDays ? window.PremiumAPI.getRemainingDays() : 0;
-      statusDiv.innerHTML = `👑 Premium aktif sampai ${new Date(until).toLocaleDateString('id-ID')} (${remainingDays} hari lagi)<br>✨ Kamu mendapatkan 5 template eksklusif!`;
+      const days  = window.PremiumAPI.getRemainingDays();
+      const until = window.PremiumAPI.getUntilFormatted();
+      const plan  = window.PremiumAPI.getPlanName();
+      statusDiv.innerHTML =
+        `👑 Premium <strong>${plan}</strong> aktif hingga ${until} (${days} hari lagi)<br>` +
+        `✨ 8 template eksklusif telah diaktifkan!`;
+      statusDiv.style.color = '#c9952a';
     }
   } else {
     if (watermark) watermark.style.display = 'block';
-    if (statusDiv && !isPremium) {
-      statusDiv.innerHTML = '🔒 Upgrade ke Premium untuk:<br>✓ Hapus watermark<br>✓ 5 template eksklusif mewah<br>✓ Nota lebih profesional';
+    if (statusDiv) {
+      if (isPremium && isExpired) {
+        statusDiv.innerHTML = '⚠️ Premium kamu sudah kadaluarsa. Perpanjang untuk akses template eksklusif.';
+        statusDiv.style.color = '#c0431a';
+      } else {
+        statusDiv.innerHTML =
+          '🔒 Upgrade ke Premium untuk:<br>' +
+          '✓ Hapus watermark · ✓ 8 template eksklusif · ✓ Nota lebih profesional';
+        statusDiv.style.color = 'rgba(250,248,243,0.4)';
+      }
     }
   }
-  
-  // TAMPILKAN TEMPLATE PREMIUM
+
   showPremiumTemplates();
 }
 
-// Aktivasi premium
+// ── AKTIVASI PREMIUM ─────────────────────────
 function activatePremium() {
-  const key = document.getElementById('premiumKey').value;
+  const input = document.getElementById('premiumKey');
+  const key   = input ? input.value.trim() : '';
+
+  if (!key) {
+    showToast('⚠️ Masukkan kode premium terlebih dahulu!', 'warn');
+    return;
+  }
+
   if (window.PremiumAPI && window.PremiumAPI.activate(key)) {
-    alert('✅ Premium berhasil diaktifkan! Kamu sekarang mendapatkan 5 template eksklusif!');
+    showToast('✅ Premium berhasil diaktifkan! 8 template eksklusif siap digunakan.', 'success');
+    if (input) input.value = '';
     checkPremiumStatus();
-    location.reload();
+    // Scroll ke template selector
+    setTimeout(() => {
+      const el = document.querySelector('.template-selector');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 600);
   } else {
-    alert('❌ Kode premium tidak valid. Hubungi admin untuk mendapatkan kode.');
+    showToast('❌ Kode tidak valid. Hubungi admin via WhatsApp untuk mendapatkan kode.', 'error');
   }
 }
 
-// Simpan data ke localStorage
+// ── SWITCH TEMPLATE ──────────────────────────
+function switchTemplate(templateName) {
+  currentTemplate = templateName;
+  const preview = document.getElementById('invoicePreview');
+  if (preview) preview.className = `invoice-template template-${currentTemplate}`;
+
+  document.querySelectorAll('.template-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.template === templateName);
+  });
+}
+
+// ── TOAST NOTIFICATION ───────────────────────
+function showToast(message, type = 'info') {
+  // Hapus toast sebelumnya
+  const existing = document.querySelector('.nk-toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = 'nk-toast';
+  toast.textContent = message;
+
+  const colors = {
+    success: '#2a7a4b',
+    error:   '#c0431a',
+    warn:    '#c9952a',
+    info:    '#1a1510'
+  };
+
+  Object.assign(toast.style, {
+    position:     'fixed',
+    bottom:       '2rem',
+    right:        '2rem',
+    background:   colors[type] || colors.info,
+    color:        '#fff',
+    padding:      '1rem 1.5rem',
+    borderRadius: '12px',
+    fontFamily:   "'Space Grotesk', sans-serif",
+    fontSize:     '0.85rem',
+    fontWeight:   '600',
+    zIndex:       '9999',
+    boxShadow:    '0 8px 30px rgba(0,0,0,0.25)',
+    maxWidth:     '360px',
+    lineHeight:   '1.5',
+    transform:    'translateY(20px)',
+    opacity:      '0',
+    transition:   'all 0.3s ease'
+  });
+
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity   = '1';
+  });
+
+  setTimeout(() => {
+    toast.style.transform = 'translateY(20px)';
+    toast.style.opacity   = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ── SIMPAN PRODUK ────────────────────────────
 function saveProducts(products) {
   localStorage.setItem('notaku_products', JSON.stringify(products));
 }
 
+// ── TRANSAKSI & STATISTIK ────────────────────
 function saveTransaction(total) {
-  const transaction = {
-    date: new Date().toISOString(),
+  transactionHistory.push({
+    date:  new Date().toISOString(),
     total: total
-  };
-  transactionHistory.push(transaction);
+  });
   localStorage.setItem('notaku_stats', JSON.stringify(transactionHistory));
   updateStats();
 }
 
 function updateStats() {
-  const totalTransactions = transactionHistory.length;
-  const totalRevenue = transactionHistory.reduce((sum, t) => sum + t.total, 0);
-  const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
-  
-  document.getElementById('totalTransactions').textContent = totalTransactions;
-  document.getElementById('totalRevenue').textContent = formatRupiah(totalRevenue);
-  document.getElementById('avgTransaction').textContent = formatRupiah(avgTransaction);
-  
+  const total   = transactionHistory.length;
+  const revenue = transactionHistory.reduce((s, t) => s + t.total, 0);
+  const avg     = total > 0 ? revenue / total : 0;
+
+  const el = (id) => document.getElementById(id);
+  if (el('totalTransactions')) el('totalTransactions').textContent = total;
+  if (el('totalRevenue'))      el('totalRevenue').textContent = formatRupiah(revenue);
+  if (el('avgTransaction'))    el('avgTransaction').textContent = formatRupiah(avg);
+
   updateChart();
 }
 
 function updateChart() {
-  const last7Days = [];
+  const last7Days    = [];
   const last7Revenue = [];
-  
+
   for (let i = 6; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-    last7Days.push(dateStr);
-    
-    const revenue = transactionHistory.filter(t => t.date.split('T')[0] === dateStr)
-      .reduce((sum, t) => sum + t.total, 0);
-    last7Revenue.push(revenue);
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const label   = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    last7Days.push(label);
+
+    const rev = transactionHistory
+      .filter(t => t.date.split('T')[0] === dateStr)
+      .reduce((s, t) => s + t.total, 0);
+    last7Revenue.push(rev);
   }
-  
-  if (revenueChart) {
-    revenueChart.destroy();
-  }
-  
-  const ctx = document.getElementById('revenueChart').getContext('2d');
-  revenueChart = new Chart(ctx, {
+
+  if (revenueChart) revenueChart.destroy();
+
+  const canvas = document.getElementById('revenueChart');
+  if (!canvas) return;
+
+  revenueChart = new Chart(canvas.getContext('2d'), {
     type: 'line',
     data: {
       labels: last7Days,
@@ -139,17 +235,39 @@ function updateChart() {
         label: 'Pendapatan (Rp)',
         data: last7Revenue,
         borderColor: '#c9952a',
-        backgroundColor: 'rgba(201,149,42,0.1)',
+        backgroundColor: 'rgba(201,149,42,0.08)',
+        pointBackgroundColor: '#c9952a',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
         tension: 0.4,
-        fill: true
+        fill: true,
+        borderWidth: 2.5
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
       plugins: {
-        legend: {
-          position: 'top',
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID')
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: {
+            callback: (v) => 'Rp ' + Number(v).toLocaleString('id-ID'),
+            font: { family: "'Fira Code', monospace", size: 11 }
+          }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: "'Fira Code', monospace", size: 11 } }
         }
       }
     }
@@ -157,52 +275,96 @@ function updateChart() {
 }
 
 function resetStats() {
-  if (confirm('Reset semua statistik? Data tidak dapat dikembalikan!')) {
+  if (confirm('Reset semua statistik penjualan? Data tidak dapat dikembalikan!')) {
     transactionHistory = [];
     localStorage.removeItem('notaku_stats');
     updateStats();
+    showToast('🗑️ Statistik berhasil direset.', 'warn');
   }
 }
 
-// ── INIT ───────────────────────────────────
+// ── EXPORT CSV ───────────────────────────────
+function exportStats() {
+  if (transactionHistory.length === 0) {
+    showToast('⚠️ Belum ada data transaksi untuk diexport.', 'warn');
+    return;
+  }
+
+  let csv = 'Tanggal,Total (Rp)\n';
+  transactionHistory.forEach(t => {
+    const date = new Date(t.date).toLocaleDateString('id-ID');
+    csv += `${date},${t.total}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `notaku-stats-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showToast('✅ Data statistik sudah diexport ke CSV!', 'success');
+}
+
+// ── INIT ─────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  // Set tanggal & nomor nota otomatis
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('invoiceDate').value = today;
-  
-  const num = String(Math.floor(Math.random() * 9000) + 1000);
+  const dateEl = document.getElementById('invoiceDate');
+  if (dateEl) dateEl.value = today;
+
+  const num   = String(Math.floor(Math.random() * 9000) + 1000);
   const month = String(new Date().getMonth() + 1).padStart(2, '0');
-  const year = new Date().getFullYear();
-  document.getElementById('invoiceNumber').value = `INV/${year}/${month}/${num}`;
-  
+  const year  = new Date().getFullYear();
+  const numEl = document.getElementById('invoiceNumber');
+  if (numEl) numEl.value = `INV/${year}/${month}/${num}`;
+
+  // Tambahkan 2 baris produk default
   addItem();
   addItem();
+
+  // Load data tersimpan
   loadData();
+
+  // Cek status premium
   checkPremiumStatus();
-  
-  // Template selector
+
+  // Template selector — event delegation
   document.querySelectorAll('.template-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentTemplate = btn.dataset.template;
-      document.getElementById('invoicePreview').className = `invoice-template template-${currentTemplate}`;
+      const tpl = btn.dataset.template;
+
+      // Cek apakah template premium & user tidak premium
+      if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(tpl)) {
+        if (!window.PremiumAPI.isPremium() || window.PremiumAPI.isExpired()) {
+          showToast('👑 Template ini eksklusif untuk member Premium. Upgrade sekarang!', 'warn');
+          // Scroll ke section premium
+          const premSec = document.getElementById('premium');
+          if (premSec) premSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+      }
+
+      switchTemplate(tpl);
     });
   });
 });
 
-// ── ADD ITEM ROW ───────────────────────────
+// ── ADD ITEM ROW ──────────────────────────────
 function addItem() {
   itemCount++;
-  const id = itemCount;
+  const id   = itemCount;
   const list = document.getElementById('itemsList');
-  
+  if (!list) return;
+
   const row = document.createElement('div');
   row.className = 'item-row';
   row.id = `item-${id}`;
   row.innerHTML = `
-    <input type="text" placeholder="Nama produk/jasa" class="item-name" oninput="updateSubtotal(${id})" />
-    <input type="number" placeholder="Qty" class="item-qty" min="1" value="1" oninput="updateSubtotal(${id})" />
-    <input type="number" placeholder="Harga (Rp)" class="item-price" min="0" value="" oninput="updateSubtotal(${id})" />
+    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  oninput="updateSubtotal(${id})" />
+    <input type="number" placeholder="Qty"                class="item-qty"   min="1" value="1" oninput="updateSubtotal(${id})" />
+    <input type="number" placeholder="Harga (Rp)"         class="item-price" min="0" oninput="updateSubtotal(${id})" />
     <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
   `;
   list.appendChild(row);
@@ -214,49 +376,10 @@ function removeItem(id) {
 }
 
 function updateSubtotal(id) {
-  // just triggers on input — totals calculated on generate
+  // Dipanggil saat input berubah — kalkulasi terjadi di generateInvoice
 }
 
-// ── SAVED PRODUCTS ─────────────────────────
-function saveProduct() {
-  const name = document.getElementById('saveProductName').value.trim();
-  const price = parseFloat(document.getElementById('saveProductPrice').value);
-  
-  if (!name || isNaN(price) || price <= 0) {
-    alert('Masukkan nama produk dan harga yang valid!');
-    return;
-  }
-  
-  const products = JSON.parse(localStorage.getItem('notaku_products') || '[]');
-  products.push({ name, price });
-  saveProducts(products);
-  displaySavedProducts(products);
-  closeSaveProductModal();
-  document.getElementById('saveProductName').value = '';
-  document.getElementById('saveProductPrice').value = '';
-}
-
-function displaySavedProducts(products) {
-  const container = document.getElementById('savedProducts');
-  container.innerHTML = '';
-  
-  products.forEach(product => {
-    const btn = document.createElement('div');
-    btn.className = 'saved-product';
-    btn.innerHTML = `${product.name}<br/><small>${formatRupiah(product.price)}</small>`;
-    btn.onclick = () => addSavedProductToItems(product.name, product.price);
-    container.appendChild(btn);
-  });
-}
-
-function addSavedProductToItems(name, price) {
-  addItem();
-  const items = document.querySelectorAll('.item-row');
-  const lastItem = items[items.length - 1];
-  lastItem.querySelector('.item-name').value = name;
-  lastItem.querySelector('.item-price').value = price;
-}
-
+// ── SAVED PRODUCTS ────────────────────────────
 function showSaveProductModal() {
   document.getElementById('saveProductModal').style.display = 'block';
 }
@@ -273,285 +396,357 @@ function closePremiumModal() {
   document.getElementById('premiumModal').style.display = 'none';
 }
 
-// Click outside modal to close
-window.onclick = function(event) {
+window.onclick = function (event) {
   if (event.target.classList.contains('modal')) {
     event.target.style.display = 'none';
   }
+};
+
+function saveProduct() {
+  const name  = document.getElementById('saveProductName').value.trim();
+  const price = parseFloat(document.getElementById('saveProductPrice').value);
+
+  if (!name || isNaN(price) || price <= 0) {
+    showToast('⚠️ Masukkan nama produk dan harga yang valid!', 'warn');
+    return;
+  }
+
+  const products = JSON.parse(localStorage.getItem('notaku_products') || '[]');
+  // Cegah duplikat nama
+  if (products.find(p => p.name.toLowerCase() === name.toLowerCase())) {
+    showToast('⚠️ Produk dengan nama ini sudah tersimpan.', 'warn');
+    return;
+  }
+
+  products.push({ name, price });
+  saveProducts(products);
+  displaySavedProducts(products);
+  closeSaveProductModal();
+  document.getElementById('saveProductName').value  = '';
+  document.getElementById('saveProductPrice').value = '';
+  showToast(`✅ Produk "${name}" berhasil disimpan!`, 'success');
 }
 
-// ── FORMAT RUPIAH ──────────────────────────
+function displaySavedProducts(products) {
+  const container = document.getElementById('savedProducts');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (products.length === 0) {
+    container.innerHTML = '<span style="font-size:0.75rem;color:var(--muted)">Belum ada produk tersimpan.</span>';
+    return;
+  }
+
+  products.forEach((product, index) => {
+    const btn = document.createElement('div');
+    btn.className = 'saved-product';
+    btn.title = `Klik untuk tambahkan ke nota`;
+    btn.innerHTML = `
+      <span class="sp-name">${product.name}</span>
+      <span class="sp-price">${formatRupiah(product.price)}</span>
+      <button class="sp-del" onclick="deleteProduct(event, ${index})" title="Hapus">✕</button>
+    `;
+    btn.onclick = (e) => {
+      if (e.target.classList.contains('sp-del')) return;
+      addSavedProductToItems(product.name, product.price);
+    };
+    container.appendChild(btn);
+  });
+}
+
+function deleteProduct(e, index) {
+  e.stopPropagation();
+  const products = JSON.parse(localStorage.getItem('notaku_products') || '[]');
+  const name = products[index]?.name || '';
+  products.splice(index, 1);
+  saveProducts(products);
+  displaySavedProducts(products);
+  showToast(`🗑️ Produk "${name}" dihapus.`, 'warn');
+}
+
+function addSavedProductToItems(name, price) {
+  addItem();
+  const items    = document.querySelectorAll('.item-row');
+  const lastItem = items[items.length - 1];
+  if (!lastItem) return;
+  lastItem.querySelector('.item-name').value  = name;
+  lastItem.querySelector('.item-price').value = price;
+  showToast(`✅ "${name}" ditambahkan ke nota.`, 'success');
+}
+
+// ── FORMAT HELPERS ────────────────────────────
 function formatRupiah(num) {
-  return 'Rp ' + Number(num).toLocaleString('id-ID');
+  return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
 }
 
 function formatDate(str) {
   if (!str) return '';
-  const d = new Date(str);
-  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date(str).toLocaleDateString('id-ID', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  });
 }
 
-// ── GENERATE INVOICE ───────────────────────
+// ── GENERATE INVOICE ──────────────────────────
 function generateInvoice() {
-  const rows = document.querySelectorAll('.item-row');
+  const rows  = document.querySelectorAll('.item-row');
   const items = [];
+
   rows.forEach(row => {
-    const name = row.querySelector('.item-name').value.trim();
-    const qty  = parseFloat(row.querySelector('.item-qty').value) || 0;
-    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+    const name  = row.querySelector('.item-name')?.value.trim();
+    const qty   = parseFloat(row.querySelector('.item-qty')?.value)   || 0;
+    const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
     if (name || price > 0) {
       items.push({ name: name || '-', qty, price, subtotal: qty * price });
     }
   });
-  
+
   if (items.length === 0) {
-    alert('Tambahkan minimal 1 produk dulu!');
+    showToast('⚠️ Tambahkan minimal 1 produk terlebih dahulu!', 'warn');
     return;
   }
-  
-  const storeName    = document.getElementById('storeName').value.trim() || 'Nama Toko';
-  const storeAddress = document.getElementById('storeAddress').value.trim();
-  const storePhone   = document.getElementById('storePhone').value.trim();
-  const buyerName    = document.getElementById('buyerName').value.trim() || 'Pelanggan';
-  const buyerPhone   = document.getElementById('buyerPhone').value.trim();
-  const invoiceNum   = document.getElementById('invoiceNumber').value.trim();
-  const invoiceDate  = document.getElementById('invoiceDate').value;
-  const discount     = parseFloat(document.getElementById('discount').value) || 0;
-  const taxPct       = parseFloat(document.getElementById('tax').value) || 0;
-  const notes        = document.getElementById('notes').value.trim();
-  
+
+  const get = (id) => document.getElementById(id)?.value.trim() || '';
+
+  const storeName    = get('storeName')    || 'Nama Toko';
+  const storeAddress = get('storeAddress');
+  const storePhone   = get('storePhone');
+  const buyerName    = get('buyerName')    || 'Pelanggan';
+  const buyerPhone   = get('buyerPhone');
+  const invoiceNum   = get('invoiceNumber');
+  const invoiceDate  = get('invoiceDate');
+  const discount     = parseFloat(document.getElementById('discount')?.value) || 0;
+  const taxPct       = parseFloat(document.getElementById('tax')?.value)      || 0;
+  const notes        = get('notes');
+
   const subtotal = items.reduce((s, i) => s + i.subtotal, 0);
   const taxAmt   = Math.round(subtotal * taxPct / 100);
-  const total    = subtotal - discount + taxAmt;
-  
-  // Kirim event ke Google Analytics
+  const total    = Math.max(0, subtotal - discount + taxAmt);
+
+  // Google Analytics
   if (typeof gtag === 'function') {
     gtag('event', 'generate_invoice', {
-      'event_category': 'engagement',
-      'event_label': storeName,
-      'value': total
+      event_category: 'engagement',
+      event_label: storeName,
+      value: total
     });
   }
-  
-  // Save transaction untuk statistik
+
+  // Simpan ke statistik
   saveTransaction(total);
-  
-  document.getElementById('inv-storeName').textContent = storeName;
-  document.getElementById('inv-storeAddress').textContent = storeAddress;
-  document.getElementById('inv-storePhone').textContent = storePhone ? `☎ ${storePhone}` : '';
-  document.getElementById('inv-number').textContent = invoiceNum;
-  document.getElementById('inv-date').textContent = formatDate(invoiceDate);
-  document.getElementById('inv-buyerName').textContent = buyerName;
-  document.getElementById('inv-buyerPhone').textContent = buyerPhone ? `☎ ${buyerPhone}` : '';
-  document.getElementById('inv-sigName').textContent = storeName;
-  
+
+  // ── Isi preview ────────────────────────────
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  set('inv-storeName',   storeName);
+  set('inv-storeAddress', storeAddress);
+  set('inv-storePhone',  storePhone   ? `☎ ${storePhone}`  : '');
+  set('inv-number',      invoiceNum);
+  set('inv-date',        formatDate(invoiceDate));
+  set('inv-buyerName',   buyerName);
+  set('inv-buyerPhone',  buyerPhone   ? `☎ ${buyerPhone}`  : '');
+  set('inv-sigName',     storeName);
+
   const tbody = document.getElementById('inv-items');
-  tbody.innerHTML = '';
-  items.forEach(item => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${item.name}</td>
-      <td style="text-align:center">${item.qty}</td>
-      <td>${formatRupiah(item.price)}</td>
-      <td style="text-align:right;font-weight:600">${formatRupiah(item.subtotal)}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-  
-  document.getElementById('inv-subtotal').textContent = formatRupiah(subtotal);
-  
-  if (discount > 0) {
-    document.getElementById('inv-discountRow').style.display = 'flex';
-    document.getElementById('inv-discount').textContent = `- ${formatRupiah(discount)}`;
-  } else {
-    document.getElementById('inv-discountRow').style.display = 'none';
+  if (tbody) {
+    tbody.innerHTML = '';
+    items.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.name}</td>
+        <td style="text-align:center">${item.qty}</td>
+        <td>${formatRupiah(item.price)}</td>
+        <td style="text-align:right;font-weight:600">${formatRupiah(item.subtotal)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
-  
-  if (taxPct > 0) {
-    document.getElementById('inv-taxRow').style.display = 'flex';
-    document.getElementById('inv-tax').textContent = `+ ${formatRupiah(taxAmt)} (${taxPct}%)`;
-  } else {
-    document.getElementById('inv-taxRow').style.display = 'none';
-  }
-  
-  document.getElementById('inv-total').textContent = formatRupiah(total);
-  
-  if (notes) {
-    document.getElementById('inv-notesSection').style.display = 'block';
-    document.getElementById('inv-notes').textContent = notes;
-  } else {
-    document.getElementById('inv-notesSection').style.display = 'none';
-  }
-  
-  document.getElementById('previewPlaceholder').style.display = 'none';
-  document.getElementById('invoicePreview').style.display = 'block';
-  document.getElementById('previewActions').style.display = 'flex';
-  
-  document.getElementById('invoicePreview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  set('inv-subtotal', formatRupiah(subtotal));
+
+  const discRow = document.getElementById('inv-discountRow');
+  if (discRow) discRow.style.display = discount > 0 ? 'flex' : 'none';
+  set('inv-discount', discount > 0 ? `- ${formatRupiah(discount)}` : '');
+
+  const taxRow = document.getElementById('inv-taxRow');
+  if (taxRow) taxRow.style.display = taxPct > 0 ? 'flex' : 'none';
+  set('inv-tax', taxPct > 0 ? `+ ${formatRupiah(taxAmt)} (${taxPct}%)` : '');
+
+  set('inv-total', formatRupiah(total));
+
+  const notesSection = document.getElementById('inv-notesSection');
+  if (notesSection) notesSection.style.display = notes ? 'block' : 'none';
+  set('inv-notes', notes);
+
+  // ── Tampilkan preview ──────────────────────
+  const placeholder = document.getElementById('previewPlaceholder');
+  const preview     = document.getElementById('invoicePreview');
+  const actions     = document.getElementById('previewActions');
+
+  if (placeholder) placeholder.style.display = 'none';
+  if (preview)     preview.style.display     = 'block';
+  if (actions)     actions.style.display     = 'flex';
+
+  // Terapkan template aktif
+  if (preview) preview.className = `invoice-template template-${currentTemplate}`;
+
+  // Scroll ke preview
+  if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  showToast('✅ Nota berhasil dibuat!', 'success');
 }
 
-// ── DOWNLOAD PDF (OPTIMIZED FOR HP) ──
+// ── DOWNLOAD PDF ──────────────────────────────
 async function downloadPDF() {
   const { jsPDF } = window.jspdf;
-  const invoice = document.getElementById('invoicePreview');
-  
-  const btn = event.target;
-  const originalText = btn.textContent;
-  btn.textContent = '⏳ Menyiapkan...';
-  btn.disabled = true;
-  
-  // Simpan style asli sementara
-  const originalStyle = {
-    width: invoice.style.width,
+  const invoice   = document.getElementById('invoicePreview');
+  if (!invoice) return;
+
+  const btn          = event?.target?.closest('button') || event?.target;
+  const originalHTML = btn ? btn.innerHTML : '';
+  if (btn) { btn.innerHTML = '⏳ Menyiapkan…'; btn.disabled = true; }
+
+  // Simpan style asli
+  const orig = {
+    width:    invoice.style.width,
     maxWidth: invoice.style.maxWidth,
-    margin: invoice.style.margin,
-    transform: invoice.style.transform
+    margin:   invoice.style.margin
   };
-  
-  // Set style untuk capture yang optimal
-  invoice.style.width = '100%';
+
+  invoice.style.width    = '600px';
   invoice.style.maxWidth = '600px';
-  invoice.style.margin = '0 auto';
-  invoice.style.transform = 'scale(1)';
-  
+  invoice.style.margin   = '0';
+
   try {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // Ambil ukuran asli elemen
-    const originalWidth = invoice.offsetWidth;
-    const originalHeight = invoice.offsetHeight;
-    
-    // Hitung scale yang tepat untuk A5 (148mm x 210mm)
-    const targetWidth = 600; // lebar target dalam pixel
-    const scale = targetWidth / originalWidth;
-    
+    await new Promise(r => setTimeout(r, 250));
+
     const canvas = await html2canvas(invoice, {
-      scale: scale * 2,  // Scale dinamis
-      useCORS: true,
+      scale:           2.5,
+      useCORS:         true,
       backgroundColor: '#ffffff',
-      logging: false,
-      windowWidth: originalWidth,
-      windowHeight: originalHeight,
-      onclone: (clonedDoc, element) => {
-        // Pastikan cloned element juga rapi
-        element.style.width = '100%';
-        element.style.maxWidth = '600px';
-        element.style.margin = '0 auto';
-      }
+      logging:         false,
+      windowWidth:     600
     });
-    
+
     const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    
-    // Gunakan format A5 (148mm x 210mm) - landscape lebih nyaman di HP?
-    // Coba portrait dulu
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a5'
-    });
-    
-    const pdfWidth = pdf.internal.pageSize.getWidth();  // 148 mm
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    
-    // Tambahkan margin kecil agar tidak kepotong
-    const margin = 5; // margin 5mm
-    const contentWidth = pdfWidth - (margin * 2);
-    const contentHeight = (canvas.height * contentWidth) / canvas.width;
-    
-    pdf.addImage(imgData, 'JPEG', margin, margin, contentWidth, contentHeight, undefined, 'FAST');
-    
-    const filename = `nota-${document.getElementById('invoiceNumber').value.replace(/\//g, '-')}.pdf`;
+
+    const pdf      = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
+    const pdfW     = pdf.internal.pageSize.getWidth();
+    const margin   = 6;
+    const contentW = pdfW - margin * 2;
+    const contentH = (canvas.height * contentW) / canvas.width;
+
+    pdf.addImage(imgData, 'JPEG', margin, margin, contentW, contentH, undefined, 'FAST');
+
+    const filename = `nota-${document.getElementById('invoiceNumber')?.value.replace(/\//g, '-') || 'notaku'}.pdf`;
     pdf.save(filename);
-    
-  } catch (e) {
-    console.error('PDF Error:', e);
-    alert('Gagal generate PDF. Silakan coba lagi atau gunakan fitur Print.');
+
+    showToast('✅ PDF berhasil didownload!', 'success');
+
+    if (typeof gtag === 'function') {
+      gtag('event', 'download_pdf', { event_category: 'engagement' });
+    }
+
+  } catch (err) {
+    console.error('PDF Error:', err);
+    showToast('❌ Gagal membuat PDF. Coba gunakan fitur Print.', 'error');
   }
-  
-  // Kembalikan style asli
-  invoice.style.width = originalStyle.width;
-  invoice.style.maxWidth = originalStyle.maxWidth;
-  invoice.style.margin = originalStyle.margin;
-  invoice.style.transform = originalStyle.transform;
-  
-  btn.textContent = originalText;
-  btn.disabled = false;
+
+  // Kembalikan style
+  invoice.style.width    = orig.width;
+  invoice.style.maxWidth = orig.maxWidth;
+  invoice.style.margin   = orig.margin;
+
+  if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
 }
 
-// ── PRINT ──────────────────────────────────
+// ── PRINT ─────────────────────────────────────
 function printInvoice() {
-  const invoice = document.getElementById('invoicePreview').outerHTML;
+  const invoice = document.getElementById('invoicePreview');
+  if (!invoice) return;
+
   const printWin = window.open('', '_blank');
-  printWin.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Nota</title>
-      <link rel="stylesheet" href="style.css"/>
-      <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
-      <style>
-        body { padding: 1rem; background: white; }
-        @media print { body { padding: 0; } }
-      </style>
-    </head>
-    <body>
-      ${invoice}
-      <script>window.onload = () => { window.print(); window.close(); }<\/script>
-    </body>
-    </html>
-  `);
+  printWin.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Nota — NotaKu</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    body { padding: 1rem; background: #fff; }
+    @media print { body { padding: 0; } .inv-watermark { display: none !important; } }
+  </style>
+</head>
+<body>
+  ${invoice.outerHTML}
+  <script>window.onload = () => { window.print(); window.close(); }<\/script>
+</body>
+</html>`);
   printWin.document.close();
 }
 
-// ========== FUNGSI PREMIUM REAL ==========
+// ── PAYMENT INFO ──────────────────────────────
 function showPaymentInfo(paket, nominal) {
-    const paymentDiv = document.getElementById('paymentInfo');
-    const amountSpan = document.getElementById('paymentAmount');
-    amountSpan.textContent = `Rp ${nominal.toLocaleString('id-ID')}`;
-    paymentDiv.style.display = 'block';
-    paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    if (typeof gtag === 'function') {
-        gtag('event', 'view_payment_info', {
-            'event_category': 'premium',
-            'event_label': paket,
-            'value': nominal
-        });
-    }
+  const paymentDiv  = document.getElementById('paymentInfo');
+  const amountSpan  = document.getElementById('paymentAmount');
+
+  if (!paymentDiv || !amountSpan) return;
+
+  amountSpan.textContent = `Rp ${nominal.toLocaleString('id-ID')}`;
+  paymentDiv.style.display = 'block';
+  paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  if (typeof gtag === 'function') {
+    gtag('event', 'view_payment_info', {
+      event_category: 'premium',
+      event_label: paket,
+      value: nominal
+    });
+  }
 }
 
 function copyPaymentInfo() {
-    const rekening = '359301009186508';
-    navigator.clipboard.writeText(rekening);
-    alert('✅ Nomor rekening sudah di-copy: ' + rekening);
-    
-    if (typeof gtag === 'function') {
-        gtag('event', 'copy_rekening', {
-            'event_category': 'premium',
-            'event_label': 'BRI'
-        });
-    }
-}
-// Tambahkan fungsi ini di script.js
-function exportStats() {
-  if (transactionHistory.length === 0) {
-    alert('Belum ada data transaksi untuk diexport.');
-    return;
+  const rekening = '359301009186508';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(rekening).then(() => {
+      showToast('✅ No. rekening BRI berhasil di-copy!', 'success');
+    });
+  } else {
+    // Fallback
+    const el = document.createElement('textarea');
+    el.value = rekening;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('✅ No. rekening BRI berhasil di-copy!', 'success');
   }
-  
-  let csvContent = "Tanggal,Total (Rp)\n";
-  transactionHistory.forEach(t => {
-    const date = new Date(t.date).toLocaleDateString('id-ID');
-    csvContent += `${date},${t.total}\n`;
-  });
-  
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `notaku-stats-${new Date().toISOString().split('T')[0]}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  
-  alert('✅ Data statistik sudah diexport ke CSV!');
+
+  if (typeof gtag === 'function') {
+    gtag('event', 'copy_rekening', { event_category: 'premium', event_label: 'BRI' });
+  }
 }
+
+// ── STYLE TAMBAHAN UNTUK SAVED PRODUCTS ───────
+// Inject CSS inline untuk elemen dinamis
+(function injectDynamicStyles() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .saved-product {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      padding: 0.4rem 1.8rem 0.4rem 0.7rem;
+    }
+    .sp-name  { font-size: 0.78rem; font-weight: 600; color: var(--ink); }
+    .sp-price { font-family: var(--font-mono, monospace); font-size: 0.65rem; color: var(--muted); }
+    .sp-del   {
+      position: absolute; top: 0.3rem; right: 0.3rem;
+      background: none; border: none; color: var(--muted);
+      font-size: 0.65rem; cursor: pointer; padding: 0.1rem 0.3rem;
+      border-radius: 4px; transition: all 0.15s; line-height: 1;
+    }
+    .sp-del:hover { background: rgba(192,67,26,0.1); color: var(--rust); }
+  `;
+  document.head.appendChild(style);
+})();
