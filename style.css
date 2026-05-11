@@ -1458,3 +1458,80 @@ textarea {
   .premium-plans { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
 }
+/* ============================================
+   DARK MODE TOGGLE & EXPORT BUTTON
+   ============================================ */
+
+/* Dark Mode Styles */
+body.dark-mode {
+  --ink: #faf8f4;
+  --paper: #0f0d0a;
+  --cream: #1e1915;
+  --muted: #a99e8e;
+  --border: #2a241e;
+  --shadow: rgba(250,248,243,0.05);
+  --shadow-lg: rgba(250,248,243,0.08);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body.dark-mode .glass-panel,
+body.dark-mode .stats-container,
+body.dark-mode .trust-card,
+body.dark-mode .modal-content,
+body.dark-mode .invoice-template {
+  background: rgba(20, 18, 16, 0.95);
+  border-color: var(--border);
+}
+
+body.dark-mode .stat-card,
+body.dark-mode .saved-product,
+body.dark-mode .plan {
+  background: #1a1612;
+  border-color: var(--border);
+}
+
+body.dark-mode .preview-placeholder {
+  color: var(--muted);
+}
+
+body.dark-mode .trust-card p,
+body.dark-mode .stat-label,
+body.dark-mode .panel-step {
+  color: var(--muted);
+}
+
+body.dark-mode .inv-table td {
+  border-bottom-color: #2a241e;
+}
+
+body.dark-mode .inv-divider {
+  background: linear-gradient(90deg, var(--gold), #2a241e);
+}
+
+body.dark-mode .inv-notes {
+  background: #1e1915;
+  color: var(--muted);
+}
+
+body.dark-mode .inv-powered {
+  border-top-color: #2a241e;
+  color: #555;
+}
+
+/* Dark Mode Toggle Button */
+.dark-toggle:hover {
+  background: rgba(201,149,42,0.2) !important;
+}
+
+/* Export Button */
+.export-btn {
+  background: #2a7a4b !important;
+  border-color: #2a7a4b !important;
+  color: white !important;
+}
+
+.export-btn:hover {
+  background: #1a5a3b !important;
+  color: white !important;
+}
