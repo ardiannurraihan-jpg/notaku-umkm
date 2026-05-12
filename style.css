@@ -32,6 +32,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
+/* Di bagian responsive atau global */
+input, textarea, button {
+  font-size: 16px; /* Mencegah auto-zoom di iOS saat fokus */
+}
+
 body {
   font-family: var(--font-body);
   background: var(--paper);
