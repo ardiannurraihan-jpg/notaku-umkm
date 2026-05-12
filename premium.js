@@ -1,94 +1,97 @@
 // ============================================
 //   NOTAKU — PREMIUM LICENSE SYSTEM
+//   Supports 8 exclusive templates
 // ============================================
 
 const PREMIUM_CONFIG = {
 
-  validKeys: ["DEMO-PREMIUM-2025"],
-
-  premiumTemplates: [
-    'premium-luxury', 'premium-elegant', 'premium-dark', 'premium-art',
-    'premium-nature', 'premium-neon', 'premium-sakura', 'premium-royal'
+  // ── Valid license keys ──────────────────
+  validKeys: [
+    "DEMO-PREMIUM-2025",
+    // Tambahkan kode premium Anda di sini
   ],
 
-  // Ambil semua key dari admin (localStorage)
-  getAllValidKeys: function() {
-    let adminKeys = [];
-    try {
-      const saved = localStorage.getItem('notaku_all_license_keys');
-      if (saved) {
-        const keys = JSON.parse(saved);
-        adminKeys = keys.filter(k => new Date(k.expiresAt) > new Date()).map(k => k.key);
-      }
-    } catch(e) {}
-    return [...this.validKeys, ...adminKeys];
-  },
+  // ── Daftar semua template premium ───────
+  premiumTemplates: [
+    'premium-luxury',
+    'premium-elegant',
+    'premium-dark',
+    'premium-art',
+    'premium-nature',
+    'premium-neon',
+    'premium-sakura',
+    'premium-royal'
+  ],
 
-  isPremium: function() {
+  // ── Cek apakah user premium ─────────────
+  isPremium: function () {
     const saved = localStorage.getItem('notaku_premium_key');
-    if (!saved) return false;
-    const validKeys = this.getAllValidKeys();
-    if (!validKeys.includes(saved)) return false;
-    return !this.isExpired();
+    return !!(saved && this.validKeys.includes(saved));
   },
 
-  activate: function(key) {
+  // ── Aktivasi premium ────────────────────
+  activate: function (key) {
     const cleanKey = key.trim().toUpperCase();
-    const validKeys = this.getAllValidKeys();
-    const matched = validKeys.find(k => k.toUpperCase() === cleanKey);
-    
+    const matched = this.validKeys.find(k => k.toUpperCase() === cleanKey);
     if (matched) {
       localStorage.setItem('notaku_premium_key', matched);
-      try {
-        const saved = localStorage.getItem('notaku_all_license_keys');
-        if (saved) {
-          const keys = JSON.parse(saved);
-          const keyData = keys.find(k => k.key === matched);
-          if (keyData && keyData.expiresAt) {
-            localStorage.setItem('notaku_premium_until', keyData.expiresAt);
-            localStorage.setItem('notaku_premium_plan', keyData.duration === 365 ? 'tahunan' : (keyData.duration === 90 ? '3bulan' : 'bulanan'));
-            return true;
-          }
-        }
-      } catch(e) {}
-      const days = matched.includes('YEARLY') ? 365 : 30;
-      localStorage.setItem('notaku_premium_until', new Date(Date.now() + days * 86400000).toISOString());
-      localStorage.setItem('notaku_premium_plan', days === 365 ? 'tahunan' : 'bulanan');
+      // Cek apakah key tahunan (mengandung "YEARLY" atau "ANNUAL")
+      const isYearly = matched.includes('YEARLY') || matched.includes('ANNUAL') || matched.includes('TAHUNAN');
+      const days = isYearly ? 365 : 30;
+      const until = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+      localStorage.setItem('notaku_premium_until', until);
+      localStorage.setItem('notaku_premium_plan', isYearly ? 'tahunan' : 'bulanan');
       return true;
     }
     return false;
   },
 
-  isExpired: function() {
+  // ── Cek masa aktif ──────────────────────
+  isExpired: function () {
     const until = localStorage.getItem('notaku_premium_until');
     if (!until) return true;
     return new Date(until) < new Date();
   },
 
-  getRemainingDays: function() {
+  // ── Sisa hari aktif ─────────────────────
+  getRemainingDays: function () {
     const until = localStorage.getItem('notaku_premium_until');
     if (!until) return 0;
-    return Math.max(0, Math.ceil((new Date(until) - new Date()) / 86400000));
+    const diff = new Date(until) - new Date();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   },
 
-  getPlanName: function() {
+  // ── Nama paket ──────────────────────────
+  getPlanName: function () {
     return localStorage.getItem('notaku_premium_plan') || 'bulanan';
   },
 
-  getUntilFormatted: function() {
+  // ── Tanggal berakhir (formatted) ────────
+  getUntilFormatted: function () {
     const until = localStorage.getItem('notaku_premium_until');
-    return until ? new Date(until).toLocaleDateString('id-ID') : '-';
+    if (!until) return '-';
+    return new Date(until).toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
   },
 
-  isTemplatePremium: function(templateName) {
+  // ── Apakah watermark perlu disembunyikan ─
+  shouldHideWatermark: function () {
+    return this.isPremium() && !this.isExpired();
+  },
+
+  // ── Apakah template ini premium ─────────
+  isTemplatePremium: function (templateName) {
     return this.premiumTemplates.includes(templateName);
   },
 
-  deactivate: function() {
+  // ── Deaktivasi (logout premium) ─────────
+  deactivate: function () {
     localStorage.removeItem('notaku_premium_key');
     localStorage.removeItem('notaku_premium_until');
     localStorage.removeItem('notaku_premium_plan');
   }
 };
 
+// Export ke global
 window.PremiumAPI = PREMIUM_CONFIG;
