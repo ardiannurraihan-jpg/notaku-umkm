@@ -392,7 +392,7 @@ function checkPremiumStatus() {
   const isExpired = window.PremiumAPI.isExpired();
   const watermark = document.getElementById('watermark');
   const statusDiv = document.getElementById('premiumStatus');
-  const aiButton = document.getElementById('aiSmartBtn');
+  const aiContainer = document.getElementById('aiSmartContainer');
   
   if (isPremium && !isExpired) {
     if (watermark) watermark.style.display = 'none';
