@@ -222,7 +222,7 @@ function exportToExcel() {
   showToast('✅ Laporan Excel berhasil diunduh!', 'success');
 }
 
-// ────────── AI SMART INVOICE ───────────────
+// ────────── AI SMART INVOICE (FIXED - LEBIH CERDAS) ───────────────
 async function aiSmartSuggest() {
   const items = [];
   document.querySelectorAll('.item-row').forEach(row => {
@@ -230,39 +230,112 @@ async function aiSmartSuggest() {
     const qty = row.querySelector('.item-qty')?.value || 1;
     if (name) items.push({ name, qty });
   });
+  
   if (items.length === 0) {
     showToast('Tambahkan produk dulu!', 'warn');
     return;
   }
-  showToast('🤖 AI sedang berpikir...', 'info');
-  const prompt = `Anda adalah asisten bisnis untuk UMKM Indonesia. Berdasarkan daftar produk: ${items.map(i => `${i.name} (${i.qty}x)`).join(', ')}, berikan 3 saran singkat: 1. Saran harga jual fair (dalam Rupiah), 2. Saran diskon menarik (persen), 3. Saran deskripsi nota profesional (maks 50 kata). Format JSON dengan key: hargaSaran, diskonSaran, deskripsiSaran`;
+  
+  showToast('🤖 AI sedang menganalisis produk...', 'info');
+  
+  // Prompt yang lebih baik dengan contoh harga riil
+  const prompt = `Anda adalah AI asisten bisnis UMKM Indonesia yang ahli dalam menentukan harga produk.  
+Berikut daftar produk yang dijual: ${items.map(i => `${i.name} (${i.qty}x)`).join(', ')}
+
+TUGAS ANDA:
+1. Perhatikan NAMA PRODUK dengan seksama. Jika produk adalah barang branded/merek terkenal (seperti Nike, Adidas, New Balance, Samsung, Apple, dll), berikan harga yang sesuai dengan pasaran (bisa mencapai 500rb - 5jt).
+2. Jika produk adalah barang umum (seperti tas, sepatu, baju, celana, jam tangan, dll), berikan harga wajar sesuai kualitas (50rb - 500rb).
+3. Jika produk adalah makanan/minuman, berikan harga 5rb - 50rb.
+4. Jika produk adalah elektronik (hp, laptop, charger, dll), berikan harga 100rb - 10jt tergantung jenisnya.
+5. Berikan diskon yang LOGIS (0-20% untuk produk baru, 20-50% untuk promo/bundling).
+6. Berikan deskripsi nota yang profesional dan spesifik sesuai produk.
+
+Format jawaban HARUS JSON dengan key: hargaSaran, diskonSaran, deskripsiSaran
+
+CONTOH JAWABAN YANG BENAR:
+- Untuk "Sepatu New Balance 574": {"hargaSaran": "Rp 1.200.000 - 1.500.000", "diskonSaran": "0", "deskripsiSaran": "Terima kasih telah membeli Sepatu New Balance 574 original. Bergaransi resmi 1 tahun."}
+- Untuk "Sepatu lokal": {"hargaSaran": "Rp 150.000 - 250.000", "diskonSaran": "10", "deskripsiSaran": "Terima kasih telah berbelanja sepatu lokal berkualitas."}
+- Untuk "Nasi Goreng": {"hargaSaran": "Rp 15.000 - 25.000", "diskonSaran": "0", "deskripsiSaran": "Selamat menikmati! Nasi Goreng spesial dengan topping pilihan."}
+
+JANGAN berikan harga generik seperti 25rb-50rb untuk produk yang JELAS lebih mahal. Analisis nama produk dengan teliti!`;
+  
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
     });
+    
     const data = await response.json();
     let aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     aiText = aiText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    
     let suggestion;
-    try { suggestion = JSON.parse(aiText); } catch(e) { suggestion = { hargaSaran: 'Rp 25.000 - 50.000', diskonSaran: '5', deskripsiSaran: 'Terima kasih telah berbelanja!' }; }
+    try {
+      suggestion = JSON.parse(aiText);
+    } catch(e) {
+      // Fallback cerdas berdasarkan nama produk
+      const productNames = items.map(i => i.name.toLowerCase()).join(' ');
+      let hargaSaran = 'Rp 50.000 - 100.000';
+      let diskonSaran = '5';
+      let deskripsiSaran = 'Terima kasih telah berbelanja!';
+      
+      // Deteksi merek terkenal
+      if (productNames.includes('new balance') || productNames.includes('nike') || productNames.includes('adidas') || productNames.includes('puma') || productNames.includes('reebok')) {
+        hargaSaran = 'Rp 1.200.000 - 2.500.000';
+        deskripsiSaran = 'Terima kasih telah membeli sepatu original branded. Garansi resmi tersedia.';
+      }
+      else if (productNames.includes('sepatu') || productNames.includes('sneakers') || productNames.includes('shoe')) {
+        hargaSaran = 'Rp 200.000 - 500.000';
+        deskripsiSaran = 'Terima kasih telah membeli sepatu berkualitas.';
+      }
+      else if (productNames.includes('iphone') || productNames.includes('samsung') || productNames.includes('xiaomi') || productNames.includes('oppo') || productNames.includes('vivo')) {
+        hargaSaran = 'Rp 2.000.000 - 15.000.000';
+        diskonSaran = '0';
+        deskripsiSaran = 'Terima kasih telah membeli HP original. Garansi resmi 1 tahun.';
+      }
+      else if (productNames.includes('laptop') || productNames.includes('notebook') || productNames.includes('macbook')) {
+        hargaSaran = 'Rp 5.000.000 - 25.000.000';
+        diskonSaran = '0';
+        deskripsiSaran = 'Terima kasih telah membeli laptop. Garansi resmi tersedia.';
+      }
+      else if (productNames.includes('baju') || productNames.includes('kaos') || productNames.includes('kemeja') || productNames.includes('jaket')) {
+        hargaSaran = 'Rp 75.000 - 250.000';
+        deskripsiSaran = 'Terima kasih telah berbelanja pakaian berkualitas.';
+      }
+      else if (productNames.includes('nasi') || productNames.includes('mie') || productNames.includes('ayam') || productNames.includes('minuman')) {
+        hargaSaran = 'Rp 10.000 - 35.000';
+        diskonSaran = '0';
+        deskripsiSaran = 'Selamat menikmati!';
+      }
+      else if (productNames.includes('tas') || productNames.includes('bag')) {
+        hargaSaran = 'Rp 150.000 - 400.000';
+        deskripsiSaran = 'Terima kasih telah membeli tas berkualitas.';
+      }
+      else if (productNames.includes('jam') || productNames.includes('watch')) {
+        hargaSaran = 'Rp 250.000 - 1.500.000';
+        deskripsiSaran = 'Terima kasih telah membeli jam tangan.';
+      }
+      
+      suggestion = { hargaSaran, diskonSaran, deskripsiSaran };
+    }
+    
     document.getElementById('aiSuggestionResult').innerHTML = `
       <div style="background:rgba(201,149,42,0.1); padding:1rem; border-radius:8px; margin-top:0.5rem;">
         <div style="color:var(--gold); margin-bottom:0.5rem;">🤖 AI Suggestion</div>
         <div><strong>💰 Harga:</strong> ${suggestion.hargaSaran}</div>
-        <div><strong>🎯 Diskon:</strong> ${suggestion.diskonSaran}</div>
+        <div><strong>🎯 Diskon:</strong> ${suggestion.diskonSaran}%</div>
         <div><strong>📝 Deskripsi:</strong> ${suggestion.deskripsiSaran}</div>
-        <button onclick="applyAIDiscount('${suggestion.diskonSaran || '5'}')" style="margin-top:0.5rem;background:var(--gold);border:none;padding:0.2rem 0.8rem;border-radius:4px;cursor:pointer;">✨ Terapkan Diskon</button>
+        <button onclick="applyAIDiscount('${suggestion.diskonSaran}')" style="margin-top:0.5rem;background:var(--gold);border:none;padding:0.2rem 0.8rem;border-radius:4px;cursor:pointer;">✨ Terapkan Diskon</button>
       </div>
     `;
     showToast('AI saran siap!', 'success');
-  } catch(e) { showToast('AI sedang sibuk, coba lagi', 'error'); }
-}
-
-function applyAIDiscount(discountStr) {
-  const disc = parseInt(discountStr) || 5;
-  document.getElementById('discount').value = disc;
-  showToast(`✅ Diskon ${disc}% diterapkan!`, 'success');
+  } catch(e) {
+    console.error('AI Error:', e);
+    showToast('AI sedang sibuk, coba lagi', 'error');
+  }
 }
 
 // ────────── LOAD DATA ─────────────────────
