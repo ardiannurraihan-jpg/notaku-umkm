@@ -339,7 +339,7 @@ function resetStats() {
 // ── EXPORT CSV ───────────────────────────────
 function exportStats() {
   if (transactionHistory.length === 0) {
-    showToast('⚠️ Belum ada data transaksi untuk diexport.', 'warn');
+    showToast('⚠️ Belum ada数据 transaksi untuk diexport.', 'warn');
     return;
   }
 
@@ -431,7 +431,7 @@ function addItem(name = '', qty = 1, price = 0) {
   row.className = 'item-row';
   row.id = `item-${id}`;
   row.innerHTML = `
-    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${name}" oninput="updateSubtotal(${id})" />
+    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${name.replace(/"/g, '&quot;')}" oninput="updateSubtotal(${id})" />
     <input type="number" placeholder="Qty"                class="item-qty"   min="1" value="${qty}" oninput="updateSubtotal(${id})" />
     <input type="number" placeholder="Harga (Rp)"         class="item-price" min="0" value="${price}" oninput="updateSubtotal(${id})" />
     <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
@@ -510,7 +510,7 @@ function displaySavedProducts(products) {
     btn.className = 'saved-product';
     btn.title = `Klik untuk tambahkan ke nota`;
     btn.innerHTML = `
-      <span class="sp-name">${product.name}</span>
+      <span class="sp-name">${escapeHtml(product.name)}</span>
       <span class="sp-price">${formatRupiah(product.price)}</span>
       <button class="sp-del" onclick="deleteProduct(event, ${index})" title="Hapus">✕</button>
     `;
@@ -535,6 +535,17 @@ function deleteProduct(e, index) {
 function addSavedProductToItems(name, price) {
   addItem(name, 1, price);
   showToast(`✅ "${name}" ditambahkan ke nota.`, 'success');
+}
+
+// ── HELPER ESCAPE HTML ───────────────────────
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
 }
 
 // ── FORMAT HELPERS ────────────────────────────
@@ -636,7 +647,7 @@ function generateInvoice() {
     items.forEach(item => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${item.name}</td>
+        <td>${escapeHtml(item.name)}</td>
         <td style="text-align:center">${item.qty}</td>
         <td>${formatRupiah(item.price)}</td>
         <td style="text-align:right;font-weight:600">${formatRupiah(item.subtotal)}</td>
@@ -779,6 +790,9 @@ function showPaymentInfo(paket, nominal) {
   amountSpan.textContent = `Rp ${nominal.toLocaleString('id-ID')}`;
   paymentDiv.style.display = 'block';
   paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // Optional: tampilkan toast konfirmasi
+  showToast(`✅ Silakan transfer Rp ${nominal.toLocaleString('id-ID')}`, 'success');
 
   if (typeof gtag === 'function') {
     gtag('event', 'view_payment_info', {
