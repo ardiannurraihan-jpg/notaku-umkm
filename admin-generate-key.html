@@ -5,231 +5,241 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin NotaKu - Generate License Key</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Lora', serif;
             background: #faf7f0;
             padding: 2rem;
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
         }
         .card {
             background: white;
-            border-radius: 12px;
+            border-radius: 24px;
             padding: 2rem;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
         }
-        input, select, button {
+        h1, h2, h3 { font-family: 'Syne', sans-serif; color: #1a1208; margin-bottom: 0.5rem; }
+        h1 { color: #c9952a; font-size: 1.8rem; }
+        .bank-info {
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 16px;
+            margin: 1rem 0;
+            border-left: 4px solid #2a7a4b;
+        }
+        label { display: block; margin: 1rem 0 0.3rem; font-weight: 600; color: #4a3e2e; }
+        input, select {
             width: 100%;
-            padding: 0.75rem;
-            margin: 0.5rem 0;
-            border: 1px solid #ddd3bb;
-            border-radius: 6px;
+            padding: 0.8rem;
+            border: 1.5px solid #ddd3bb;
+            border-radius: 12px;
             font-size: 1rem;
+            background: white;
         }
         button {
             background: #c9952a;
             color: #1a1208;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
             font-weight: bold;
             cursor: pointer;
+            margin-top: 1rem;
+            font-size: 1rem;
+            transition: all 0.2s;
         }
+        button:hover { background: #e8b84b; transform: translateY(-2px); }
         .generated-key {
             background: #f2ead8;
             padding: 1rem;
-            border-radius: 6px;
+            border-radius: 12px;
             font-family: monospace;
             font-size: 1.2rem;
             text-align: center;
+            word-break: break-all;
             margin: 1rem 0;
         }
-        .bank-info {
-            background: #e8f4e8;
+        .key-item {
+            background: #faf7f0;
+            border-radius: 12px;
             padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid #ddd3bb;
         }
-        hr {
-            border: none;
-            border-top: 1px solid #ddd;
+        .key-code { font-family: monospace; font-weight: bold; font-size: 0.9rem; color: #c9952a; }
+        .delete-btn {
+            background: #c0431a;
+            color: white;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .delete-btn:hover { background: #a03512; }
+        hr { margin: 1.5rem 0; border: none; border-top: 1px solid #ddd3bb; }
+        .note { font-size: 0.7rem; color: #7a6e5e; margin-top: 0.5rem; }
+        .success-badge { background: #2a7a4b; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; display: inline-block; }
+        .expired-badge { background: #c0431a; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; display: inline-block; }
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #c9952a;
+            border-radius: 12px;
+            padding: 1rem;
             margin: 1rem 0;
+            font-size: 0.85rem;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>🔐 Admin NotaKu</h1>
-        <p>Generate license key untuk user premium</p>
-        
-        <div class="bank-info">
-            <strong>🏦 REKENING ANDA:</strong><br>
-            Bank BRI<br>
-            No. Rekening: 3593 0100 9186 508<br>
-            A.n. [Ardian Nurraihan]
-        </div>
-        
-        <hr>
-        
-        <h3>Generate License Key Baru</h3>
-        <label>Nama Pembeli:</label>
-        <input type="text" id="buyerName" placeholder="Contoh: Warung Makmur">
-        
-        <label>Durasi Premium:</label>
-        <select id="duration">
-            <option value="30">1 Bulan (Rp 49.000)</option>
-            <option value="365">1 Tahun (Rp 499.000) - Hemat 15%</option>
-        </select>
-        
-        <button onclick="generateLicenseKey()">Generate License Key</button>
-        
-        <div id="result" style="display:none;">
-            <h3>✅ License Key:</h3>
-            <div class="generated-key" id="licenseKey"></div>
-            <p style="font-size:0.8rem; color:#666;">Kirim kode ini ke pembeli melalui WhatsApp/Email</p>
-        </div>
-        
-        <hr>
-        
-        <h3>📋 Semua License Key Aktif</h3>
-        <div id="keyList"></div>
+<div class="card">
+    <h1>🔐 Admin NotaKu</h1>
+    <p>Generate & kelola license key premium</p>
+
+    <div class="bank-info">
+        <strong>🏦 REKENING ANDA (BRI)</strong><br>
+        No. Rekening: 3593 0100 9186 508<br>
+        A.n. Ardian Nurraihan
     </div>
 
-    <script>
-        // Load existing keys dari localStorage
-        let allKeys = JSON.parse(localStorage.getItem('notaku_all_license_keys') || '[]');
+    <hr>
+
+    <h3>📝 Generate License Key Baru</h3>
+    <label>Nama Pembeli:</label>
+    <input type="text" id="buyerName" placeholder="Contoh: Toko Makmur Jaya">
+
+    <label>Durasi Premium:</label>
+    <select id="duration">
+        <option value="30">1 Bulan (Rp 49.000)</option>
+        <option value="90">3 Bulan (Rp 129.000) - Hemat 12%</option>
+        <option value="365">1 Tahun (Rp 499.000) - Hemat 15%</option>
+    </select>
+
+    <button onclick="generateLicenseKey()">✨ Generate License Key</button>
+
+    <div id="result" style="display:none;">
+        <h3>✅ License Key:</h3>
+        <div class="generated-key" id="licenseKey"></div>
+        <p class="note">📋 Kode sudah di-copy otomatis. Kirim ke pembeli via WhatsApp/Email</p>
+        <div class="warning-box">
+            ⚠️ <strong>PENTING:</strong> Setelah generate, key akan otomatis tersimpan di sistem.<br>
+            User cukup masukkan kode di form aktivasi pada halaman utama NotaKu.<br>
+            <strong>TIDAK PERLU update premium.js manual lagi!</strong>
+        </div>
+    </div>
+
+    <hr>
+
+    <h3>📋 Semua License Key Aktif</h3>
+    <div id="keyList"></div>
+    <div id="expiredList"></div>
+
+    <hr>
+    <p class="note">💡 Sistem penyimpanan menggunakan localStorage. Key akan tetap valid sampai expired date.</p>
+    <p class="note">🔗 <a href="/" target="_blank">Kembali ke NotaKu</a></p>
+</div>
+
+<script>
+    // Load existing keys dari localStorage
+    let allKeys = JSON.parse(localStorage.getItem('notaku_all_license_keys') || '[]');
+    
+    function saveKeys() {
+        localStorage.setItem('notaku_all_license_keys', JSON.stringify(allKeys));
+        // Trigger event untuk sync ke premium.js
+        window.dispatchEvent(new Event('storage'));
+        displayAllKeys();
+    }
+    
+    function generateLicenseKey() {
+        const buyerName = document.getElementById('buyerName').value.trim();
+        const duration = parseInt(document.getElementById('duration').value);
         
-        function saveKeys() {
-            localStorage.setItem('notaku_all_license_keys', JSON.stringify(allKeys));
+        if (!buyerName) {
+            alert('Masukkan nama pembeli!');
+            return;
         }
         
-        function generateLicenseKey() {
-            const buyerName = document.getElementById('buyerName').value.trim();
-            const duration = parseInt(document.getElementById('duration').value);
-            
-            if (!buyerName) {
-                alert('Masukkan nama pembeli!');
-                return;
-            }
-            
-            // Generate random key format: NOTAKU-XXXX-XXXX-XXXX
-            const randomPart = () => Math.random().toString(36).substring(2, 6).toUpperCase();
-            const key = `NOTAKU-${randomPart()}-${randomPart()}-${randomPart()}`;
-            
-            const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + duration);
-            
-            const newKey = {
-                key: key,
-                buyerName: buyerName,
-                createdAt: new Date().toISOString(),
-                expiresAt: expiresAt.toISOString(),
-                duration: duration,
-                isActive: true
-            };
-            
-            allKeys.push(newKey);
-            saveKeys();
-            updatePremiumJS();
-            
-            // Tampilkan hasil
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('licenseKey').innerHTML = key;
-            
-            // Reset form sedikit
-            document.getElementById('buyerName').value = '';
-            
-            // Refresh daftar
-            displayAllKeys();
-            
-            // Copy ke clipboard otomatis
-            navigator.clipboard.writeText(key);
+        // Generate random key format: NOTAKU-XXXX-XXXX-XXXX
+        const randomPart = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+        const key = `NOTAKU-${randomPart()}-${randomPart()}-${randomPart()}`;
+        
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + duration);
+        
+        const newKey = {
+            key: key,
+            buyerName: buyerName,
+            createdAt: new Date().toISOString(),
+            expiresAt: expiresAt.toISOString(),
+            duration: duration,
+            isActive: true
+        };
+        
+        allKeys.push(newKey);
+        saveKeys();
+        
+        // Tampilkan hasil
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('licenseKey').innerHTML = key;
+        
+        // Reset form
+        document.getElementById('buyerName').value = '';
+        
+        // Copy ke clipboard otomatis
+        navigator.clipboard.writeText(key).then(() => {
             alert('✅ Key berhasil dibuat dan sudah di-copy!');
-        }
+        }).catch(() => {
+            alert('✅ Key berhasil dibuat! Copy manual: ' + key);
+        });
+    }
+    
+    function displayAllKeys() {
+        const now = new Date();
+        const activeKeys = allKeys.filter(k => new Date(k.expiresAt) > now);
+        const expiredKeys = allKeys.filter(k => new Date(k.expiresAt) <= now);
         
-        function displayAllKeys() {
-            const container = document.getElementById('keyList');
-            const activeKeys = allKeys.filter(k => new Date(k.expiresAt) > new Date());
-            
-            if (activeKeys.length === 0) {
-                container.innerHTML = '<p style="color:#666;">Belum ada license key aktif</p>';
-                return;
-            }
-            
+        const container = document.getElementById('keyList');
+        const expiredContainer = document.getElementById('expiredList');
+        
+        if (activeKeys.length === 0) {
+            container.innerHTML = '<p style="color:#7a6e5e;">Belum ada license key aktif</p>';
+        } else {
             container.innerHTML = activeKeys.map(k => `
-                <div style="border-bottom:1px solid #ddd; padding:0.5rem 0;">
-                    <strong>${k.key}</strong><br>
-                    Pembeli: ${k.buyerName}<br>
-                    Expired: ${new Date(k.expiresAt).toLocaleDateString('id-ID')}
-                    <button onclick="deleteKey('${k.key}')" style="background:#c0431a; padding:0.2rem 0.5rem; width:auto; margin-top:0.3rem;">Hapus</button>
+                <div class="key-item">
+                    <div><span class="success-badge">AKTIF</span></div>
+                    <div class="key-code">${k.key}</div>
+                    <div>📛 ${k.buyerName}</div>
+                    <div>📅 Expired: ${new Date(k.expiresAt).toLocaleDateString('id-ID')}</div>
+                    <div>⏱️ Sisa: ${Math.ceil((new Date(k.expiresAt) - now) / (1000*60*60*24))} hari</div>
+                    <button class="delete-btn" onclick="deleteKey('${k.key}')">🗑️ Hapus Key</button>
                 </div>
             `).join('');
         }
         
-        function deleteKey(key) {
-            if (confirm(`Hapus key ${key}?`)) {
-                allKeys = allKeys.filter(k => k.key !== key);
-                saveKeys();
-                updatePremiumJS();
-                displayAllKeys();
-            }
+        if (expiredKeys.length > 0) {
+            expiredContainer.innerHTML = `<h4 style="margin:1rem 0 0.5rem;">⏰ Kadaluarsa (${expiredKeys.length})</h4>` + 
+                expiredKeys.map(k => `
+                    <div class="key-item" style="opacity:0.6">
+                        <div><span class="expired-badge">EXPIRED</span></div>
+                        <div class="key-code">${k.key}</div>
+                        <div>📛 ${k.buyerName}</div>
+                        <div>📅 Expired: ${new Date(k.expiresAt).toLocaleDateString('id-ID')}</div>
+                        <button class="delete-btn" onclick="deleteKey('${k.key}')">🗑️ Hapus</button>
+                    </div>
+                `).join('');
+        } else {
+            expiredContainer.innerHTML = '';
         }
-        
-        function updatePremiumJS() {
-            // Update file premium.js dengan keys terbaru
-            const activeKeys = allKeys.filter(k => new Date(k.expiresAt) > new Date());
-            const validKeysArray = activeKeys.map(k => k.key);
-            
-            const premiumJSCode = `// premium.js - Sistem License Key (Auto-generated by admin)
-const PREMIUM_CONFIG = {
-  validKeys: ${JSON.stringify(validKeysArray)},
-  
-  isPremium: function() {
-    const saved = localStorage.getItem('notaku_premium_key');
-    return saved && this.validKeys.includes(saved);
-  },
-  
-  activate: function(key) {
-    if (this.validKeys.includes(key)) {
-      localStorage.setItem('notaku_premium_key', key);
-      // Cari expired date dari key yang diaktivasi
-      const keyData = ${JSON.stringify(activeKeys)}.find(k => k.key === key);
-      if (keyData) {
-        localStorage.setItem('notaku_premium_until', keyData.expiresAt);
-      } else {
-        localStorage.setItem('notaku_premium_until', new Date(Date.now() + 30*24*60*60*1000).toISOString());
-      }
-      return true;
     }
-    return false;
-  },
-  
-  isExpired: function() {
-    const until = localStorage.getItem('notaku_premium_until');
-    if (!until) return true;
-    return new Date(until) < new Date();
-  }
-};
-
-window.PremiumAPI = PREMIUM_CONFIG;`;
-            
-            // Tampilkan instruksi update
-            console.log('Premium keys updated. Copy kode di bawah ke premium.js');
-            document.getElementById('keyList').innerHTML += `
-                <div style="background:#ffffcc; padding:1rem; margin-top:1rem;">
-                    ⚠️ <strong>PENTING:</strong> Copy kode di bawah dan <strong>ganti isi file premium.js</strong> di GitHub:<br>
-                    <textarea id="premiumCode" style="width:100%; height:200px; font-size:10px;">${premiumJSCode}</textarea>
-                    <button onclick="copyPremiumCode()" style="margin-top:0.5rem;">Copy Kode</button>
-                </div>
-            `;
+    
+    function deleteKey(key) {
+        if (confirm(`Hapus key ${key}?`)) {
+            allKeys = allKeys.filter(k => k.key !== key);
+            saveKeys();
         }
-        
-        function copyPremiumCode() {
-            const code = document.getElementById('premiumCode');
-            code.select();
-            document.execCommand('copy');
-            alert('Kode premium.js sudah di-copy! Sekarang paste di GitHub');
-        }
-        
-        // Tampilkan semua key saat load
-        displayAllKeys();
-    </script>
+    }
+    
+    // Tampilkan semua key saat load
+    displayAllKeys();
+</script>
 </body>
 </html>
