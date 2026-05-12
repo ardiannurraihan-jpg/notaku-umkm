@@ -420,7 +420,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ── ADD ITEM ROW ──────────────────────────────
 function addItem(name = '', qty = 1, price = 0) {
   itemCount++;
   const id   = itemCount;
@@ -431,9 +430,9 @@ function addItem(name = '', qty = 1, price = 0) {
   row.className = 'item-row';
   row.id = `item-${id}`;
   row.innerHTML = `
-    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${name.replace(/"/g, '&quot;')}" oninput="updateSubtotal(${id})" />
-    <input type="number" placeholder="Qty"                class="item-qty"   min="1" value="${qty}" oninput="updateSubtotal(${id})" />
-    <input type="number" placeholder="Harga (Rp)"         class="item-price" min="0" value="${price}" oninput="updateSubtotal(${id})" />
+    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${escapeHtml(name)}" oninput="updateSubtotal(${id})" />
+    <input type="text"   placeholder="Qty"                class="item-qty"   inputmode="numeric" pattern="[0-9]*" value="${qty}" oninput="updateSubtotal(${id})" />
+    <input type="text"   placeholder="Harga (Rp)"         class="item-price" inputmode="numeric" pattern="[0-9]*" value="${price}" oninput="updateSubtotal(${id})" />
     <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
   `;
   list.appendChild(row);
