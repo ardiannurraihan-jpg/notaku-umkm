@@ -1,6 +1,6 @@
 // ============================================
-//   NOTAKU — MAIN SCRIPT (FULL VERSION + DASHBOARD)
-//   Supports: 11 Templates, AI Superior, WA Share, Excel Export, Logo Upload, History, Chat
+//   NOTAKU — MAIN SCRIPT (FULL VERSION + DASHBOARD + VOICE)
+//   Supports: 11 Templates, AI Superior, WA Share, Excel Export, Logo Upload, History, Chat, Voice
 // ============================================
 
 // ────────── KONFIGURASI ─────────────────────
@@ -10,8 +10,282 @@ let revenueChart = null;
 let transactionHistory = [];
 let invoiceHistory = [];
 let userLogo = null;
+let isRecording = false;
+let recognition = null;
+let demoPendingTemplate = null;
+
 const GEMINI_API_KEY = 'AIzaSyB4kY3ZXsINoRbMRBZmSihV_7YSjkG_x44';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+
+// ────────── VOICE RECOGNITION ───────────────
+function initSpeechRecognition() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    console.warn('Speech recognition not supported');
+    return null;
+  }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'id-ID';
+  return recognition;
+}
+
+function toggleVoiceRecording() {
+  if (isRecording) {
+    stopVoiceRecording();
+  } else {
+    startVoiceRecording();
+  }
+}
+
+function startVoiceRecording() {
+  if (!recognition) {
+    recognition = initSpeechRecognition();
+    if (!recognition) {
+      showToast('Browser Anda tidak support voice recognition', 'error');
+      return;
+    }
+    
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById('voiceTextInput').value = transcript;
+      stopVoiceRecording();
+      showToast('✅ Suara terdeteksi! Klik "Proses dengan AI"', 'success');
+    };
+    
+    recognition.onerror = (event) => {
+      console.error('Speech error:', event.error);
+      stopVoiceRecording();
+      showToast('Gagal mendeteksi suara. Coba lagi atau ketik manual.', 'error');
+    };
+    
+    recognition.onend = () => {
+      stopVoiceRecording();
+    };
+  }
+  
+  try {
+    recognition.start();
+    isRecording = true;
+    const btn = document.getElementById('voiceRecordBtn');
+    const textSpan = document.getElementById('vrbText');
+    const iconDiv = document.getElementById('vrbIcon');
+    if (btn) btn.classList.add('recording');
+    if (textSpan) textSpan.innerHTML = '🎙️ Mendengarkan... (bicara sekarang)';
+    if (iconDiv) iconDiv.innerHTML = '<div class="pulse-ring"></div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+    showToast('🎤 Bicara sekarang...', 'info');
+  } catch(e) {
+    showToast('Gagal memulai voice recognition', 'error');
+  }
+}
+
+function stopVoiceRecording() {
+  if (recognition) {
+    try { recognition.stop(); } catch(e) {}
+  }
+  isRecording = false;
+  const btn = document.getElementById('voiceRecordBtn');
+  const textSpan = document.getElementById('vrbText');
+  const iconDiv = document.getElementById('vrbIcon');
+  if (btn) btn.classList.remove('recording');
+  if (textSpan) textSpan.innerHTML = '🎙️ Tap untuk mulai bicara';
+  if (iconDiv) iconDiv.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+}
+
+function openVoiceModal() {
+  const modal = document.getElementById('voiceModal');
+  if (modal) modal.style.display = 'flex';
+  const textarea = document.getElementById('voiceTextInput');
+  if (textarea) textarea.value = '';
+  const resultDiv = document.getElementById('voiceResult');
+  if (resultDiv) resultDiv.style.display = 'none';
+}
+
+function closeVoiceModal() {
+  const modal = document.getElementById('voiceModal');
+  if (modal) modal.style.display = 'none';
+  stopVoiceRecording();
+}
+
+async function processVoiceInput() {
+  const textarea = document.getElementById('voiceTextInput');
+  const text = textarea?.value.trim();
+  if (!text) {
+    showToast('Masukkan deskripsi produk atau rekam suara dulu!', 'warn');
+    return;
+  }
+  
+  showToast('🤖 AI sedang memproses...', 'info');
+  const resultDiv = document.getElementById('voiceResult');
+  if (resultDiv) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div style="padding:1rem;text-align:center">🧠 AI menganalisis teks...</div>';
+  }
+  
+  const prompt = `Anda adalah AI parser untuk nota UMKM. Ekstrak daftar produk dari teks berikut: "${text}". Format output JSON: {"items":[{"name":"nama produk","qty":jumlah,"price":harga_per_unit}]}. Harga dalam angka, qty default 1 jika tidak disebut. Hanya output JSON, tanpa penjelasan lain. Contoh: {"items":[{"name":"batik","qty":3,"price":150000},{"name":"tas rotan","qty":2,"price":200000}]}`;
+  
+  try {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type':application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+    const data = await response.json();
+    let aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    aiText = aiText.replace(/```json\n?/g,'').replace(/```\n?/g,'');
+    let parsed;
+    try { parsed = JSON.parse(aiText); } catch(e) { parsed = { items: [] }; }
+    
+    if (parsed.items && parsed.items.length > 0) {
+      // Clear existing items & add new ones
+      const container = document.getElementById('itemsList');
+      if (container) container.innerHTML = '';
+      itemCount = 0;
+      parsed.items.forEach(item => {
+        const qty = parseInt(item.qty) || 1;
+        const price = parseInt(item.price) || 0;
+        addItem(item.name, qty, price);
+      });
+      if (resultDiv) {
+        resultDiv.innerHTML = `<div style="background:rgba(74,222,128,0.15);padding:1rem;border-radius:12px;">
+          ✅ Berhasil menambahkan ${parsed.items.length} produk!<br/>
+          ${parsed.items.map(i => `• ${i.name} (${i.qty||1}x Rp ${(i.price||0).toLocaleString('id-ID')})`).join('<br/>')}
+        </div>`;
+      }
+      showToast(`${parsed.items.length} produk ditambahkan!`, 'success');
+      setTimeout(() => closeVoiceModal(), 2000);
+    } else {
+      throw new Error('No items parsed');
+    }
+  } catch(e) {
+    console.error('Voice AI error:', e);
+    if (resultDiv) {
+      resultDiv.innerHTML = '<div style="background:rgba(239,68,68,0.15);padding:1rem;border-radius:12px;">⚠️ Gagal memproses. Coba format: "3 batik 150rb, 2 tas 200rb"</div>';
+    }
+  }
+}
+
+// ────────── TEMPLATE DEMO ──────────────────
+function showTemplateDemo(templateName) {
+  demoPendingTemplate = templateName;
+  const modal = document.getElementById('templateDemoModal');
+  const title = document.getElementById('demoModalTitle');
+  const previewDiv = document.getElementById('templateDemoPreview');
+  if (!modal || !previewDiv) return;
+  
+  const templateNames = {
+    'premium-luxury': '💎 Luxury Gold',
+    'premium-dark': '🌙 Dark Executive',
+    'premium-neon': '⚡ Neon Cyber',
+    'premium-sakura': '🌸 Sakura Soft',
+    'premium-royal': '👑 Royal Marble',
+    'premium-nature': '🍃 Nature Fresh',
+    'premium-elegant': '🦢 Elegant Silk',
+    'premium-art': '🎨 Art Deco'
+  };
+  if (title) title.innerHTML = `Preview: ${templateNames[templateName] || templateName}`;
+  
+  // Create preview HTML
+  const demoStore = { storeName: 'Demo Store', storeAddress: 'Jl. Contoh No. 123', storePhone: '08123456789' };
+  const demoBuyer = { buyerName: 'Customer Demo', buyerPhone: '081234567890' };
+  const demoItems = [
+    { name: 'Produk Premium A', qty: 2, price: 250000, subtotal: 500000 },
+    { name: 'Produk Premium B', qty: 1, price: 350000, subtotal: 350000 }
+  ];
+  const subtotal = 850000;
+  const discount = 0;
+  const taxAmt = 0;
+  const total = 850000;
+  
+  let templateClass = `invoice-template template-${templateName}`;
+  let html = `<div class="${templateClass}" style="max-width:400px;margin:0 auto;font-size:0.8rem;">
+    <div class="inv-header"><div class="inv-store"><div class="inv-store-name">Demo Store</div><div class="inv-store-sub">Jl. Contoh No. 123</div></div>
+    <div class="inv-meta"><div class="inv-label">NOTA</div><div class="inv-num">DEMO/001</div><div class="inv-date">${new Date().toLocaleDateString('id-ID')}</div></div></div>
+    <div class="inv-divider"></div>
+    <div class="inv-buyer"><div class="inv-buyer-label">Kepada Yth.</div><div class="inv-buyer-name">Customer Demo</div></div>
+    <table class="inv-table"><thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr></thead><tbody>
+    ${demoItems.map(i => `<tr><td>${i.name}</td><td style="text-align:center">${i.qty}</td><td>Rp ${i.price.toLocaleString('id-ID')}</td><td style="text-align:right">Rp ${i.subtotal.toLocaleString('id-ID')}</td></tr>`).join('')}
+    </tbody></table>
+    <div class="inv-summary"><div class="inv-sum-row"><span>Subtotal</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
+    <div class="inv-sum-row total"><span>TOTAL</span><span>Rp ${total.toLocaleString('id-ID')}</span></div></div>
+    <div class="inv-footer"><div class="inv-footer-left"><div>Hormat kami,</div><div class="inv-sig-space"></div><div>Demo Store</div></div>
+    <div class="inv-footer-right"><div class="inv-stamp">LUNAS</div></div></div>
+    <div class="inv-powered">NotaKu AI · DEMO</div>
+  </div>`;
+  
+  previewDiv.innerHTML = html;
+  modal.style.display = 'flex';
+}
+
+function closeTemplateDemo() {
+  const modal = document.getElementById('templateDemoModal');
+  if (modal) modal.style.display = 'none';
+  demoPendingTemplate = null;
+}
+
+function applyDemoTemplate() {
+  if (demoPendingTemplate) {
+    switchTemplate(demoPendingTemplate);
+    showToast(`Template ${demoPendingTemplate} diterapkan!`, 'success');
+  }
+  closeTemplateDemo();
+}
+
+// ────────── AI QUICK GENERATE ──────────────
+async function aiQuickGenerate() {
+  const input = document.getElementById('aiQuickInput');
+  const text = input?.value.trim();
+  if (!text) {
+    showToast('Masukkan deskripsi produk!', 'warn');
+    return;
+  }
+  showToast('🤖 AI memproses...', 'info');
+  
+  const prompt = `Ekstrak daftar produk dari: "${text}". Output JSON: {"items":[{"name":"nama","qty":jumlah,"price":harga}]}. Hanya JSON.`;
+  try {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+    const data = await response.json();
+    let aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    aiText = aiText.replace(/```json\n?/g,'').replace(/```\n?/g,'');
+    let parsed;
+    try { parsed = JSON.parse(aiText); } catch(e) { parsed = { items: [] }; }
+    
+    if (parsed.items && parsed.items.length > 0) {
+      const container = document.getElementById('itemsList');
+      if (container) container.innerHTML = '';
+      itemCount = 0;
+      parsed.items.forEach(item => {
+        addItem(item.name, parseInt(item.qty)||1, parseInt(item.price)||0);
+      });
+      showToast(`${parsed.items.length} produk ditambahkan!`, 'success');
+      if (input) input.value = '';
+    } else {
+      showToast('Gagal memproses, coba format lain', 'error');
+    }
+  } catch(e) {
+    showToast('AI error, coba lagi', 'error');
+  }
+}
+
+function setChatInput(text) {
+  const input = document.getElementById('chatInput');
+  if (input) input.value = text;
+  sendChatMessage();
+}
+
+function scrollToPremium() {
+  const section = document.getElementById('premium');
+  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function openRevenuePrediction() {
+  calculatePrediction();
+}
 
 // ────────── SAVE & LOAD ────────────────────
 function saveCurrentInvoice() {
@@ -77,32 +351,8 @@ function loadInvoiceHistory() {
   if (saved) {
     try {
       invoiceHistory = JSON.parse(saved);
-      displayInvoiceHistory();
     } catch(e) {}
   }
-}
-
-function displayInvoiceHistory() {
-  const container = document.getElementById('invoiceHistoryList');
-  if (!container) return;
-  if (invoiceHistory.length === 0) {
-    container.innerHTML = '<div style="padding:1rem;text-align:center;color:var(--muted)">Belum ada riwayat nota</div>';
-    return;
-  }
-  container.innerHTML = invoiceHistory.slice(0, 20).map(inv => `
-    <div class="history-item" onclick="loadInvoiceById(${inv.id})">
-      <div class="history-item-header">
-        <span class="history-number">${inv.invoiceNumber}</span>
-        <span class="history-date">${new Date(inv.createdAt).toLocaleDateString('id-ID')}</span>
-      </div>
-      <div class="history-store">${inv.storeName || 'Nama Toko'}</div>
-      <div class="history-buyer">${inv.buyerName || 'Pelanggan'}</div>
-      <div class="history-actions">
-        <button onclick="event.stopPropagation(); duplicateInvoice(${inv.id})">📋 Duplikat</button>
-        <button onclick="event.stopPropagation(); deleteInvoice(${inv.id})">🗑️ Hapus</button>
-      </div>
-    </div>
-  `).join('');
 }
 
 function loadInvoiceById(id) {
@@ -128,7 +378,7 @@ function loadInvoiceById(id) {
   }
   switchTemplate(invoice.template);
   showToast('Nota berhasil dimuat!', 'success');
-  document.getElementById('premium')?.scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('app')?.scrollIntoView({ behavior: 'smooth' });
 }
 
 function duplicateInvoice(id) {
@@ -143,7 +393,6 @@ function deleteInvoice(id) {
   if (confirm('Hapus nota ini dari riwayat?')) {
     invoiceHistory = invoiceHistory.filter(inv => inv.id !== id);
     localStorage.setItem('notaku_invoice_history', JSON.stringify(invoiceHistory));
-    displayInvoiceHistory();
     showToast('Nota dihapus', 'warn');
   }
 }
@@ -162,6 +411,12 @@ function uploadLogo() {
         localStorage.setItem('notaku_user_logo', userLogo);
         showToast('Logo berhasil diupload!', 'success');
         updateDashboardStats();
+        const logoArea = document.getElementById('invLogoArea');
+        const logoImg = document.getElementById('invLogoImg');
+        if (logoArea && logoImg) {
+          logoArea.style.display = 'block';
+          logoImg.src = userLogo;
+        }
         if (document.getElementById('invoicePreview').style.display !== 'none') generateInvoice();
       };
       reader.readAsDataURL(file);
@@ -175,6 +430,8 @@ function removeLogo() {
   localStorage.removeItem('notaku_user_logo');
   showToast('Logo dihapus', 'warn');
   updateDashboardStats();
+  const logoArea = document.getElementById('invLogoArea');
+  if (logoArea) logoArea.style.display = 'none';
   if (document.getElementById('invoicePreview').style.display !== 'none') generateInvoice();
 }
 
@@ -213,7 +470,7 @@ function exportToExcel() {
     showToast('Belum ada data transaksi!', 'warn');
     return;
   }
-  let html = `<html><head><meta charset="UTF-8"><title>NotaKu - Laporan Penjualan</title><style>body{font-family:Arial;margin:20px;}h1{color:#c9952a;}table{border-collapse:collapse;width:100%;margin-top:20px;}th,td{border:1px solid #ddd;padding:8px;}th{background-color:#c9952a;color:white;}.total{font-weight:bold;background-color:#f2ead8;}</style></head><body><h1>📊 NotaKu - Laporan Penjualan</h1><p>Periode: ${new Date().toLocaleDateString('id-ID')}</p><p>Total Transaksi: ${transactionHistory.length}</p><p>Total Pendapatan: ${formatRupiah(transactionHistory.reduce((s,t)=>s+t.total,0))}</p><hr/><table><thead><tr><th>Tanggal</th><th>Total (Rp)</th></tr></thead><tbody>${transactionHistory.map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('id-ID')}</td><td>${Number(t.total).toLocaleString('id-ID')}</td></tr>`).join('')}<tr class="total"><td><strong>TOTAL</strong></td><td><strong>${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}</strong></td></tr></tbody></table><div class="chart-container"><h3>📈 Grafik Tren Penjualan</h3><img src="https://quickchart.io/chart?c={type:'line',data:{labels:[${transactionHistory.slice(-7).map(t=>`'${new Date(t.date).toLocaleDateString('id-ID')}'`).join(',')}],datasets:[{label:'Pendapatan',data:[${transactionHistory.slice(-7).map(t=>t.total).join(',')}],borderColor:'#c9952a',fill:false}]}}" style="max-width:100%"/></div><p style="margin-top:30px;color:#999;">Dibuat dengan NotaKu - Generator Nota Gratis untuk UMKM Indonesia</p></body></html>`;
+  let html = `<html><head><meta charset="UTF-8"><title>NotaKu - Laporan Penjualan</title><style>body{font-family:Arial;margin:20px;}h1{color:#c9952a;}table{border-collapse:collapse;width:100%;margin-top:20px;}th,td{border:1px solid #ddd;padding:8px;}th{background-color:#c9952a;color:white;}.total{font-weight:bold;background-color:#f2ead8;}</style></head><body><h1>📊 NotaKu - Laporan Penjualan</h1><p>Periode: ${new Date().toLocaleDateString('id-ID')}</p><p>Total Transaksi: ${transactionHistory.length}</p><p>Total Pendapatan: ${formatRupiah(transactionHistory.reduce((s,t)=>s+t.total,0))}</p><hr/></td><thead><tr><th>Tanggal</th><th>Total (Rp)</th></tr></thead><tbody>${transactionHistory.map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('id-ID')}</td><td>${Number(t.total).toLocaleString('id-ID')}</td></tr>`).join('')}<tr class="total"><td><strong>TOTAL</strong></td><td><strong>${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}</strong></td></tr></tbody></table><p style="margin-top:30px;color:#999;">Dibuat dengan NotaKu - Generator Nota Gratis untuk UMKM Indonesia</p></body></html>`;
   const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -230,7 +487,6 @@ function updateDashboardStats() {
   const logoStatus = document.getElementById('logoStatus');
   const aiPreview = document.getElementById('aiAnalystPreview');
   const predictionPreview = document.getElementById('predictionPreview');
-  const dashboardDate = document.getElementById('dashboardDate');
   if (historyCount) historyCount.innerHTML = `${invoiceHistory.length} nota`;
   if (logoStatus) logoStatus.innerHTML = userLogo ? '✓ Logo terpasang' : 'Belum ada logo';
   if (aiPreview) aiPreview.innerHTML = transactionHistory.length > 0 ? `${transactionHistory.length} transaksi, siap analisis` : 'Buat nota dulu';
@@ -238,7 +494,6 @@ function updateDashboardStats() {
     const avg = transactionHistory.reduce((s,t) => s + t.total, 0) / transactionHistory.length;
     predictionPreview.innerHTML = `Prediksi: ${formatRupiah(avg * 30)}/bulan`;
   }
-  if (dashboardDate) dashboardDate.innerHTML = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function openAIAnalyst() {
@@ -350,6 +605,30 @@ function openInvoiceHistory() {
   }
 }
 
+function calculatePrediction() {
+  const resultDiv = document.getElementById('predictionResult');
+  if (!resultDiv) {
+    // create modal if needed
+    openRevenuePrediction();
+    return;
+  }
+  if (transactionHistory.length < 3) {
+    resultDiv.innerHTML = '⚠️ Butuh minimal 3 transaksi untuk prediksi yang akurat.';
+    return;
+  }
+  const totalRevenue = transactionHistory.reduce((s,t) => s + t.total, 0);
+  const avgDaily = totalRevenue / transactionHistory.length;
+  const nextMonth = avgDaily * 30;
+  resultDiv.innerHTML = `<div style="background:rgba(201,149,42,0.1);padding:1rem;border-radius:12px;">
+    <p><strong>📊 Berdasarkan ${transactionHistory.length} transaksi:</strong></p>
+    <p>💰 <strong>Prediksi pendapatan bulan depan:</strong> ${formatRupiah(nextMonth)}</p>
+    <p>📈 <strong>Target 3 bulan:</strong> ${formatRupiah(nextMonth * 3)}</p>
+    <p>🎯 <strong>Untuk mencapai target:</strong> Rata-rata ${formatRupiah(nextMonth / 30)}/hari</p>
+    <hr style="margin:0.5rem 0;border-color:rgba(201,149,42,0.2);">
+    <p style="font-size:0.7rem;color:var(--muted);">💡 AI Saran: Promosi rutin dan loyalty program bisa meningkatkan 20-30%</p>
+  </div>`;
+}
+
 function openRevenuePrediction() {
   const modal = document.createElement('div');
   modal.className = 'modal-detail active';
@@ -368,26 +647,6 @@ function openRevenuePrediction() {
   calculatePrediction();
 }
 
-function calculatePrediction() {
-  const resultDiv = document.getElementById('predictionResult');
-  if (!resultDiv) return;
-  if (transactionHistory.length < 3) {
-    resultDiv.innerHTML = '⚠️ Butuh minimal 3 transaksi untuk prediksi yang akurat.';
-    return;
-  }
-  const totalRevenue = transactionHistory.reduce((s,t) => s + t.total, 0);
-  const avgDaily = totalRevenue / transactionHistory.length;
-  const nextMonth = avgDaily * 30;
-  resultDiv.innerHTML = `<div style="background:rgba(201,149,42,0.1);padding:1rem;border-radius:12px;">
-    <p><strong>📊 Berdasarkan ${transactionHistory.length} transaksi:</strong></p>
-    <p>💰 <strong>Prediksi pendapatan bulan depan:</strong> ${formatRupiah(nextMonth)}</p>
-    <p>📈 <strong>Target 3 bulan:</strong> ${formatRupiah(nextMonth * 3)}</p>
-    <p>🎯 <strong>Untuk mencapai target:</strong> Rata-rata ${formatRupiah(nextMonth / 30)}/hari</p>
-    <hr style="margin:0.5rem 0;border-color:rgba(201,149,42,0.2);">
-    <p style="font-size:0.7rem;color:var(--muted);">💡 AI Saran: Promosi rutin dan loyalty program bisa meningkatkan 20-30%</p>
-  </div>`;
-}
-
 async function sendChatMessage() {
   const input = document.getElementById('chatInput');
   const message = input?.value.trim();
@@ -395,14 +654,14 @@ async function sendChatMessage() {
   const messagesDiv = document.getElementById('chatMessages');
   if (!messagesDiv) return;
   const userMsgDiv = document.createElement('div');
-  userMsgDiv.className = 'chat-message user';
-  userMsgDiv.textContent = message;
+  userMsgDiv.className = 'acw-msg user';
+  userMsgDiv.innerHTML = `<div class="acw-avatar">👤</div><div class="acw-bubble">${escapeHtml(message)}</div>`;
   messagesDiv.appendChild(userMsgDiv);
   input.value = '';
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
   const aiLoadingDiv = document.createElement('div');
-  aiLoadingDiv.className = 'chat-message ai';
-  aiLoadingDiv.textContent = '🧠 AI sedang berpikir...';
+  aiLoadingDiv.className = 'acw-msg ai';
+  aiLoadingDiv.innerHTML = `<div class="acw-avatar">🧠</div><div class="acw-bubble">🧠 AI sedang berpikir...</div>`;
   messagesDiv.appendChild(aiLoadingDiv);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
   const context = `Anda adalah AI Business Assistant super cerdas (tahun 2030). Data bisnis: Total transaksi ${transactionHistory.length}, total pendapatan Rp ${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}. Pertanyaan: ${message}. Jawab ramah, profesional, actionable. Gunakan emoji. Maksimal 300 kata.`;
@@ -414,10 +673,10 @@ async function sendChatMessage() {
     });
     const data = await response.json();
     const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf, AI sedang sibuk. Coba lagi nanti.';
-    aiLoadingDiv.textContent = aiResponse;
+    aiLoadingDiv.innerHTML = `<div class="acw-avatar">🧠</div><div class="acw-bubble">${aiResponse.replace(/\n/g, '<br>')}</div>`;
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   } catch(e) {
-    aiLoadingDiv.textContent = '⚠️ Gagal terhubung ke AI. Coba lagi nanti.';
+    aiLoadingDiv.innerHTML = `<div class="acw-avatar">🧠</div><div class="acw-bubble">⚠️ Gagal terhubung ke AI. Coba lagi nanti.</div>`;
   }
 }
 
@@ -494,20 +753,24 @@ function loadData() {
 
 // ────────── PREMIUM TEMPLATES ──────────────
 function showPremiumTemplates() {
-  const premiumGroup = document.getElementById('premiumTemplateGroup');
-  const premiumNote = document.getElementById('premiumTemplateNote');
-  if (!premiumGroup) return;
-  const active = window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
-  if (active) {
-    premiumGroup.style.display = 'block';
-    if (premiumNote) premiumNote.style.display = 'block';
-  } else {
-    premiumGroup.style.display = 'none';
-    if (premiumNote) premiumNote.style.display = 'none';
-    if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(currentTemplate)) {
-      switchTemplate('classic');
+  const premiumGroup = document.getElementById('premiumTemplates');
+  const freeGroup = document.getElementById('freeTemplates');
+  const isPremium = window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
+  if (premiumGroup) premiumGroup.style.display = isPremium ? 'grid' : 'none';
+  if (freeGroup) freeGroup.style.display = 'grid';
+  const tabFree = document.querySelector('.ttab[data-tab="free"]');
+  const tabPremium = document.querySelector('.ttab[data-tab="premium"]');
+  if (tabFree && tabPremium) {
+    if (isPremium) {
+      tabFree.classList.remove('active');
+      tabPremium.classList.add('active');
+    } else {
+      tabFree.classList.add('active');
+      tabPremium.classList.remove('active');
     }
   }
+  const premiumTabLock = document.getElementById('premiumTabLock');
+  if (premiumTabLock) premiumTabLock.innerHTML = isPremium ? '✓' : '🔒';
 }
 
 function checkPremiumStatus() {
@@ -515,25 +778,31 @@ function checkPremiumStatus() {
   const isPremium = window.PremiumAPI.isPremium();
   const isExpired = window.PremiumAPI.isExpired();
   const watermark = document.getElementById('watermark');
+  const premiumDashboard = document.getElementById('premiumDashboard');
   const statusDiv = document.getElementById('premiumStatus');
-  const aiContainer = document.getElementById('aiSmartContainer');
-  const dashboard = document.getElementById('premiumDashboard');
+  const pdExpiry = document.getElementById('pdExpiry');
+  const aiInsightBar = document.getElementById('aiInsightBar');
+  
   if (isPremium && !isExpired) {
     if (watermark) watermark.style.display = 'none';
-    if (aiContainer) aiContainer.style.display = 'block';
-    if (dashboard) dashboard.style.display = 'block';
+    if (premiumDashboard) premiumDashboard.style.display = 'block';
+    if (aiInsightBar) aiInsightBar.style.display = 'flex';
     if (statusDiv) {
       const days = window.PremiumAPI.getRemainingDays();
       const until = window.PremiumAPI.getUntilFormatted();
       const plan = window.PremiumAPI.getPlanName();
-      statusDiv.innerHTML = `👑 Premium <strong>${plan}</strong> aktif hingga ${until} (${days} hari lagi)<br>✨ 11 template eksklusif + AI Smart + Logo Custom + Riwayat Nota!`;
+      statusDiv.innerHTML = `✅ Premium <strong>${plan}</strong> aktif hingga ${until} (${days} hari lagi)<br>✨ Akses semua template premium + AI lengkap!`;
       statusDiv.style.color = '#c9952a';
+    }
+    if (pdExpiry) {
+      const until = window.PremiumAPI.getUntilFormatted();
+      pdExpiry.innerHTML = `Berlaku hingga: ${until}`;
     }
     updateDashboardStats();
   } else {
     if (watermark) watermark.style.display = 'block';
-    if (aiContainer) aiContainer.style.display = 'none';
-    if (dashboard) dashboard.style.display = 'none';
+    if (premiumDashboard) premiumDashboard.style.display = 'none';
+    if (aiInsightBar) aiInsightBar.style.display = 'none';
     if (statusDiv) {
       if (isPremium && isExpired) {
         statusDiv.innerHTML = '⚠️ Premium sudah kadaluarsa. Perpanjang untuk akses fitur eksklusif!';
@@ -559,7 +828,7 @@ function activatePremium() {
     if (input) input.value = '';
     checkPremiumStatus();
     setTimeout(() => {
-      const el = document.querySelector('.template-selector');
+      const el = document.querySelector('.template-tabs');
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 600);
   } else {
@@ -571,9 +840,40 @@ function switchTemplate(templateName) {
   currentTemplate = templateName;
   const preview = document.getElementById('invoicePreview');
   if (preview) preview.className = `invoice-template template-${currentTemplate}`;
-  document.querySelectorAll('.template-btn').forEach(b => {
+  document.querySelectorAll('.tpl-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.template === templateName);
   });
+}
+
+// ────────── TAB MANAGEMENT ─────────────────
+function initTabs() {
+  const tabFree = document.querySelector('.ttab[data-tab="free"]');
+  const tabPremium = document.querySelector('.ttab[data-tab="premium"]');
+  const freeTemplates = document.getElementById('freeTemplates');
+  const premiumTemplates = document.getElementById('premiumTemplates');
+  
+  if (tabFree) {
+    tabFree.addEventListener('click', () => {
+      tabFree.classList.add('active');
+      if (tabPremium) tabPremium.classList.remove('active');
+      if (freeTemplates) freeTemplates.style.display = 'grid';
+      if (premiumTemplates) premiumTemplates.style.display = 'none';
+    });
+  }
+  if (tabPremium) {
+    tabPremium.addEventListener('click', () => {
+      const isPremium = window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
+      if (!isPremium) {
+        showToast('👑 Template premium untuk member! Upgrade sekarang!', 'warn');
+        document.getElementById('premium')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      tabPremium.classList.add('active');
+      if (tabFree) tabFree.classList.remove('active');
+      if (freeTemplates) freeTemplates.style.display = 'none';
+      if (premiumTemplates) premiumTemplates.style.display = 'grid';
+    });
+  }
 }
 
 // ────────── ADD ITEM ───────────────────────
@@ -597,11 +897,28 @@ function removeItem(id) {
 function updateSubtotal(id) {}
 
 // ────────── SAVED PRODUCTS ─────────────────
-function showSaveProductModal() { document.getElementById('saveProductModal').style.display = 'block'; }
-function closeSaveProductModal() { document.getElementById('saveProductModal').style.display = 'none'; }
-function showPremiumModal() { document.getElementById('premiumModal').style.display = 'block'; }
-function closePremiumModal() { document.getElementById('premiumModal').style.display = 'none'; }
-window.onclick = function(event) { if (event.target.classList.contains('modal')) { event.target.style.display = 'none'; } };
+function showSaveProductModal() { 
+  const modal = document.getElementById('saveProductModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeSaveProductModal() { 
+  const modal = document.getElementById('saveProductModal');
+  if (modal) modal.style.display = 'none';
+}
+function showPremiumModal() { 
+  const modal = document.getElementById('premiumModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closePremiumModal() { 
+  const modal = document.getElementById('premiumModal');
+  if (modal) modal.style.display = 'none';
+}
+
+window.onclick = function(event) { 
+  if (event.target.classList.contains('modal-overlay')) { 
+    event.target.style.display = 'none'; 
+  } 
+};
 
 function saveProduct() {
   const name = document.getElementById('saveProductName').value.trim();
@@ -678,7 +995,7 @@ function updateChart() {
   if (!canvas) return;
   revenueChart = new Chart(canvas.getContext('2d'), {
     type: 'line', data: { labels: last7Days, datasets: [{ label: 'Pendapatan (Rp)', data: last7Revenue, borderColor: '#c9952a', backgroundColor: 'rgba(201,149,42,0.08)', pointBackgroundColor: '#c9952a', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.4, fill: true, borderWidth: 2.5 }] },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID') } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: (v) => 'Rp ' + Number(v).toLocaleString('id-ID'), font: { family: "'Fira Code', monospace", size: 11 } } }, x: { grid: { display: false }, ticks: { font: { family: "'Fira Code', monospace", size: 11 } } } } }
+    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID') } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: (v) => 'Rp ' + Number(v).toLocaleString('id-ID'), font: { family: "'DM Mono', monospace", size: 11 } } }, x: { grid: { display: false }, ticks: { font: { family: "'DM Mono', monospace", size: 11 } } } } }
   });
 }
 
@@ -803,8 +1120,30 @@ function printInvoice() {
   const invoice = document.getElementById('invoicePreview');
   if (!invoice) return;
   const printWin = window.open('', '_blank');
-  printWin.document.write(`<!DOCTYPE html><html><head><title>NotaKu</title><link rel="stylesheet" href="style.css"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/><style>body{padding:1rem;background:#fff;}@media print{body{padding:0;}.inv-watermark{display:none!important;}}</style></head><body>${invoice.outerHTML}<script>window.onload=()=>{window.print();window.close();};<\/script></body></html>`);
+  printWin.document.write(`<!DOCTYPE html><html><head><title>NotaKu</title><style>${getStylesForPrint()}</style></head><body>${invoice.outerHTML}<script>window.onload=()=>{window.print();window.close();};<\/script></body></html>`);
   printWin.document.close();
+}
+
+function getStylesForPrint() {
+  return `
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { padding: 1rem; background: #fff; font-family: 'DM Sans', system-ui; }
+    .invoice-template { max-width: 600px; margin: 0 auto; background: #fff; padding: 1.5rem; border: 1px solid #e0d8c8; border-radius: 4px; }
+    .inv-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+    .inv-store-name { font-weight: 800; font-size: 1.2rem; }
+    .inv-store-sub { font-size: 0.7rem; color: #666; }
+    .inv-meta { text-align: right; }
+    .inv-num { font-weight: 700; color: #c9952a; }
+    .inv-divider { height: 1px; background: #e0d8c8; margin: 0.8rem 0; }
+    .inv-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .inv-table th, .inv-table td { padding: 0.5rem; border-bottom: 1px solid #e0d8c8; text-align: left; }
+    .inv-summary { margin-top: 1rem; }
+    .inv-sum-row { display: flex; justify-content: space-between; padding: 0.3rem 0; }
+    .inv-sum-row.total { font-weight: 800; font-size: 1.1rem; border-top: 1px solid #000; margin-top: 0.3rem; padding-top: 0.5rem; }
+    .inv-stamp { font-weight: 800; color: #2a7a4b; border: 2px solid #2a7a4b; display: inline-block; padding: 0.2rem 0.8rem; transform: rotate(-6deg); }
+    .inv-powered { text-align: center; font-size: 0.6rem; color: #ccc; margin-top: 1rem; }
+    @media print { body { padding: 0; } .inv-watermark { display: none; } }
+  `;
 }
 
 // ────────── PAYMENT ────────────────────────
@@ -833,7 +1172,7 @@ function showToast(message, type = 'info') {
   toast.className = 'nk-toast';
   toast.textContent = message;
   const colors = { success: '#2a7a4b', error: '#c0431a', warn: '#c9952a', info: '#1a1510' };
-  Object.assign(toast.style, { position: 'fixed', bottom: '2rem', right: '2rem', background: colors[type] || colors.info, color: '#fff', padding: '1rem 1.5rem', borderRadius: '12px', fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.85rem', fontWeight: '600', zIndex: '9999', boxShadow: '0 8px 30px rgba(0,0,0,0.25)', maxWidth: '360px', lineHeight: '1.5', transform: 'translateY(20px)', opacity: '0', transition: 'all 0.3s ease' });
+  Object.assign(toast.style, { position: 'fixed', bottom: '2rem', right: '2rem', background: colors[type] || colors.info, color: '#fff', padding: '1rem 1.5rem', borderRadius: '12px', fontFamily: "'DM Sans', sans-serif", fontSize: '0.85rem', fontWeight: '600', zIndex: '9999', boxShadow: '0 8px 30px rgba(0,0,0,0.25)', maxWidth: '360px', lineHeight: '1.5', transform: 'translateY(20px)', opacity: '0', transition: 'all 0.3s ease' });
   document.body.appendChild(toast);
   requestAnimationFrame(() => { toast.style.transform = 'translateY(0)'; toast.style.opacity = '1'; });
   setTimeout(() => { toast.style.transform = 'translateY(20px)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3500);
@@ -863,8 +1202,12 @@ window.addEventListener('DOMContentLoaded', () => {
   if (numEl) numEl.value = `INV/${year}/${month}/${num}`;
   addItem(); addItem();
   loadData(); loadLastInvoice();
-  checkPremiumStatus(); displayInvoiceHistory();
-  document.querySelectorAll('.template-btn').forEach(btn => {
+  checkPremiumStatus();
+  initTabs();
+  initSpeechRecognition();
+  
+  // Template button listeners
+  document.querySelectorAll('.tpl-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tpl = btn.dataset.template;
       if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(tpl)) {
@@ -877,81 +1220,28 @@ window.addEventListener('DOMContentLoaded', () => {
       switchTemplate(tpl);
     });
   });
+  
   const toggleBtn = document.getElementById('darkModeToggle');
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
-      toggleBtn.innerHTML = isDark ? '☀️ Terang' : '🌙 Mode';
+      toggleBtn.style.opacity = '0.8';
+      setTimeout(() => toggleBtn.style.opacity = '', 200);
       localStorage.setItem('notaku_dark_mode', isDark);
     });
     if (localStorage.getItem('notaku_dark_mode') === 'true') {
       document.body.classList.add('dark-mode');
-      toggleBtn.innerHTML = '☀️ Terang';
+    }
+  }
+  
+  // Load logo if exists
+  if (userLogo) {
+    const logoArea = document.getElementById('invLogoArea');
+    const logoImg = document.getElementById('invLogoImg');
+    if (logoArea && logoImg) {
+      logoArea.style.display = 'block';
+      logoImg.src = userLogo;
     }
   }
 });
-
-// ────────── INJECT STYLES ──────────────────
-(function injectDynamicStyles() {
-  const style = document.createElement('style');
-  style.textContent = `
-    .saved-product { position: relative; display: flex; flex-direction: column; gap: 0.1rem; padding: 0.4rem 1.8rem 0.4rem 0.7rem; background: var(--cream); border-radius: 8px; cursor: pointer; transition: all 0.15s; }
-    .saved-product:hover { background: var(--gold-pale); transform: translateY(-1px); }
-    .sp-name { font-size: 0.78rem; font-weight: 600; color: var(--ink); }
-    .sp-price { font-family: monospace; font-size: 0.65rem; color: var(--muted); }
-    .sp-del { position: absolute; top: 0.3rem; right: 0.3rem; background: none; border: none; color: var(--muted); font-size: 0.65rem; cursor: pointer; padding: 0.1rem 0.3rem; border-radius: 4px; }
-    .sp-del:hover { background: rgba(192,67,26,0.1); color: var(--rust); }
-    .history-item { background: var(--cream); border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.15s; }
-    .history-item:hover { background: var(--gold-pale); transform: translateY(-1px); }
-    .history-item-header { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
-    .history-number { font-weight: 700; font-family: monospace; color: var(--gold); }
-    .history-date { font-size: 0.7rem; color: var(--muted); }
-    .history-store { font-size: 0.8rem; font-weight: 500; }
-    .history-buyer { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
-    .history-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-    .history-actions button { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.5rem; font-size: 0.65rem; cursor: pointer; }
-    .history-actions button:hover { background: var(--gold); color: var(--ink); }
-    .ai-btn { background: linear-gradient(135deg, #6b3fa0, #c9952a); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.7rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.5rem; }
-    .ai-btn:hover { opacity: 0.9; transform: scale(1.02); }
-    .logo-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
-    .logo-actions button { background: var(--gold); border: none; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.7rem; cursor: pointer; }
-    .premium-feature-badge { background: linear-gradient(135deg, #c9952a, #e8b84b); color: var(--ink); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.6rem; font-weight: bold; display: inline-block; margin-left: 0.5rem; }
-    .premium-dashboard { background: rgba(0,0,0,0.3); border-radius: 24px; padding: 2rem; margin-bottom: 3rem; backdrop-filter: blur(10px); border: 1px solid rgba(201,149,42,0.2); }
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-    .dashboard-title { display: flex; align-items: center; gap: 0.8rem; font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--paper); }
-    .dashboard-icon { font-size: 1.6rem; }
-    .premium-badge-dash { background: linear-gradient(135deg, #c9952a, #e8b84b); color: var(--ink); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
-    .dashboard-date { font-family: var(--font-mono); font-size: 0.7rem; color: rgba(250,248,243,0.4); }
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .dash-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 1.5rem; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
-    .dash-card:hover { transform: translateY(-5px); border-color: rgba(201,149,42,0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-    .dash-card:hover::after { content: '→ Klik untuk buka'; position: absolute; bottom: 1rem; right: 1rem; font-size: 0.6rem; color: var(--gold); font-family: var(--font-mono); }
-    .dash-card-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
-    .dash-card-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--paper); margin-bottom: 0.3rem; }
-    .dash-card-desc { font-size: 0.7rem; color: rgba(250,248,243,0.4); margin-bottom: 0.8rem; }
-    .dash-card-stats { font-size: 0.75rem; color: var(--gold); font-family: var(--font-mono); padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
-    .ai-chat-section { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 1rem; margin-top: 1rem; }
-    .chat-header { display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem 1rem; background: rgba(201,149,42,0.1); border-radius: 12px; margin-bottom: 1rem; font-family: var(--font-display); font-size: 0.85rem; color: var(--paper); }
-    .chat-icon { font-size: 1.2rem; }
-    .chat-badge { background: linear-gradient(135deg, #6b3fa0, #c9952a); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.6rem; margin-left: auto; }
-    .chat-messages { max-height: 250px; overflow-y: auto; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.8rem; padding: 0.5rem; }
-    .chat-message { max-width: 85%; padding: 0.8rem 1rem; border-radius: 16px; font-size: 0.85rem; line-height: 1.5; }
-    .chat-message.user { background: linear-gradient(135deg, #c9952a, #e8b84b); color: var(--ink); align-self: flex-end; border-bottom-right-radius: 4px; }
-    .chat-message.ai { background: rgba(255,255,255,0.08); color: var(--paper); align-self: flex-start; border-bottom-left-radius: 4px; }
-    .chat-input-area { display: flex; gap: 0.5rem; padding-top: 0.5rem; }
-    .chat-input-area input { flex: 1; padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; color: var(--paper); font-family: var(--font-body); font-size: 0.85rem; outline: none; }
-    .chat-input-area input:focus { border-color: var(--gold); }
-    .chat-input-area button { background: linear-gradient(135deg, #c9952a, #e8b84b); border: none; padding: 0 1.5rem; border-radius: 30px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-    .chat-input-area button:hover { transform: scale(1.02); filter: brightness(1.05); }
-    .modal-detail { display: none; position: fixed; z-index: 2000; inset: 0; background: rgba(13,11,8,0.8); backdrop-filter: blur(8px); align-items: center; justify-content: center; }
-    .modal-detail.active { display: flex; }
-    .modal-detail-content { background: linear-gradient(135deg, #1a1510, #0f0d0a); border: 1px solid rgba(201,149,42,0.3); border-radius: 32px; max-width: 500px; width: 90%; padding: 2rem; position: relative; animation: modalFadeIn 0.3s ease; }
-    @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-    .modal-detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .modal-detail-close { background: none; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; }
-    .modal-detail-body { color: var(--paper); }
-    @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } .modal-detail-content { max-width: 95%; padding: 1.5rem; } }
-  `;
-  document.head.appendChild(style);
-})();
