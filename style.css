@@ -1856,3 +1856,437 @@ textarea {
   .prem-title     { font-size: 1.8rem; }
   .trust-title    { font-size: 1.4rem; }
 }
+/* ============================================
+   TAMBAHAN UNTUK INDEX.HTML YANG BARU
+   (Tambahkan ini di AKHIR file style.css)
+   ============================================ */
+
+/* Glass Card (alias untuk glass-panel) */
+.glass-card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: 0 4px 30px var(--shadow), 0 1px 0 rgba(255,255,255,0.8) inset;
+}
+
+/* Action Pill (alias untuk action-btn) */
+.action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.2rem;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.action-pill:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+}
+.action-pill.danger {
+  background: transparent;
+  border: 1.5px solid var(--rust);
+  color: var(--rust);
+}
+.action-pill.danger:hover {
+  background: var(--rust);
+  color: #fff;
+}
+
+/* Template Showcase New */
+.template-showcase-new {
+  margin: 4rem 0;
+  overflow-x: auto;
+}
+.tsn-scroll {
+  display: flex;
+  gap: 1.5rem;
+  padding-bottom: 1rem;
+}
+.tsn-card {
+  min-width: 280px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 1rem;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s;
+}
+.tsn-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(201,149,42,0.4);
+}
+.tsn-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tsn-card:hover .tsn-overlay {
+  opacity: 1;
+}
+.tsn-preview-btn {
+  background: var(--gold);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 40px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tsn-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+.tsn-hot {
+  background: var(--rust);
+  color: #fff;
+  padding: 0.1rem 0.4rem;
+  border-radius: 20px;
+  margin-left: 0.3rem;
+}
+.tsn-mockup {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+}
+.tsm-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.tsm-sname {
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+.tsm-badge {
+  font-size: 0.55rem;
+  border: 1px solid;
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+}
+.tsm-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  padding: 0.2rem 0;
+}
+.tsm-total {
+  font-weight: 700;
+  font-size: 0.7rem;
+  margin-top: 0.3rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid #eee;
+}
+.tsm-stamp {
+  font-size: 0.55rem;
+  font-weight: 700;
+  margin-top: 0.3rem;
+  display: inline-block;
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+  transform: rotate(-5deg);
+}
+.tsn-new-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 0.55rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.tsn-new-badge.new {
+  background: var(--rust);
+  color: #fff;
+}
+.tsn-more-card {
+  background: rgba(255,255,255,0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.tsn-more-inner {
+  text-align: center;
+}
+.tsn-more-icon {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+/* Template Mockup Variants */
+.gold-mock { background: linear-gradient(135deg, #fdf6e3, #fff); }
+.gold-total { color: #b8821e; }
+.dark-mock { background: #111; color: #ccc; }
+.dark-header { background: #0a0a0a; }
+.dark-name { color: var(--gold); }
+.dark-row { color: #888; }
+.dark-total { color: var(--gold); border-top-color: #333; }
+.neon-mock { background: #0a0f1a; }
+.neon-header { background: rgba(0,212,255,0.05); }
+.neon-name { color: #00d4ff; }
+.neon-bdg { color: #7b2fff; border-color: #7b2fff; }
+.neon-row { color: #406080; }
+.neon-total { color: #00d4ff; border-top-color: rgba(0,212,255,0.2); }
+.neon-stamp { color: #00d4ff; border-color: #00d4ff; }
+.sakura-mock { background: linear-gradient(135deg, #fff0f6, #fff8fb); }
+.sakura-header { background: linear-gradient(135deg, #e8527a, #f5b8ce); }
+.sakura-name { color: #fff; }
+.sakura-row { color: #c080a0; }
+.sakura-total { color: #e8527a; }
+.royal-mock { background: linear-gradient(135deg, #f8f5ff, #f2eefc); }
+.royal-header { background: linear-gradient(135deg, #3a1f6e, #6b3fa0); }
+.royal-name { color: #dcc8ff; }
+.royal-row { color: #9060c8; }
+.royal-total { color: #6b3fa0; }
+
+/* Pricing Section yang sudah ada di index.html */
+.pricing-section {
+  margin: 4rem 0;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.price-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 2rem;
+  transition: all 0.3s;
+}
+.price-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(201,149,42,0.3);
+}
+.price-card-featured {
+  border: 2px solid var(--gold);
+  background: rgba(201,149,42,0.05);
+  position: relative;
+}
+.pc-popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: var(--ink);
+  padding: 0.2rem 1rem;
+  border-radius: 40px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.pc-plan {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--paper);
+}
+.pc-price {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+.pc-price .pc-period {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+.pc-permonth {
+  font-size: 0.7rem;
+  color: rgba(250,248,243,0.5);
+  margin-bottom: 1rem;
+}
+.featured-price {
+  font-size: 2.2rem;
+}
+.pc-list {
+  list-style: none;
+  margin: 1rem 0;
+}
+.pc-list li {
+  padding: 0.4rem 0;
+  font-size: 0.8rem;
+  color: rgba(250,248,243,0.7);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.pc-list li::before {
+  content: "✓";
+  color: var(--gold);
+}
+.pc-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 40px;
+  color: var(--paper);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pc-btn:hover {
+  background: rgba(201,149,42,0.2);
+  border-color: var(--gold);
+}
+.pc-btn-gold {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+}
+.pc-btn-gold:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+}
+
+/* Payment Card - Fix muncul */
+#paymentInfo {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--paper);
+  border-top: 3px solid var(--gold);
+  padding: 1.5rem;
+  z-index: 1100;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+}
+#paymentInfo.show {
+  display: block !important;
+  transform: translateY(0);
+}
+.payment-card-inner {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+.pay-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.pay-bank { font-weight: 700; font-size: 1.2rem; }
+.pay-number { font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; color: var(--gold); margin: 0.5rem 0; }
+.pay-name { font-size: 0.8rem; color: var(--muted); }
+.pay-amount { margin: 0.8rem 0; font-weight: 600; }
+.pay-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.pay-copy-btn, .pay-wa-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pay-copy-btn {
+  background: var(--gold);
+  border: none;
+  color: var(--ink);
+  font-weight: 600;
+}
+.pay-wa-btn {
+  background: #25D366;
+  color: white;
+  border: none;
+}
+
+/* Activation Section */
+.activation-section { margin-top: 3rem; }
+.act-card {
+  background: rgba(0,0,0,0.3);
+  border-radius: 24px;
+  padding: 2rem;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+.act-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.act-card h4 { color: var(--paper); font-size: 1rem; margin-bottom: 1rem; }
+.act-input-row {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.act-input-row input {
+  flex: 1;
+  padding: 0.8rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 40px;
+  color: var(--paper);
+  outline: none;
+}
+.act-input-row button {
+  padding: 0.8rem 1.5rem;
+  background: var(--gold);
+  border: none;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.act-status { margin-top: 1rem; font-size: 0.75rem; color: var(--gold); }
+
+/* Guarantee Strip */
+.guarantee-strip {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background: rgba(255,255,255,0.03);
+  border-radius: 60px;
+  flex-wrap: wrap;
+}
+.gs-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.gs-icon { font-size: 1.5rem; }
+.gs-item strong { color: var(--paper); font-size: 0.8rem; }
+.gs-item small { font-size: 0.65rem; color: rgba(250,248,243,0.5); }
+.gs-sep {
+  width: 1px;
+  height: 30px;
+  background: rgba(250,248,243,0.1);
+}
+
+/* Dark mode untuk payment card */
+body.dark-mode #paymentInfo {
+  background: #1a1612;
+  border-top-color: var(--gold);
+}
+body.dark-mode .pay-number {
+  color: var(--gold);
+}
+body.dark-mode .pay-name {
+  color: var(--muted);
+}
