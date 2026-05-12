@@ -68,7 +68,6 @@
         UMKM Indonesia 🇮🇩
       </div>
       <a href="#premium" class="nav-premium-btn">✦ Premium</a>
-      <button id="darkModeToggle" class="nav-premium-btn dark-toggle" style="background: transparent; border: 1px solid rgba(201,149,42,0.4);">🌙 Mode</button>
     </div>
   </nav>
 
@@ -352,7 +351,7 @@
             <tr><th>Produk / Jasa</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr>
           </thead>
           <tbody id="inv-items"></tbody>
-        </tr>
+        </table>
         <div class="inv-summary">
           <div class="inv-summary-row"><span>Subtotal</span><span id="inv-subtotal"></span></div>
           <div class="inv-summary-row discount" id="inv-discountRow" style="display:none"><span>Diskon</span><span id="inv-discount"></span></div>
@@ -385,10 +384,7 @@
     <div class="glass-panel stats-container">
       <div class="stats-header">
         <h2 class="panel-title">Statistik Penjualan</h2>
-        <div style="display: flex; gap: 0.5rem;">
-          <button class="reset-stats-btn export-btn" onclick="exportStats()" style="background: #2a7a4b; border-color: #2a7a4b;">📊 Export CSV</button>
-          <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
-        </div>
+        <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
       </div>
       <div class="stats-grid">
         <div class="stat-card">
@@ -509,33 +505,19 @@
   <div class="pricing-grid">
     <div class="pricing-card">
       <div class="pc-badge">BULANAN</div>
-      <div class="pc-price">Rp 29.000<span>/bulan</span></div>
+      <div class="pc-price">Rp 49.000<span>/bulan</span></div>
       <ul class="pc-features">
         <li>✓ 8 Template Eksklusif</li>
         <li>✓ Tanpa Watermark</li>
         <li>✓ Prioritas Support</li>
         <li>✓ Update Template Gratis</li>
       </ul>
-      <button class="pc-btn" onclick="showPaymentInfo('bulanan', 29000)">Pilih Bulanan</button>
+      <button class="pc-btn" onclick="showPaymentInfo('bulanan', 49000)">Pilih Bulanan</button>
     </div>
-
-    <div class="pricing-card">
-      <div class="pc-badge">3 BULAN</div>
-      <div class="pc-price">Rp 69.000<span>/3 bulan</span></div>
-      <div class="pc-per">≈ Rp 23.000/bulan</div>
-      <ul class="pc-features">
-        <li>✓ 8 Template Eksklusif</li>
-        <li>✓ Tanpa Watermark</li>
-        <li>✓ Prioritas Support</li>
-        <li>✓ Update Template Gratis</li>
-      </ul>
-      <button class="pc-btn" onclick="showPaymentInfo('3bulan', 69000)">Pilih 3 Bulan</button>
-    </div>
-
     <div class="pricing-card pricing-featured">
-      <div class="pc-badge featured-badge">TERPOPULER • HEMAT 53%</div>
-      <div class="pc-price">Rp 199.000<span>/tahun</span></div>
-      <div class="pc-per">≈ Rp 16.583/bulan</div>
+      <div class="pc-badge featured-badge">TERPOPULER • HEMAT 15%</div>
+      <div class="pc-price">Rp 499.000<span>/tahun</span></div>
+      <div class="pc-per">≈ Rp 41.583/bulan</div>
       <ul class="pc-features">
         <li>✓ 8 Template Eksklusif</li>
         <li>✓ Tanpa Watermark</li>
@@ -543,7 +525,51 @@
         <li>✓ Update Template Gratis</li>
         <li>✓ Template Baru Eksklusif</li>
       </ul>
-      <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 199000)">Pilih Tahunan</button>
+      <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 499000)">Pilih Tahunan</button>
+    </div>
+  </div>
+
+  <div id="paymentInfo" class="payment-info" style="display:none;">
+    <h4>💳 Transfer ke Rekening Berikut:</h4>
+    <p class="bank-account">BRI: 3593 0100 9186 508</p>
+    <p>a.n. <strong>Ardian Nurraihan</strong></p>
+    <p>Nominal: <strong id="paymentAmount">Rp 0</strong></p>
+    <p class="wa-confirm">📱 Kirim bukti ke WhatsApp:
+      <a href="https://wa.me/6282134858510?text=Halo%20Admin%2C%20saya%20sudah%20transfer%20untuk%20premium%20NotaKu">0821-3485-8510</a>
+    </p>
+    <button class="copy-btn" onclick="copyPaymentInfo()">📋 Copy No Rekening</button>
+  </div>
+
+  <div class="premium-activation">
+    <h4>🔑 Punya kode premium?</h4>
+    <div class="activation-input">
+      <input type="text" id="premiumKey" placeholder="Masukkan kode premium…">
+      <button onclick="activatePremium()">Aktivasi</button>
+    </div>
+    <div id="premiumStatus" class="premium-status"></div>
+  </div>
+
+  <div class="guarantee-row">
+    <div class="guarantee-box">
+      <div class="guarantee-icon">💰</div>
+      <div class="guarantee-text">
+        <strong>100% Garansi Uang Kembali</strong><br/>
+        Kode tidak dikirim dalam 24 jam? Uang kembali penuh.
+      </div>
+    </div>
+    <div class="guarantee-box">
+      <div class="guarantee-icon">⚡</div>
+      <div class="guarantee-text">
+        <strong>Aktivasi Cepat</strong><br/>
+        Biasanya kode dikirim dalam &lt;1 jam setelah transfer.
+      </div>
+    </div>
+    <div class="guarantee-box">
+      <div class="guarantee-icon">🔒</div>
+      <div class="guarantee-text">
+        <strong>Transaksi Aman</strong><br/>
+        Rekening BRI terverifikasi atas nama Ardian Nurraihan.
+      </div>
     </div>
   </div>
 </section>
