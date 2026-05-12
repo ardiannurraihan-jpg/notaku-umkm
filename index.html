@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="google-site-verification" content="NPWAmD-kQ5WiV9OONu_M0jhEtTyo45FPkeGdoX1q__U" />
-  <meta name="description" content="NotaKu AI — Generator Nota UMKM #1 Indonesia dengan kecerdasan buatan. Auto-generate nota dari suara, analisis bisnis real-time, 11 template eksklusif. Gratis selamanya!" />
-  <meta name="keywords" content="nota umkm, generator nota ai, buat nota online, nota gratis, invoice generator, nota penjualan ai" />
+  <meta name="description" content="Buat nota profesional gratis untuk UMKM Indonesia. Download PDF, simpan produk favorit, pilih template, pantau penjualan. Tanpa ribet, langsung jadi!" />
+  <meta name="keywords" content="nota umkm, generator nota, buat nota online, nota gratis, invoice generator, nota penjualan" />
   <meta name="author" content="NotaKu" />
-  <title>NotaKu AI — Generator Nota UMKM Bertenaga Kecerdasan Buatan</title>
+  <title>NotaKu — Generator Nota UMKM Profesional</title>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BW47VZ45RG"></script>
   <script>
@@ -21,579 +21,327 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "NotaKu AI",
-    "description": "Generator nota AI gratis untuk UMKM Indonesia.",
+    "name": "NotaKu",
+    "description": "Generator nota gratis untuk UMKM Indonesia.",
     "url": "https://notaku-umkm.vercel.app",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "All",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" },
-    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "200" }
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "ratingCount": "50" }
   }
   </script>
 
+  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
+
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
-<!-- AMBIENT ORBS -->
-<div class="ambient-layer" aria-hidden="true">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-</div>
-
-<!-- GRAIN TEXTURE -->
-<div class="grain-overlay" aria-hidden="true"></div>
-
 <!-- CURSOR GLOW -->
-<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
-<!-- ══════════════════════════════════════
-     SOCIAL PROOF TOAST (live notif)
-═══════════════════════════════════════ -->
-<div class="sp-toast" id="spToast" aria-live="polite">
-  <div class="sp-avatar">🏪</div>
-  <div class="sp-text">
-    <strong id="spName">Toko Mawar Semarang</strong>
-    <span id="spAction">baru saja upgrade ke Premium ✨</span>
-  </div>
-</div>
+<!-- NOISE OVERLAY -->
+<div class="noise-overlay"></div>
 
-<!-- ══════════════════════════════════════
-     LIMITED OFFER BANNER
-═══════════════════════════════════════ -->
-<div class="offer-banner" id="offerBanner">
-  <div class="offer-inner">
-    <span class="offer-fire">🔥</span>
-    <span class="offer-text">Penawaran Terbatas — Hemat <strong>53%</strong> untuk paket Tahunan</span>
-    <div class="offer-timer">
-      <span class="timer-label">Berakhir dalam:</span>
-      <div class="timer-blocks">
-        <div class="timer-block"><span id="timerH">02</span><small>JAM</small></div>
-        <div class="timer-sep">:</div>
-        <div class="timer-block"><span id="timerM">47</span><small>MNT</small></div>
-        <div class="timer-sep">:</div>
-        <div class="timer-block"><span id="timerS">30</span><small>DET</small></div>
-      </div>
-    </div>
-    <a href="#premium" class="offer-cta">Klaim Sekarang →</a>
-  </div>
-  <button class="offer-close" onclick="document.getElementById('offerBanner').style.display='none'" aria-label="Tutup">✕</button>
-</div>
-
-<!-- ══════════════════════════════════════
-     HERO
-═══════════════════════════════════════ -->
+<!-- HERO -->
 <header class="hero">
+  <div class="hero-grid-lines"></div>
+  <div class="hero-radial"></div>
+
   <nav class="navbar">
     <div class="logo">
-      <div class="logo-mark">N</div>
-      <span class="logo-text">ota<span class="logo-ku">Ku</span></span>
-      <span class="logo-ai-badge">AI</span>
-    </div>
-    <div class="nav-center">
-      <a href="#app" class="nav-link">Generator</a>
-      <a href="#ai-features" class="nav-link">Fitur AI</a>
-      <a href="#premium" class="nav-link">Premium</a>
+      <span class="logo-n">N</span>ota<span class="logo-ku">Ku</span>
+      <span class="logo-dot">●</span>
     </div>
     <div class="nav-right">
-      <div class="nav-live-dot">
-        <span class="live-pulse"></span>
-        <span class="live-text">200+ UMKM Online</span>
+      <div class="nav-tag">
+        <span class="tag-dot"></span>
+        UMKM Indonesia 🇮🇩
       </div>
-      <a href="#premium" class="nav-premium-btn">
-        <span class="btn-shine"></span>
-        ✦ Premium
-      </a>
-      <button id="darkModeToggle" class="nav-icon-btn" aria-label="Toggle dark mode">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
+      <a href="#premium" class="nav-premium-btn">✦ Premium</a>
+      <button id="darkModeToggle" class="nav-premium-btn dark-toggle" style="background: transparent; border: 1px solid rgba(201,149,42,0.4);">🌙 Mode</button>
     </div>
   </nav>
 
   <div class="hero-body">
     <div class="hero-content">
       <div class="hero-eyebrow">
-        <div class="eyebrow-dot"></div>
+        <span class="eyebrow-line"></span>
         <span>Generator Nota #1 Indonesia</span>
-        <div class="eyebrow-sep">·</div>
-        <span class="eyebrow-ai">Bertenaga AI</span>
+        <span class="eyebrow-pill">Gratis Selamanya</span>
       </div>
-
       <h1 class="hero-title">
-        <span class="title-line-1">Nota</span>
-        <span class="title-line-2"><em>Profesional</em></span>
-        <span class="title-line-3">Dalam <span class="title-highlight">Detik</span></span>
+        Nota<br/>
+        <em>Profesional</em><br/>
+        <span class="title-accent">Dalam Detik</span>
       </h1>
-
-      <p class="hero-desc">
-        Buat nota bisnis berkualitas tinggi dengan kecerdasan buatan.<br/>
-        Auto-generate dari suara, analisis penjualan real-time, 11 template eksklusif.
-      </p>
-
+      <p class="hero-sub">Simpan produk favorit, pilih template mewah,<br/>cetak massal & pantau penjualan — semua gratis.</p>
       <div class="hero-ctas">
         <a href="#app" class="cta-primary">
-          <span class="cta-icon">✦</span>
-          Buat Nota Sekarang
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span>Buat Nota Sekarang</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
         </a>
-        <button class="cta-voice" id="heroVoiceBtn" onclick="openVoiceModal()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-          AI Voice
-        </button>
+        <a href="#premium" class="cta-ghost">Lihat Premium →</a>
       </div>
-
       <div class="hero-stats">
-        <div class="hstat">
-          <span class="hstat-n">200+</span>
-          <span class="hstat-l">UMKM Aktif</span>
-        </div>
-        <div class="hstat-rule"></div>
-        <div class="hstat">
-          <span class="hstat-n">11</span>
-          <span class="hstat-l">Template</span>
-        </div>
-        <div class="hstat-rule"></div>
-        <div class="hstat">
-          <span class="hstat-n">4</span>
-          <span class="hstat-l">Fitur AI</span>
-        </div>
-        <div class="hstat-rule"></div>
-        <div class="hstat">
-          <span class="hstat-n">100%</span>
-          <span class="hstat-l">Gratis</span>
-        </div>
+        <div class="h-stat"><span class="h-stat-num">50+</span><span class="h-stat-lab">UMKM Aktif</span></div>
+        <div class="h-stat-div"></div>
+        <div class="h-stat"><span class="h-stat-num">8</span><span class="h-stat-lab">Template</span></div>
+        <div class="h-stat-div"></div>
+        <div class="h-stat"><span class="h-stat-num">100%</span><span class="h-stat-lab">Gratis</span></div>
       </div>
     </div>
 
-    <!-- HERO VISUAL: Nota Mockup + AI overlay -->
     <div class="hero-visual">
-      <div class="hv-glow"></div>
-      <div class="nota-card">
-        <div class="nc-header">
-          <div class="nc-store">
-            <div class="nc-name">Toko Berkah Jaya</div>
-            <div class="nc-addr">Jl. Pahlawan No. 12, Semarang</div>
+      <div class="nota-mockup">
+        <div class="nota-mockup-header">
+          <div class="nm-store">
+            <div class="nm-name">Toko Berkah Jaya</div>
+            <div class="nm-sub">Jl. Pahlawan No. 12, Semarang</div>
           </div>
-          <div class="nc-badge">NOTA</div>
+          <div class="nm-badge">NOTA</div>
         </div>
-        <div class="nc-divider"></div>
-        <div class="nc-items">
-          <div class="nc-item"><span>Batik Tulis Semarang</span><span>Rp 185.000</span></div>
-          <div class="nc-item"><span>Kain Lurik Premium</span><span>Rp 95.000</span></div>
-          <div class="nc-item"><span>Tas Anyaman Rotan</span><span>Rp 120.000</span></div>
+        <div class="nota-mockup-divider"></div>
+        <div class="nm-items">
+          <div class="nm-item"><span>Batik Tulis Semarang</span><span>Rp 185.000</span></div>
+          <div class="nm-item"><span>Kain Lurik Premium</span><span>Rp 95.000</span></div>
+          <div class="nm-item"><span>Tas Anyaman Rotan</span><span>Rp 120.000</span></div>
         </div>
-        <div class="nc-divider"></div>
-        <div class="nc-total">
+        <div class="nota-mockup-divider"></div>
+        <div class="nm-total">
           <span>TOTAL</span>
-          <span class="nc-total-val">Rp 400.000</span>
+          <span class="nm-total-val">Rp 400.000</span>
         </div>
-        <div class="nc-stamp">LUNAS ✓</div>
-        <div class="nc-powered">NotaKu AI</div>
+        <div class="nm-stamp">LUNAS ✓</div>
+        <div class="nm-powered">NotaKu.id</div>
       </div>
 
-      <!-- AI floating chips -->
-      <div class="ai-chip ai-chip-1">
-        <span class="ai-chip-icon">🤖</span>
-        <span>AI Generated</span>
+      <div class="floating-badge fb1">
+        <span>⬇ PDF Ready</span>
       </div>
-      <div class="ai-chip ai-chip-2">
-        <span class="ai-chip-icon">📊</span>
-        <span>Analytics Ready</span>
+      <div class="floating-badge fb2">
+        <span>✓ Terkirim</span>
       </div>
-      <div class="ai-chip ai-chip-3">
-        <span class="ai-chip-icon">⚡</span>
-        <span>0.3s Process</span>
-      </div>
-
-      <!-- Waveform decoration -->
-      <div class="waveform-deco" aria-hidden="true">
-        <div class="wf-bar"></div><div class="wf-bar"></div><div class="wf-bar"></div>
-        <div class="wf-bar"></div><div class="wf-bar"></div><div class="wf-bar"></div>
-        <div class="wf-bar"></div><div class="wf-bar"></div>
+      <div class="floating-badge fb3">
+        <span>📊 Statistik</span>
       </div>
     </div>
   </div>
 
-  <div class="hero-scroll-hint">
-    <div class="scroll-track"><div class="scroll-dot"></div></div>
+  <!-- scroll indicator -->
+  <div class="scroll-ind">
+    <div class="scroll-line"></div>
     <span>Scroll</span>
   </div>
 </header>
 
-<!-- MARQUEE -->
-<div class="marquee-strip" aria-hidden="true">
+<!-- FEATURES MARQUEE -->
+<div class="marquee-strip">
   <div class="marquee-track">
-    <span>✦ Generator Nota AI</span><span>✦ Voice to Invoice</span>
-    <span>✦ Analisis Real-time</span><span>✦ 11 Template Eksklusif</span>
-    <span>✦ Saran Harga AI</span><span>✦ Tanpa Daftar</span>
-    <span>✦ 100% Privasi</span><span>✦ Export PDF & Excel</span>
-    <span>✦ Generator Nota AI</span><span>✦ Voice to Invoice</span>
-    <span>✦ Analisis Real-time</span><span>✦ 11 Template Eksklusif</span>
-    <span>✦ Saran Harga AI</span><span>✦ Tanpa Daftar</span>
-    <span>✦ 100% Privasi</span><span>✦ Export PDF & Excel</span>
+    <span>✦ Buat Nota Gratis</span>
+    <span>✦ Download PDF</span>
+    <span>✦ 8 Template Eksklusif</span>
+    <span>✦ Statistik Penjualan</span>
+    <span>✦ Simpan Produk Favorit</span>
+    <span>✦ Tanpa Daftar</span>
+    <span>✦ 100% Privasi</span>
+    <span>✦ Buat Nota Gratis</span>
+    <span>✦ Download PDF</span>
+    <span>✦ 8 Template Eksklusif</span>
+    <span>✦ Statistik Penjualan</span>
+    <span>✦ Simpan Produk Favorit</span>
+    <span>✦ Tanpa Daftar</span>
+    <span>✦ 100% Privasi</span>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     AI FEATURES SHOWCASE
-═══════════════════════════════════════ -->
-<section id="ai-features" class="ai-showcase-section">
-  <div class="section-eyebrow">/ Kecerdasan Buatan</div>
-  <h2 class="section-title">Empat Pilar AI NotaKu</h2>
-  <p class="section-sub">Teknologi AI yang benar-benar bekerja untuk bisnis Anda</p>
-
-  <div class="ai-features-grid">
-
-    <!-- AI 1: Voice to Invoice -->
-    <div class="ai-feat-card" data-aos="fade-up">
-      <div class="afc-number">01</div>
-      <div class="afc-icon-wrap">
-        <div class="afc-icon">🎙️</div>
-        <div class="afc-icon-ring"></div>
-      </div>
-      <h3>Voice to Invoice</h3>
-      <p>Cukup ucapkan produk dan harga Anda, AI langsung mengisi nota secara otomatis. Tanpa ketik, langsung jadi.</p>
-      <div class="afc-demo">
-        <div class="afc-demo-input">
-          <span class="demo-quote">"</span>Jual batik 3 lembar harga 150 ribu, tas rotan 2 buah 200 ribu<span class="demo-quote">"</span>
-        </div>
-        <div class="afc-demo-arrow">→ AI Proses</div>
-        <div class="afc-demo-output">
-          <div class="demo-row"><span>Batik</span><span>3× Rp 150.000</span></div>
-          <div class="demo-row"><span>Tas Rotan</span><span>2× Rp 200.000</span></div>
-          <div class="demo-total">Total: Rp 850.000 ✓</div>
-        </div>
-      </div>
-      <button class="afc-try-btn" onclick="openVoiceModal()">
-        Coba Sekarang <span>→</span>
-      </button>
-    </div>
-
-    <!-- AI 2: Smart Price -->
-    <div class="ai-feat-card" data-aos="fade-up" data-aos-delay="100">
-      <div class="afc-number">02</div>
-      <div class="afc-icon-wrap">
-        <div class="afc-icon">💡</div>
-        <div class="afc-icon-ring"></div>
-      </div>
-      <h3>Saran Harga Cerdas</h3>
-      <p>AI menganalisis nama produk Anda dan memberikan saran harga jual yang kompetitif berdasarkan pasar UMKM Indonesia.</p>
-      <div class="afc-price-demo">
-        <div class="price-chip">Batik Tulis <span class="price-suggest">→ Rp 150k–250k</span></div>
-        <div class="price-chip">Kain Lurik <span class="price-suggest">→ Rp 80k–120k</span></div>
-        <div class="price-chip">Tas Rotan <span class="price-suggest">→ Rp 100k–200k</span></div>
-        <div class="price-accuracy">Akurasi AI: <strong>87%</strong> 🎯</div>
-      </div>
-      <button class="afc-try-btn" onclick="aiSmartSuggest()">
-        Saran Harga Sekarang <span>→</span>
-      </button>
-    </div>
-
-    <!-- AI 3: Business Analyst -->
-    <div class="ai-feat-card" data-aos="fade-up" data-aos-delay="200">
-      <div class="afc-number">03</div>
-      <div class="afc-icon-wrap">
-        <div class="afc-icon">📈</div>
-        <div class="afc-icon-ring"></div>
-      </div>
-      <h3>Analisis Bisnis Real-time</h3>
-      <p>Pantau tren penjualan, prediksi pendapatan bulan depan, dan dapatkan rekomendasi strategis dari AI setiap saat.</p>
-      <div class="afc-chart-mini" id="miniChart">
-        <div class="mini-bars">
-          <div class="mb" style="height:40%"></div>
-          <div class="mb" style="height:60%"></div>
-          <div class="mb" style="height:45%"></div>
-          <div class="mb" style="height:80%"></div>
-          <div class="mb" style="height:65%"></div>
-          <div class="mb" style="height:90%"></div>
-          <div class="mb active" style="height:100%"></div>
-        </div>
-        <div class="mini-label">↑ Tren naik 24% minggu ini</div>
-      </div>
-      <button class="afc-try-btn premium-locked-btn" onclick="scrollToPremium()">
-        Aktifkan Premium <span class="lock-icon">🔒</span>
-      </button>
-    </div>
-
-    <!-- AI 4: Chat Assistant -->
-    <div class="ai-feat-card" data-aos="fade-up" data-aos-delay="300">
-      <div class="afc-number">04</div>
-      <div class="afc-icon-wrap">
-        <div class="afc-icon">🧠</div>
-        <div class="afc-icon-ring"></div>
-      </div>
-      <h3>AI Business Assistant</h3>
-      <p>Asisten bisnis AI yang memahami konteks bisnis Anda. Tanya strategi harga, cara promosi, atau minta analisis mendalam.</p>
-      <div class="afc-chat-preview">
-        <div class="cp-msg ai">💬 Bagaimana cara meningkatkan penjualan batik saya?</div>
-        <div class="cp-msg user">🤖 Coba bundling produk: batik + tas rotan dengan diskon 10%...</div>
-      </div>
-      <button class="afc-try-btn premium-locked-btn" onclick="scrollToPremium()">
-        Chat dengan AI <span class="lock-icon">🔒</span>
-      </button>
-    </div>
-
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════
-     APP SECTION
-═══════════════════════════════════════ -->
+<!-- APP SECTION -->
 <main id="app" class="app-section">
-  <div class="section-eyebrow">/ Buat Nota</div>
+  <div class="section-label">/ Buat Nota</div>
 
-  <div class="app-grid">
+  <div class="app-container">
 
-    <!-- ── FORM PANEL ─────────────────── -->
-    <div class="form-panel glass-card">
+    <!-- FORM PANEL -->
+    <div class="form-panel glass-panel">
       <div class="panel-head">
-        <div>
-          <h2 class="panel-title">Isi Data Nota</h2>
-          <p class="panel-sub">Lengkapi informasi di bawah ini</p>
-        </div>
-        <div class="step-badge">01</div>
+        <h2 class="panel-title">Isi Data Nota</h2>
+        <div class="panel-step">01</div>
       </div>
 
-      <!-- AI Quick Generate -->
-      <div class="ai-quick-bar">
-        <div class="aqb-icon">🤖</div>
-        <div class="aqb-content">
-          <div class="aqb-title">AI Quick Generate</div>
-          <input type="text" id="aiQuickInput" placeholder='Ketik: "Jual 3 batik @150rb dan 2 tas @200rb"' />
+      <div class="form-group">
+        <label class="group-label">🏪 Info Toko / Usaha</label>
+        <div class="input-stack">
+          <div class="input-wrap">
+            <input type="text" id="storeName" placeholder="Nama Toko / Usaha Anda" />
+            <div class="input-line"></div>
+          </div>
+          <div class="input-wrap">
+            <input type="text" id="storeAddress" placeholder="Alamat (opsional)" />
+            <div class="input-line"></div>
+          </div>
+          <div class="input-wrap">
+            <input type="text" id="storePhone" placeholder="No. HP / WA (opsional)" />
+            <div class="input-line"></div>
+          </div>
         </div>
-        <button class="aqb-btn" onclick="aiQuickGenerate()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </button>
       </div>
 
-      <!-- Store Info -->
-      <fieldset class="form-section">
-        <legend class="form-section-label">🏪 Info Toko / Usaha</legend>
-        <div class="input-group">
-          <div class="input-float">
-            <input type="text" id="storeName" placeholder=" " />
-            <label>Nama Toko / Usaha</label>
-            <div class="input-underline"></div>
+      <div class="form-group">
+        <label class="group-label">👤 Info Pembeli</label>
+        <div class="input-stack">
+          <div class="input-wrap">
+            <input type="text" id="buyerName" placeholder="Nama Pembeli" />
+            <div class="input-line"></div>
           </div>
-          <div class="input-float">
-            <input type="text" id="storeAddress" placeholder=" " />
-            <label>Alamat (opsional)</label>
-            <div class="input-underline"></div>
-          </div>
-          <div class="input-float">
-            <input type="text" id="storePhone" placeholder=" " />
-            <label>No. HP / WA (opsional)</label>
-            <div class="input-underline"></div>
+          <div class="input-wrap">
+            <input type="text" id="buyerPhone" placeholder="No. HP Pembeli (opsional)" />
+            <div class="input-line"></div>
           </div>
         </div>
-      </fieldset>
+      </div>
 
-      <!-- Buyer Info -->
-      <fieldset class="form-section">
-        <legend class="form-section-label">👤 Info Pembeli</legend>
-        <div class="input-row-2">
-          <div class="input-float">
-            <input type="text" id="buyerName" placeholder=" " />
-            <label>Nama Pembeli</label>
-            <div class="input-underline"></div>
+      <div class="form-group">
+        <label class="group-label">📋 Detail Nota</label>
+        <div class="input-row">
+          <div class="input-wrap">
+            <input type="text" id="invoiceNumber" placeholder="No. Nota (otomatis)" />
+            <div class="input-line"></div>
           </div>
-          <div class="input-float">
-            <input type="text" id="buyerPhone" placeholder=" " />
-            <label>No. HP Pembeli</label>
-            <div class="input-underline"></div>
-          </div>
-        </div>
-      </fieldset>
-
-      <!-- Invoice Detail -->
-      <fieldset class="form-section">
-        <legend class="form-section-label">📋 Detail Nota</legend>
-        <div class="input-row-2">
-          <div class="input-float">
-            <input type="text" id="invoiceNumber" placeholder=" " />
-            <label>No. Nota</label>
-            <div class="input-underline"></div>
-          </div>
-          <div class="input-float">
+          <div class="input-wrap">
             <input type="date" id="invoiceDate" />
-            <label class="date-label">Tanggal</label>
-            <div class="input-underline"></div>
+            <div class="input-line"></div>
           </div>
         </div>
-      </fieldset>
+      </div>
 
       <!-- Template Selector -->
-      <fieldset class="form-section">
-        <legend class="form-section-label">🎨 Template Nota</legend>
-        <div class="template-tabs">
-          <button class="ttab active" data-tab="free">Gratis (3)</button>
-          <button class="ttab" data-tab="premium" id="premiumTab">
-            👑 Premium (8)
-            <span class="ttab-lock" id="premiumTabLock">🔒</span>
-          </button>
-        </div>
-        <div id="freeTemplates" class="template-grid">
-          <button class="tpl-btn active" data-template="classic">
-            <div class="tpl-preview tpl-classic-prev"></div>
-            <span>Classic</span>
-          </button>
-          <button class="tpl-btn" data-template="modern">
-            <div class="tpl-preview tpl-modern-prev"></div>
-            <span>Modern</span>
-          </button>
-          <button class="tpl-btn" data-template="minimal">
-            <div class="tpl-preview tpl-minimal-prev"></div>
-            <span>Minimal</span>
-          </button>
-        </div>
-        <div id="premiumTemplates" class="template-grid" style="display:none">
-          <button class="tpl-btn premium-tpl" data-template="premium-luxury">
-            <div class="tpl-preview tpl-luxury-prev"></div>
-            <span>💎 Luxury</span>
-          </button>
-          <button class="tpl-btn premium-tpl" data-template="premium-dark">
-            <div class="tpl-preview tpl-dark-prev"></div>
-            <span>🌙 Dark</span>
-          </button>
-          <button class="tpl-btn premium-tpl" data-template="premium-neon">
-            <div class="tpl-preview tpl-neon-prev"></div>
-            <span>⚡ Neon</span>
-          </button>
-          <button class="tpl-btn premium-tpl" data-template="premium-sakura">
-            <div class="tpl-preview tpl-sakura-prev"></div>
-            <span>🌸 Sakura</span>
-          </button>
-          <button class="tpl-btn premium-tpl" data-template="premium-royal">
-            <div class="tpl-preview tpl-royal-prev"></div>
-            <span>👑 Royal</span>
-          </button>
-          <button class="tpl-btn premium-tpl" data-template="premium-nature">
-            <div class="tpl-preview tpl-nature-prev"></div>
-            <span>🍃 Nature</span>
-          </button>
-          <button class="tpl-btn premium-tpl" data-template="premium-elegant">
-            <div class="tpl-preview tpl-elegant-prev"></div>
-            <span>🦢 Elegant</span>
-          </button>
-          <button class="tpl-btn premium-tpl" data-template="premium-art">
-            <div class="tpl-preview tpl-art-prev"></div>
-            <span>🎨 Art Deco</span>
-          </button>
-        </div>
-      </fieldset>
+      <div class="form-group">
+        <label class="group-label">🎨 Pilih Template</label>
+        <div class="template-selector">
+          <div class="template-group-label-ui">📋 GRATIS</div>
+          <div class="template-buttons">
+            <button class="template-btn active" data-template="classic">
+              <span class="tb-icon">◈</span> Classic
+            </button>
+            <button class="template-btn" data-template="modern">
+              <span class="tb-icon">◆</span> Modern
+            </button>
+            <button class="template-btn" data-template="minimal">
+              <span class="tb-icon">◻</span> Minimal
+            </button>
+          </div>
 
-      <!-- Products -->
-      <fieldset class="form-section">
-        <legend class="form-section-label">🛍 Daftar Produk</legend>
-        <div id="itemsList" class="items-list"></div>
-        <div class="items-actions">
-          <button class="add-item-btn" onclick="addItem()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Tambah Produk
-          </button>
-          <button class="ai-price-btn" onclick="aiSmartSuggest()">
-            <span>🤖</span> AI Saran Harga
-          </button>
+          <div id="premiumTemplateGroup" style="display:none">
+            <div class="template-group-label-ui premium-label">👑 PREMIUM EXCLUSIVE</div>
+            <div class="template-buttons">
+              <button class="template-btn premium-template" data-template="premium-luxury">💎 Luxury Gold</button>
+              <button class="template-btn premium-template" data-template="premium-elegant">🦢 Elegant Silk</button>
+              <button class="template-btn premium-template" data-template="premium-dark">🌙 Dark Executive</button>
+              <button class="template-btn premium-template" data-template="premium-art">🎨 Art Deco</button>
+              <button class="template-btn premium-template" data-template="premium-nature">🍃 Nature Fresh</button>
+              <button class="template-btn premium-template" data-template="premium-neon">⚡ Neon Cyber</button>
+              <button class="template-btn premium-template" data-template="premium-sakura">🌸 Sakura Soft</button>
+              <button class="template-btn premium-template" data-template="premium-royal">👑 Royal Marble</button>
+            </div>
+          </div>
         </div>
-        <div id="aiSuggestionResult"></div>
-      </fieldset>
+        <div id="premiumTemplateNote" style="font-size:0.7rem;color:var(--gold);margin-top:0.5rem;display:none;">
+          ⭐ 8 template eksklusif aktif sebagai member Premium!
+        </div>
+      </div>
 
-      <!-- Saved Products -->
-      <fieldset class="form-section">
-        <legend class="form-section-label">⭐ Produk Tersimpan</legend>
-        <div id="savedProducts" class="saved-products-wrap"></div>
-        <button class="ghost-btn small" onclick="showSaveProductModal()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Simpan Produk Baru
+      <div class="form-group">
+        <label class="group-label">🛍 Daftar Produk</label>
+        <div id="itemsList"></div>
+        <button class="add-item-btn" onclick="addItem()">
+          <span>+</span> Tambah Produk
         </button>
-      </fieldset>
+      </div>
 
-      <!-- Discount & Notes -->
-      <fieldset class="form-section">
-        <legend class="form-section-label">💰 Diskon & Catatan</legend>
-        <div class="input-row-2">
-          <div class="input-float">
-            <input type="number" id="discount" placeholder=" " min="0" value="0" />
-            <label>Diskon (Rp)</label>
-            <div class="input-underline"></div>
+      <div class="form-group">
+        <label class="group-label">⭐ Produk Favorit</label>
+        <div id="savedProducts" class="saved-products"></div>
+        <button class="add-item-btn small" onclick="showSaveProductModal()">💾 Simpan Produk</button>
+      </div>
+
+      <!-- AI SMART BUTTON (Premium Feature) -->
+      <div class="form-group" id="aiSmartContainer" style="display:none;">
+        <button class="ai-btn" onclick="aiSmartSuggest()">
+          🤖 AI Smart Invoice
+          <span class="premium-feature-badge">PREMIUM</span>
+        </button>
+        <div id="aiSuggestionResult"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">💰 Diskon & Catatan</label>
+        <div class="input-row">
+          <div class="input-wrap">
+            <input type="number" id="discount" placeholder="Diskon (Rp)" min="0" value="0" />
+            <div class="input-line"></div>
           </div>
-          <div class="input-float">
-            <input type="number" id="tax" placeholder=" " min="0" max="100" value="0" />
-            <label>Pajak (%)</label>
-            <div class="input-underline"></div>
+          <div class="input-wrap">
+            <input type="number" id="tax" placeholder="Pajak (%)" min="0" max="100" value="0" />
+            <div class="input-line"></div>
           </div>
         </div>
-        <div class="input-float">
-          <textarea id="notes" placeholder=" " rows="3"></textarea>
-          <label>Catatan tambahan</label>
-          <div class="input-underline"></div>
+        <div class="input-wrap">
+          <textarea id="notes" placeholder="Catatan tambahan (terima kasih, syarat pengembalian, dll)"></textarea>
+          <div class="input-line"></div>
         </div>
-      </fieldset>
+      </div>
 
       <button class="generate-btn" onclick="generateInvoice()">
-        <span class="gen-shimmer"></span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Generate Nota AI
-        <span class="gen-badge">↵</span>
+        <span class="gen-icon">✦</span>
+        <span>Generate Nota</span>
+        <span class="gen-arrow">→</span>
       </button>
     </div>
 
-    <!-- ── PREVIEW PANEL ─────────────── -->
-    <div class="preview-panel glass-card">
-      <div class="preview-head">
-        <div>
+    <!-- PREVIEW PANEL -->
+    <div class="preview-panel glass-panel">
+      <div class="preview-header">
+        <div class="panel-head">
           <h2 class="panel-title">Preview Nota</h2>
-          <p class="panel-sub">Real-time preview</p>
+          <div class="panel-step">02</div>
         </div>
-        <div class="step-badge">02</div>
+        <div class="preview-actions" id="previewActions" style="display:none">
+          <button class="action-btn" onclick="downloadPDF()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            PDF
+          </button>
+          <button class="action-btn secondary" onclick="printInvoice()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print
+          </button>
+          <button class="action-btn secondary" onclick="shareToWhatsApp()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.574 2.81.7A2 2 0 0122 16.92z"/></svg>
+            WA
+          </button>
+        </div>
       </div>
 
-      <div class="preview-actions" id="previewActions" style="display:none">
-        <button class="action-pill primary" onclick="downloadPDF()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          PDF
-        </button>
-        <button class="action-pill" onclick="printInvoice()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Cetak
-        </button>
-        <button class="action-pill" onclick="shareToWhatsApp()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6"/></svg>
-          WA
-        </button>
-        <button class="action-pill danger" onclick="generateInvoice()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Reset
-        </button>
-      </div>
-
-      <!-- Placeholder -->
       <div class="preview-placeholder" id="previewPlaceholder">
-        <div class="pp-art">
-          <div class="pp-ring r1"></div>
-          <div class="pp-ring r2"></div>
-          <div class="pp-ring r3"></div>
-          <div class="pp-icon">🧾</div>
+        <div class="placeholder-art">
+          <div class="pa-ring pa-ring-1"></div>
+          <div class="pa-ring pa-ring-2"></div>
+          <div class="pa-ring pa-ring-3"></div>
+          <div class="pa-icon">🧾</div>
         </div>
-        <p>Isi form &amp; klik <strong>Generate Nota AI</strong></p>
-        <span class="pp-sub">Preview akan muncul di sini</span>
+        <p>Isi form & klik <strong>Generate Nota</strong></p>
+        <span class="ph-sub">Preview akan muncul di sini</span>
       </div>
 
-      <!-- Invoice Preview -->
       <div id="invoicePreview" class="invoice-template template-classic" style="display:none">
-        <!-- Logo area (premium) -->
-        <div class="inv-logo-area" id="invLogoArea" style="display:none">
-          <img id="invLogoImg" src="" alt="Logo Toko" class="inv-logo-img"/>
-        </div>
-
         <div class="inv-header">
           <div class="inv-store">
             <div class="inv-store-name" id="inv-storeName"></div>
@@ -606,34 +354,28 @@
             <div class="inv-date" id="inv-date"></div>
           </div>
         </div>
-
         <div class="inv-divider"></div>
-
         <div class="inv-buyer">
           <div class="inv-buyer-label">Kepada Yth.</div>
           <div class="inv-buyer-name" id="inv-buyerName"></div>
           <div class="inv-buyer-sub" id="inv-buyerPhone"></div>
         </div>
-
         <table class="inv-table">
           <thead>
             <tr><th>Produk / Jasa</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr>
           </thead>
           <tbody id="inv-items"></tbody>
         </table>
-
         <div class="inv-summary">
-          <div class="inv-sum-row"><span>Subtotal</span><span id="inv-subtotal"></span></div>
-          <div class="inv-sum-row discount" id="inv-discountRow" style="display:none"><span>Diskon</span><span id="inv-discount"></span></div>
-          <div class="inv-sum-row tax" id="inv-taxRow" style="display:none"><span>Pajak</span><span id="inv-tax"></span></div>
-          <div class="inv-sum-row total"><span>TOTAL</span><span id="inv-total"></span></div>
+          <div class="inv-summary-row"><span>Subtotal</span><span id="inv-subtotal"></span></div>
+          <div class="inv-summary-row discount" id="inv-discountRow" style="display:none"><span>Diskon</span><span id="inv-discount"></span></div>
+          <div class="inv-summary-row tax" id="inv-taxRow" style="display:none"><span>Pajak</span><span id="inv-tax"></span></div>
+          <div class="inv-summary-row total"><span>TOTAL</span><span id="inv-total"></span></div>
         </div>
-
-        <div class="inv-notes-wrap" id="inv-notesSection" style="display:none">
+        <div class="inv-notes" id="inv-notesSection" style="display:none">
           <div class="inv-notes-label">Catatan:</div>
           <div id="inv-notes"></div>
         </div>
-
         <div class="inv-footer">
           <div class="inv-footer-left">
             <div>Hormat kami,</div>
@@ -644,407 +386,358 @@
             <div class="inv-stamp" id="inv-stamp">LUNAS</div>
           </div>
         </div>
-
-        <div class="inv-watermark" id="watermark">NotaKu AI</div>
-        <div class="inv-powered">Dibuat dengan <strong>NotaKu AI</strong> — Generator Nota Bertenaga Kecerdasan Buatan untuk UMKM Indonesia</div>
+        <div class="inv-watermark" id="watermark">NotaKu.id</div>
+        <div class="inv-powered">Dibuat dengan <strong>NotaKu.id</strong> — Generator Nota Gratis untuk UMKM Indonesia</div>
       </div>
     </div>
   </div>
 
-  <!-- ── STATISTICS ────────────────────── -->
+  <!-- STATISTIK -->
   <div class="stats-section">
-    <div class="section-eyebrow">/ Statistik Penjualan</div>
-    <div class="stats-panel glass-card">
+    <div class="section-label">/ Statistik</div>
+    <div class="glass-panel stats-container">
       <div class="stats-header">
-        <div>
-          <h3 class="panel-title">Laporan Bisnis</h3>
-          <p class="panel-sub" id="statsDateRange">Semua waktu</p>
-        </div>
-        <div class="stats-actions">
-          <button class="ghost-btn" onclick="exportToExcel()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Excel
-          </button>
-          <button class="ghost-btn" onclick="exportStats()">CSV</button>
-          <button class="ghost-btn danger" onclick="resetStats()">Reset</button>
+        <h2 class="panel-title">Statistik Penjualan</h2>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="reset-stats-btn export-btn" onclick="exportToExcel()" style="background: #2a7a4b; border-color: #2a7a4b;">📊 Export Excel</button>
+          <button class="reset-stats-btn" onclick="exportStats()" style="background: #c9952a; border-color: #c9952a;">📄 Export CSV</button>
+          <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
         </div>
       </div>
-
-      <div class="stats-kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-icon">📋</div>
-          <div class="kpi-data">
-            <div class="kpi-value" id="totalTransactions">0</div>
-            <div class="kpi-label">Total Transaksi</div>
-          </div>
-          <div class="kpi-trend" id="trendTransactions">—</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-label">Total Transaksi</div>
+          <div class="stat-value" id="totalTransactions">0</div>
         </div>
-        <div class="kpi-card featured">
-          <div class="kpi-icon">💰</div>
-          <div class="kpi-data">
-            <div class="kpi-value" id="totalRevenue">Rp 0</div>
-            <div class="kpi-label">Total Pendapatan</div>
-          </div>
-          <div class="kpi-trend" id="trendRevenue">—</div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Total Pendapatan</div>
+          <div class="stat-value" id="totalRevenue">Rp 0</div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-icon">📈</div>
-          <div class="kpi-data">
-            <div class="kpi-value" id="avgTransaction">Rp 0</div>
-            <div class="kpi-label">Rata-rata Transaksi</div>
-          </div>
-          <div class="kpi-trend" id="trendAvg">—</div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-label">Rata-rata Transaksi</div>
+          <div class="stat-value" id="avgTransaction">Rp 0</div>
         </div>
       </div>
-
-      <div class="chart-wrap">
-        <canvas id="revenueChart"></canvas>
-      </div>
-
-      <!-- AI Insight Banner -->
-      <div class="ai-insight-bar" id="aiInsightBar" style="display:none">
-        <div class="aib-icon">🤖</div>
-        <div class="aib-text" id="aiInsightText">AI sedang menganalisis data Anda...</div>
-        <button class="aib-more" onclick="openAIAnalyst()">Lihat Detail →</button>
-      </div>
+      <canvas id="revenueChart" style="max-height:280px;margin-top:1.5rem;"></canvas>
     </div>
   </div>
 </main>
 
-<!-- ══════════════════════════════════════
-     PREMIUM SECTION
-═══════════════════════════════════════ -->
+<!-- PREMIUM SECTION -->
 <section id="premium" class="premium-section">
-  <div class="prem-bg-mesh" aria-hidden="true"></div>
+  <div class="premium-bg-art"></div>
+  <div class="section-label light">/ Premium</div>
 
-  <!-- PREMIUM DASHBOARD (aktif setelah login) -->
-  <div class="premium-dashboard" id="premiumDashboard" style="display:none">
-    <div class="pd-header">
-      <div class="pd-title">
-        <span>✨</span>
+  <div class="premium-hero">
+    <div class="prem-eyebrow">✦ Upgrade Pengalaman Anda</div>
+    <h2 class="prem-title">Template<br/><em>Eksklusif</em> untuk<br/>Nota yang <span>Memukau</span></h2>
+    <p class="prem-sub">Hapus watermark & dapatkan 8 template premium yang dirancang khusus untuk tampilan nota paling profesional se-Indonesia.</p>
+  </div>
+
+  <!-- TEMPLATE SHOWCASE -->
+  <div class="template-showcase">
+    <div class="ts-card ts-luxury">
+      <div class="ts-tag">💎 Luxury Gold</div>
+      <div class="ts-preview">
+        <div class="ts-header gold-grad">
+          <div class="ts-sname">Toko Anda</div>
+          <div class="ts-badge">NOTA</div>
+        </div>
+        <div class="ts-item-row"><span>Produk A</span><span>Rp 500.000</span></div>
+        <div class="ts-item-row"><span>Produk B</span><span>Rp 200.000</span></div>
+        <div class="ts-total gold-text">TOTAL: Rp 700.000</div>
+        <div class="ts-stamp gold-stamp">LUNAS</div>
+      </div>
+    </div>
+    <div class="ts-card ts-dark">
+      <div class="ts-tag">🌙 Dark Executive</div>
+      <div class="ts-preview dark-bg">
+        <div class="ts-header dark-header">
+          <div class="ts-sname gold-text-sm">TOKO ANDA</div>
+          <div class="ts-badge gold-badge">NOTA</div>
+        </div>
+        <div class="ts-item-row dark-row"><span>Produk A</span><span>Rp 500.000</span></div>
+        <div class="ts-item-row dark-row"><span>Produk B</span><span>Rp 200.000</span></div>
+        <div class="ts-total dark-total">TOTAL: Rp 700.000</div>
+        <div class="ts-stamp dark-stamp">LUNAS</div>
+      </div>
+    </div>
+    <div class="ts-card ts-neon">
+      <div class="ts-tag new-tag">⚡ Neon Cyber <span class="new-badge">BARU</span></div>
+      <div class="ts-preview neon-bg">
+        <div class="ts-header neon-header">
+          <div class="ts-sname neon-name">TOKO ANDA</div>
+          <div class="ts-badge neon-badge">NOTA</div>
+        </div>
+        <div class="ts-item-row neon-row"><span>Produk A</span><span>Rp 500.000</span></div>
+        <div class="ts-item-row neon-row"><span>Produk B</span><span>Rp 200.000</span></div>
+        <div class="ts-total neon-total">TOTAL: Rp 700.000</div>
+        <div class="ts-stamp neon-stamp">LUNAS</div>
+      </div>
+    </div>
+    <div class="ts-card ts-sakura">
+      <div class="ts-tag new-tag">🌸 Sakura Soft <span class="new-badge">BARU</span></div>
+      <div class="ts-preview sakura-bg">
+        <div class="ts-header sakura-header">
+          <div class="ts-sname sakura-name">Toko Anda</div>
+          <div class="ts-badge sakura-badge">NOTA</div>
+        </div>
+        <div class="ts-item-row sakura-row"><span>Produk A</span><span>Rp 500.000</span></div>
+        <div class="ts-item-row sakura-row"><span>Produk B</span><span>Rp 200.000</span></div>
+        <div class="ts-total sakura-total">TOTAL: Rp 700.000</div>
+        <div class="ts-stamp sakura-stamp">LUNAS</div>
+      </div>
+    </div>
+    <div class="ts-card ts-royal">
+      <div class="ts-tag new-tag">👑 Royal Marble <span class="new-badge">BARU</span></div>
+      <div class="ts-preview royal-bg">
+        <div class="ts-header royal-header">
+          <div class="ts-sname royal-name">Toko Anda</div>
+          <div class="ts-badge royal-badge">NOTA</div>
+        </div>
+        <div class="ts-item-row royal-row"><span>Produk A</span><span>Rp 500.000</span></div>
+        <div class="ts-item-row royal-row"><span>Produk B</span><span>Rp 200.000</span></div>
+        <div class="ts-total royal-total">TOTAL: Rp 700.000</div>
+        <div class="ts-stamp royal-stamp">LUNAS</div>
+      </div>
+    </div>
+    <div class="ts-card ts-nature">
+      <div class="ts-tag">🍃 Nature Fresh</div>
+      <div class="ts-preview nature-bg">
+        <div class="ts-header nature-header">
+          <div class="ts-sname nature-name">Toko Anda</div>
+          <div class="ts-badge nature-badge">NOTA</div>
+        </div>
+        <div class="ts-item-row nature-row"><span>Produk A</span><span>Rp 500.000</span></div>
+        <div class="ts-item-row nature-row"><span>Produk B</span><span>Rp 200.000</span></div>
+        <div class="ts-total nature-total">TOTAL: Rp 700.000</div>
+        <div class="ts-stamp nature-stamp">LUNAS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREMIUM DASHBOARD (RAPI & KEREN) -->
+  <div class="premium-dashboard" id="premiumDashboard" style="display:none;">
+    <div class="dashboard-header">
+      <div class="dashboard-title">
+        <span class="dashboard-icon">✨</span>
         <span>Premium Dashboard</span>
-        <span class="pd-badge">AKTIF</span>
+        <span class="premium-badge-dash">AKTIF</span>
       </div>
-      <div class="pd-expiry" id="pdExpiry"></div>
+      <div class="dashboard-date" id="dashboardDate"></div>
     </div>
 
-    <div class="pd-grid">
-      <div class="pd-card" onclick="openAIAnalyst()">
-        <div class="pdc-icon">🤖</div>
-        <div class="pdc-title">AI Smart Analyst</div>
-        <div class="pdc-desc">Analisis mendalam & rekomendasi</div>
-        <div class="pdc-stat" id="aiAnalystPreview">Siap menganalisis</div>
+    <div class="dashboard-grid">
+      <div class="dash-card" onclick="openAIAnalyst()">
+        <div class="dash-card-icon">🤖</div>
+        <div class="dash-card-title">AI Smart Analyst</div>
+        <div class="dash-card-desc">Analisis penjualan & rekomendasi cerdas</div>
+        <div class="dash-card-stats" id="aiAnalystPreview">Siap menganalisis...</div>
       </div>
-      <div class="pd-card" onclick="openLogoUpload()">
-        <div class="pdc-icon">🖼️</div>
-        <div class="pdc-title">Custom Logo</div>
-        <div class="pdc-desc">Upload logo toko Anda</div>
-        <div class="pdc-stat" id="logoStatus">Belum ada logo</div>
+
+      <div class="dash-card" onclick="openLogoUpload()">
+        <div class="dash-card-icon">🖼️</div>
+        <div class="dash-card-title">Custom Logo</div>
+        <div class="dash-card-desc">Upload logo toko Anda</div>
+        <div class="dash-card-stats" id="logoStatus">Belum ada logo</div>
       </div>
-      <div class="pd-card" onclick="openInvoiceHistory()">
-        <div class="pdc-icon">📜</div>
-        <div class="pdc-title">Riwayat Nota</div>
-        <div class="pdc-desc">Semua nota tersimpan</div>
-        <div class="pdc-stat" id="historyCount">0 nota</div>
+
+      <div class="dash-card" onclick="openInvoiceHistory()">
+        <div class="dash-card-icon">📜</div>
+        <div class="dash-card-title">Riwayat Nota</div>
+        <div class="dash-card-desc">Lihat & kelola semua nota</div>
+        <div class="dash-card-stats" id="historyCount">0 nota</div>
       </div>
-      <div class="pd-card" onclick="exportToExcel()">
-        <div class="pdc-icon">📊</div>
-        <div class="pdc-title">Export Excel</div>
-        <div class="pdc-desc">Laporan + grafik lengkap</div>
-        <div class="pdc-stat">Klik untuk export</div>
+
+      <div class="dash-card" onclick="exportToExcel()">
+        <div class="dash-card-icon">📊</div>
+        <div class="dash-card-title">Export Excel</div>
+        <div class="dash-card-desc">Download laporan + grafik</div>
+        <div class="dash-card-stats">Klik untuk export</div>
       </div>
-      <div class="pd-card" onclick="shareToWhatsApp()">
-        <div class="pdc-icon">📱</div>
-        <div class="pdc-title">Share WhatsApp</div>
-        <div class="pdc-desc">Kirim nota ke pelanggan</div>
-        <div class="pdc-stat">Klik untuk kirim</div>
+
+      <div class="dash-card" onclick="shareToWhatsApp()">
+        <div class="dash-card-icon">📱</div>
+        <div class="dash-card-title">Kirim via WA</div>
+        <div class="dash-card-desc">Share nota ke WhatsApp</div>
+        <div class="dash-card-stats">Klik untuk kirim</div>
       </div>
-      <div class="pd-card" onclick="openRevenuePrediction()">
-        <div class="pdc-icon">🔮</div>
-        <div class="pdc-title">Prediksi Revenue</div>
-        <div class="pdc-desc">AI prediksi bulan depan</div>
-        <div class="pdc-stat" id="predictionPreview">Butuh lebih data</div>
+
+      <div class="dash-card" onclick="openRevenuePrediction()">
+        <div class="dash-card-icon">📈</div>
+        <div class="dash-card-title">Prediksi Pendapatan</div>
+        <div class="dash-card-desc">AI prediksi bulan depan</div>
+        <div class="dash-card-stats" id="predictionPreview">Belum ada data</div>
       </div>
     </div>
 
-    <!-- AI Chat (Premium) -->
-    <div class="ai-chat-widget">
-      <div class="acw-header">
-        <div class="acw-status">
-          <span class="acw-dot"></span>
-          <span>AI Business Assistant</span>
-        </div>
-        <div class="acw-model">Gemini 1.5 Pro · Streaming</div>
+    <!-- AI CHAT ASSISTANT (SUPERIOR) -->
+    <div class="ai-chat-section">
+      <div class="chat-header">
+        <span class="chat-icon">🧠</span>
+        <span>AI Business Assistant (Gemini 1.5 Pro)</span>
+        <span class="chat-badge">SUPERIOR AI</span>
       </div>
-      <div class="acw-messages" id="chatMessages">
-        <div class="acw-msg ai">
-          <div class="acw-avatar">🧠</div>
-          <div class="acw-bubble">Halo! Saya AI Assistant bisnis Anda. Tanya apa saja — strategi harga, analisis penjualan, atau minta saran promosi. Saya siap membantu!</div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message ai">
+          👋 Halo! Saya asisten AI canggih untuk bisnis Anda. Tanya apa saja tentang strategi harga, analisis penjualan, atau minta saran bisnis!
         </div>
       </div>
-      <div class="acw-input-row">
-        <input type="text" id="chatInput" placeholder="Tanya AI bisnis Anda..." onkeydown="if(event.key==='Enter')sendChatMessage()" />
-        <button onclick="sendChatMessage()" class="acw-send">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
-      </div>
-      <div class="acw-suggestions">
-        <button onclick="setChatInput('Bagaimana meningkatkan penjualan 2x lipat?')">💡 Tingkatkan penjualan</button>
-        <button onclick="setChatInput('Analisis bisnis saya sekarang')">📊 Analisis bisnis</button>
-        <button onclick="setChatInput('Strategi harga yang tepat untuk UMKM')">💰 Strategi harga</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PREMIUM HERO -->
-  <div class="section-eyebrow light">/ Premium</div>
-  <div class="prem-hero">
-    <h2 class="prem-title">
-      Template <em>Eksklusif</em><br/>
-      untuk Nota yang<br/>
-      <span class="prem-gradient-text">Memukau</span>
-    </h2>
-    <p class="prem-sub">Hapus watermark, akses 8 template premium, AI lengkap, upload logo — semua dalam satu paket terjangkau.</p>
-  </div>
-
-  <!-- TEMPLATE SHOWCASE dengan LIVE PREVIEW -->
-  <div class="template-showcase-new">
-    <div class="tsn-scroll">
-      <!-- Luxury Gold -->
-      <div class="tsn-card">
-        <div class="tsn-overlay">
-          <button class="tsn-preview-btn" onclick="showTemplateDemo('premium-luxury')">👁 Preview Live</button>
-        </div>
-        <div class="tsn-tag">💎 Luxury Gold</div>
-        <div class="tsn-mockup gold-mock">
-          <div class="tsm-h"><span class="tsm-sname">Toko Premium</span><span class="tsm-badge">NOTA</span></div>
-          <div class="tsm-divider gold-div"></div>
-          <div class="tsm-row"><span>Produk A</span><span>Rp 500.000</span></div>
-          <div class="tsm-row"><span>Produk B</span><span>Rp 300.000</span></div>
-          <div class="tsm-total gold-total">TOTAL: Rp 800.000</div>
-          <div class="tsm-stamp gold-stamp">LUNAS</div>
-        </div>
-        <div class="tsn-new-badge">PREMIUM</div>
-      </div>
-
-      <!-- Dark Executive -->
-      <div class="tsn-card">
-        <div class="tsn-overlay">
-          <button class="tsn-preview-btn" onclick="showTemplateDemo('premium-dark')">👁 Preview Live</button>
-        </div>
-        <div class="tsn-tag">🌙 Dark Executive</div>
-        <div class="tsn-mockup dark-mock">
-          <div class="tsm-h dark-header"><span class="tsm-sname dark-name">TOKO PREMIUM</span><span class="tsm-badge gold-bdg">NOTA</span></div>
-          <div class="tsm-divider gold-div"></div>
-          <div class="tsm-row dark-row"><span>Produk A</span><span>Rp 500.000</span></div>
-          <div class="tsm-row dark-row"><span>Produk B</span><span>Rp 300.000</span></div>
-          <div class="tsm-total dark-total">TOTAL: Rp 800.000</div>
-          <div class="tsm-stamp dark-stamp">LUNAS</div>
-        </div>
-        <div class="tsn-new-badge">PREMIUM</div>
-      </div>
-
-      <!-- Neon Cyber -->
-      <div class="tsn-card">
-        <div class="tsn-overlay">
-          <button class="tsn-preview-btn" onclick="showTemplateDemo('premium-neon')">👁 Preview Live</button>
-        </div>
-        <div class="tsn-tag">⚡ Neon Cyber <span class="tsn-hot">HOT</span></div>
-        <div class="tsn-mockup neon-mock">
-          <div class="tsm-h neon-header"><span class="tsm-sname neon-name">TOKO PREMIUM</span><span class="tsm-badge neon-bdg">NOTA</span></div>
-          <div class="tsm-divider neon-div"></div>
-          <div class="tsm-row neon-row"><span>Produk A</span><span>Rp 500.000</span></div>
-          <div class="tsm-row neon-row"><span>Produk B</span><span>Rp 300.000</span></div>
-          <div class="tsm-total neon-total">TOTAL: Rp 800.000</div>
-          <div class="tsm-stamp neon-stamp">LUNAS</div>
-        </div>
-        <div class="tsn-new-badge new">BARU</div>
-      </div>
-
-      <!-- Sakura -->
-      <div class="tsn-card">
-        <div class="tsn-overlay">
-          <button class="tsn-preview-btn" onclick="showTemplateDemo('premium-sakura')">👁 Preview Live</button>
-        </div>
-        <div class="tsn-tag">🌸 Sakura Soft <span class="tsn-hot">BARU</span></div>
-        <div class="tsn-mockup sakura-mock">
-          <div class="tsm-h sakura-header"><span class="tsm-sname sakura-name">Toko Premium</span><span class="tsm-badge sakura-bdg">NOTA</span></div>
-          <div class="tsm-divider pink-div"></div>
-          <div class="tsm-row sakura-row"><span>Produk A</span><span>Rp 500.000</span></div>
-          <div class="tsm-row sakura-row"><span>Produk B</span><span>Rp 300.000</span></div>
-          <div class="tsm-total sakura-total">TOTAL: Rp 800.000</div>
-          <div class="tsm-stamp sakura-stamp">LUNAS</div>
-        </div>
-        <div class="tsn-new-badge new">BARU</div>
-      </div>
-
-      <!-- Royal Marble -->
-      <div class="tsn-card">
-        <div class="tsn-overlay">
-          <button class="tsn-preview-btn" onclick="showTemplateDemo('premium-royal')">👁 Preview Live</button>
-        </div>
-        <div class="tsn-tag">👑 Royal Marble <span class="tsn-hot">BARU</span></div>
-        <div class="tsn-mockup royal-mock">
-          <div class="tsm-h royal-header"><span class="tsm-sname royal-name">Toko Premium</span><span class="tsm-badge royal-bdg">NOTA</span></div>
-          <div class="tsm-divider purple-div"></div>
-          <div class="tsm-row royal-row"><span>Produk A</span><span>Rp 500.000</span></div>
-          <div class="tsm-row royal-row"><span>Produk B</span><span>Rp 300.000</span></div>
-          <div class="tsm-total royal-total">TOTAL: Rp 800.000</div>
-          <div class="tsm-stamp royal-stamp">LUNAS</div>
-        </div>
-        <div class="tsn-new-badge new">BARU</div>
-      </div>
-
-      <!-- + more -->
-      <div class="tsn-card tsn-more-card" onclick="scrollToPremium()">
-        <div class="tsn-more-inner">
-          <div class="tsn-more-icon">+3</div>
-          <div>Template lainnya</div>
-          <div class="tsn-more-sub">Nature, Elegant, Art Deco</div>
-        </div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Tanya AI... contoh: 'Bagaimana cara meningkatkan penjualan?' atau 'Analisis penjualan saya'" />
+        <button id="chatSendBtn" onclick="sendChatMessage()">Kirim</button>
       </div>
     </div>
   </div>
 
   <!-- PRICING -->
-  <div class="pricing-section">
-    <div class="pricing-grid">
-      <div class="price-card">
-        <div class="pc-plan">Bulanan</div>
-        <div class="pc-price">Rp 29.000<span class="pc-period">/bulan</span></div>
-        <ul class="pc-list">
-          <li>✓ 11 Template Eksklusif</li>
-          <li>✓ Tanpa Watermark</li>
-          <li>✓ AI Smart Invoice</li>
-          <li>✓ Upload Logo</li>
-          <li>✓ Riwayat 50 Nota</li>
-          <li>✓ Kirim via WhatsApp</li>
-          <li>✓ Export Excel + Grafik</li>
-        </ul>
-        <button class="pc-btn" onclick="showPaymentInfo('bulanan', 29000)">Pilih Bulanan</button>
-      </div>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pc-badge">BULANAN</div>
+      <div class="pc-price">Rp 29.000<span>/bulan</span></div>
+      <ul class="pc-features">
+        <li>✓ 11 Template Eksklusif</li>
+        <li>✓ Tanpa Watermark</li>
+        <li>✓ AI Smart Invoice</li>
+        <li>✓ Upload Logo Sendiri</li>
+        <li>✓ Riwayat Nota Lengkap</li>
+        <li>✓ Kirim Nota via WA</li>
+        <li>✓ Export Excel + Grafik</li>
+      </ul>
+      <button class="pc-btn" onclick="showPaymentInfo('bulanan', 29000)">Pilih Bulanan</button>
+    </div>
 
-      <div class="price-card price-card-3mo">
-        <div class="pc-plan">3 Bulan</div>
-        <div class="pc-price">Rp 69.000<span class="pc-period">/3 bulan</span></div>
-        <div class="pc-permonth">≈ Rp 23.000/bulan</div>
-        <ul class="pc-list">
-          <li>✓ 11 Template Eksklusif</li>
-          <li>✓ Tanpa Watermark</li>
-          <li>✓ AI Smart Invoice</li>
-          <li>✓ Upload Logo</li>
-          <li>✓ Riwayat 50 Nota</li>
-          <li>✓ Kirim via WhatsApp</li>
-          <li>✓ Export Excel + Grafik</li>
-        </ul>
-        <button class="pc-btn" onclick="showPaymentInfo('3bulan', 69000)">Pilih 3 Bulan</button>
-      </div>
+    <div class="pricing-card">
+      <div class="pc-badge">3 BULAN</div>
+      <div class="pc-price">Rp 69.000<span>/3 bulan</span></div>
+      <div class="pc-per">≈ Rp 23.000/bulan</div>
+      <ul class="pc-features">
+        <li>✓ 11 Template Eksklusif</li>
+        <li>✓ Tanpa Watermark</li>
+        <li>✓ AI Smart Invoice</li>
+        <li>✓ Upload Logo Sendiri</li>
+        <li>✓ Riwayat Nota Lengkap</li>
+        <li>✓ Kirim Nota via WA</li>
+        <li>✓ Export Excel + Grafik</li>
+      </ul>
+      <button class="pc-btn" onclick="showPaymentInfo('3bulan', 69000)">Pilih 3 Bulan</button>
+    </div>
 
-      <div class="price-card price-card-featured">
-        <div class="pc-popular-badge">⭐ TERPOPULER · HEMAT 53%</div>
-        <div class="pc-plan">Tahunan</div>
-        <div class="pc-price featured-price">Rp 199.000<span class="pc-period">/tahun</span></div>
-        <div class="pc-permonth featured-permonth">≈ Rp 16.583/bulan</div>
-        <ul class="pc-list">
-          <li>✓ 11 Template Eksklusif</li>
-          <li>✓ Tanpa Watermark</li>
-          <li>✓ AI Smart Invoice</li>
-          <li>✓ Upload Logo</li>
-          <li>✓ Riwayat 50 Nota</li>
-          <li>✓ Kirim via WhatsApp</li>
-          <li>✓ Export Excel + Grafik</li>
-          <li>✓ Template Baru Eksklusif</li>
-        </ul>
-        <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 199000)">
-          <span class="btn-shine"></span>
-          Pilih Tahunan — Hemat 53%
-        </button>
-      </div>
+    <div class="pricing-card pricing-featured">
+      <div class="pc-badge featured-badge">TERPOPULER • HEMAT 53%</div>
+      <div class="pc-price">Rp 199.000<span>/tahun</span></div>
+      <div class="pc-per">≈ Rp 16.583/bulan</div>
+      <ul class="pc-features">
+        <li>✓ 11 Template Eksklusif</li>
+        <li>✓ Tanpa Watermark</li>
+        <li>✓ AI Smart Invoice</li>
+        <li>✓ Upload Logo Sendiri</li>
+        <li>✓ Riwayat Nota Lengkap</li>
+        <li>✓ Kirim Nota via WA</li>
+        <li>✓ Export Excel + Grafik</li>
+        <li>✓ Template Baru Eksklusif</li>
+      </ul>
+      <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 199000)">Pilih Tahunan</button>
     </div>
   </div>
 
-  <!-- PAYMENT INFO -->
-  <div id="paymentInfo" class="payment-card" style="display:none">
-    <div class="payment-card-inner">
-      <div class="pay-icon">💳</div>
-      <h4>Transfer ke Rekening Berikut</h4>
-      <div class="pay-bank">BRI</div>
-      <div class="pay-number">3593 0100 9186 508</div>
-      <div class="pay-name">a.n. <strong>Ardian Nurraihan</strong></div>
-      <div class="pay-amount">Nominal: <strong id="paymentAmount">Rp 0</strong></div>
-      <div class="pay-actions">
-        <button class="pay-copy-btn" onclick="copyPaymentInfo()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          Copy No. Rekening
-        </button>
-        <a class="pay-wa-btn" href="https://wa.me/6282134858510?text=Halo%20Admin%2C%20saya%20sudah%20transfer%20untuk%20premium%20NotaKu" target="_blank">
-          📱 Konfirmasi via WA
-        </a>
+  <!-- LOGO UPLOAD (Premium Feature) - backup -->
+  <div class="logo-upload premium-feature" id="logoUploadContainer" style="text-align:center; margin: 1rem 0; display: none;">
+    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px;">
+      <h4 style="color: var(--gold);">🖼️ Custom Logo</h4>
+      <div class="logo-actions">
+        <button onclick="uploadLogo()">📤 Upload Logo Toko</button>
+        <button onclick="removeLogo()">🗑️ Hapus Logo</button>
       </div>
+      <p style="font-size:0.7rem; color:#a89a87; margin-top:0.3rem;">Logo akan muncul di header nota Anda</p>
     </div>
   </div>
 
-  <!-- PREMIUM ACTIVATION -->
-  <div class="activation-section">
-    <div class="act-card">
-      <div class="act-icon">🔑</div>
-      <h4>Sudah punya kode premium?</h4>
-      <div class="act-input-row">
-        <input type="text" id="premiumKey" placeholder="Masukkan kode aktivasi..." />
-        <button onclick="activatePremium()">Aktivasi</button>
-      </div>
-      <div id="premiumStatus" class="act-status"></div>
+  <!-- RIWAYAT NOTA (Premium Feature) - backup -->
+  <div class="invoice-history premium-feature" id="invoiceHistoryContainer" style="margin-top: 1rem; display: none;">
+    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px;">
+      <h4 style="color: var(--gold);">📜 Riwayat Nota</h4>
+      <div id="invoiceHistoryList" style="max-height: 300px; overflow-y: auto;"></div>
+      <p style="font-size:0.7rem; color:#a89a87; margin-top:0.5rem;">Klik nota untuk memuat ulang, 📋 duplikat, 🗑️ hapus</p>
     </div>
   </div>
 
-  <!-- GUARANTEE -->
-  <div class="guarantee-strip">
-    <div class="gs-item">
-      <span class="gs-icon">💰</span>
-      <div><strong>Garansi 100%</strong><br/><small>Kode tidak terkirim 24 jam? Uang kembali penuh.</small></div>
+  <div id="paymentInfo" class="payment-info" style="display:none;">
+    <h4>💳 Transfer ke Rekening Berikut:</h4>
+    <p class="bank-account">BRI: 3593 0100 9186 508</p>
+    <p>a.n. <strong>Ardian Nurraihan</strong></p>
+    <p>Nominal: <strong id="paymentAmount">Rp 0</strong></p>
+    <p class="wa-confirm">📱 Kirim bukti ke WhatsApp:
+      <a href="https://wa.me/6282134858510?text=Halo%20Admin%2C%20saya%20sudah%20transfer%20untuk%20premium%20NotaKu">0821-3485-8510</a>
+    </p>
+    <button class="copy-btn" onclick="copyPaymentInfo()">📋 Copy No Rekening</button>
+  </div>
+
+  <div class="premium-activation">
+    <h4>🔑 Punya kode premium?</h4>
+    <div class="activation-input">
+      <input type="text" id="premiumKey" placeholder="Masukkan kode premium…">
+      <button onclick="activatePremium()">Aktivasi</button>
     </div>
-    <div class="gs-sep"></div>
-    <div class="gs-item">
-      <span class="gs-icon">⚡</span>
-      <div><strong>Aktivasi Cepat</strong><br/><small>Biasanya &lt;1 jam setelah transfer.</small></div>
+    <div id="premiumStatus" class="premium-status"></div>
+  </div>
+
+  <div class="guarantee-row">
+    <div class="guarantee-box">
+      <div class="guarantee-icon">💰</div>
+      <div class="guarantee-text">
+        <strong>100% Garansi Uang Kembali</strong><br/>
+        Kode tidak dikirim dalam 24 jam? Uang kembali penuh.
+      </div>
     </div>
-    <div class="gs-sep"></div>
-    <div class="gs-item">
-      <span class="gs-icon">🔒</span>
-      <div><strong>Aman & Terverifikasi</strong><br/><small>BRI atas nama Ardian Nurraihan.</small></div>
+    <div class="guarantee-box">
+      <div class="guarantee-icon">⚡</div>
+      <div class="guarantee-text">
+        <strong>Aktivasi Cepat</strong><br/>
+        Biasanya kode dikirim dalam &lt;1 jam setelah transfer.
+      </div>
+    </div>
+    <div class="guarantee-box">
+      <div class="guarantee-icon">🔒</div>
+      <div class="guarantee-text">
+        <strong>Transaksi Aman</strong><br/>
+        Rekening BRI terverifikasi atas nama Ardian Nurraihan.
+      </div>
     </div>
   </div>
 </section>
 
-<!-- TRUST -->
+<!-- TRUST SECTION -->
 <section class="trust-section">
-  <div class="section-eyebrow">/ Kepercayaan</div>
-  <h2 class="trust-title">Mengapa 200+ UMKM<br/>Memilih NotaKu?</h2>
-
+  <div class="section-label">/ Kepercayaan</div>
+  <h2 class="trust-title">Kenapa 50+ UMKM<br/>Percaya NotaKu?</h2>
   <div class="trust-grid">
-    <div class="tc">
-      <div class="tc-num">01</div>
-      <div class="tc-icon">🤖</div>
-      <h4>AI Terdepan</h4>
-      <p>Satu-satunya generator nota UMKM yang dilengkapi 4 fitur AI: voice, price suggest, analyst, dan chat assistant.</p>
+    <div class="trust-card">
+      <div class="trust-number">01</div>
+      <div class="trust-icon">✅</div>
+      <h4>50+ UMKM Aktif</h4>
+      <p>Pelaku usaha dari Semarang, Jakarta, Surabaya, hingga Medan sudah menggunakan NotaKu.</p>
     </div>
-    <div class="tc">
-      <div class="tc-num">02</div>
-      <div class="tc-icon">⚡</div>
-      <h4>Respon Instan</h4>
-      <p>Kode premium dikirim dalam 1x24 jam — biasanya kurang dari 1 jam setelah transfer dikonfirmasi.</p>
+    <div class="trust-card">
+      <div class="trust-number">02</div>
+      <div class="trust-icon">⚡</div>
+      <h4>Respon Admin Cepat</h4>
+      <p>Kode premium dikirim dalam 1x24 jam — biasanya kurang dari 1 jam setelah transfer.</p>
     </div>
-    <div class="tc">
-      <div class="tc-num">03</div>
-      <div class="tc-icon">🔒</div>
-      <h4>100% Privasi</h4>
-      <p>Tidak ada data yang tersimpan di server. Semua data bisnis Anda tersimpan lokal di perangkat Anda.</p>
+    <div class="trust-card">
+      <div class="trust-number">03</div>
+      <div class="trust-icon">🔒</div>
+      <h4>Privasi Terjaga</h4>
+      <p>Tidak ada data yang disimpan ke server. Semua tersimpan lokal di perangkat Anda.</p>
     </div>
-    <div class="tc">
-      <div class="tc-num">04</div>
-      <div class="tc-icon">🏦</div>
+    <div class="trust-card">
+      <div class="trust-number">04</div>
+      <div class="trust-icon">🏦</div>
       <h4>Rekening Terverifikasi</h4>
-      <p>BRI 3593 0100 9186 508 atas nama Ardian Nurraihan — terdaftar resmi dan dapat diverifikasi.</p>
+      <p>BRI 3593 0100 9186 508 atas nama Ardian Nurraihan — terdaftar dan dapat dicek.</p>
     </div>
   </div>
 </section>
@@ -1053,10 +746,10 @@
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-top">
-      <div class="footer-brand">
-        <div class="footer-logo">Nota<span>Ku</span> <span class="footer-ai">AI</span></div>
-        <p>Gratis untuk semua UMKM Indonesia 🇮🇩</p>
-      </div>
+      <div class="footer-logo">Nota<span>Ku</span><span class="footer-dot">●</span></div>
+      <p>Gratis untuk semua UMKM Indonesia 🇮🇩</p>
+    </div>
+    <div class="footer-mid">
       <div class="footer-links">
         <a href="/privacy.html">Kebijakan Privasi</a>
         <a href="/terms.html">Syarat & Ketentuan</a>
@@ -1064,122 +757,68 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2025 NotaKu AI</span>
+      <span>© 2025 NotaKu</span>
       <span class="fb-dot">·</span>
-      <span>Tidak ada data disimpan ke server</span>
+      <span>Tidak ada data disimpan</span>
       <span class="fb-dot">·</span>
-      <span>100% Privasi Terjaga</span>
+      <span>100% Privasi</span>
     </div>
   </div>
 </footer>
 
-<!-- ══════════════════════════════════════
-     MODALS
-═══════════════════════════════════════ -->
-
-<!-- Save Product Modal -->
-<div id="saveProductModal" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h3>💾 Simpan Produk</h3>
-      <button class="modal-close" onclick="closeSaveProductModal()">✕</button>
+<!-- MODALS -->
+<div id="saveProductModal" class="modal">
+  <div class="modal-content">
+    <button class="close" onclick="closeSaveProductModal()">✕</button>
+    <h3>💾 Simpan Produk</h3>
+    <div class="input-wrap">
+      <input type="text" id="saveProductName" placeholder="Nama Produk" />
+      <div class="input-line"></div>
     </div>
-    <div class="input-float">
-      <input type="text" id="saveProductName" placeholder=" " />
-      <label>Nama Produk</label>
-      <div class="input-underline"></div>
+    <div class="input-wrap">
+      <input type="number" id="saveProductPrice" placeholder="Harga (Rp)" />
+      <div class="input-line"></div>
     </div>
-    <div class="input-float" style="margin-top:1rem">
-      <input type="number" id="saveProductPrice" placeholder=" " />
-      <label>Harga (Rp)</label>
-      <div class="input-underline"></div>
-    </div>
-    <button class="modal-action-btn" onclick="saveProduct()" style="margin-top:1.5rem">Simpan Produk</button>
+    <button onclick="saveProduct()">Simpan Produk</button>
   </div>
 </div>
 
-<!-- Premium Modal -->
-<div id="premiumModal" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h3>✨ Upgrade ke Premium</h3>
-      <button class="modal-close" onclick="closePremiumModal()">✕</button>
-    </div>
-    <ul class="modal-feat-list">
-      <li>✓ Hapus watermark "NotaKu AI"</li>
+<div id="premiumModal" class="modal">
+  <div class="modal-content">
+    <button class="close" onclick="closePremiumModal()">✕</button>
+    <h3>✨ Upgrade ke Premium</h3>
+    <ul class="modal-features">
+      <li>✓ Hapus watermark "NotaKu.id"</li>
       <li>✓ 11 template eksklusif mewah</li>
-      <li>✓ AI Smart Invoice + Chat Assistant</li>
+      <li>✓ AI Smart Invoice</li>
       <li>✓ Upload logo sendiri</li>
-      <li>✓ Riwayat nota lengkap (50 nota)</li>
+      <li>✓ Riwayat nota lengkap</li>
       <li>✓ Kirim nota via WhatsApp</li>
-      <li>✓ Export Excel + grafik penjualan</li>
     </ul>
-    <div class="modal-plans">
-      <div class="modal-plan" onclick="showPaymentInfo('bulanan',29000);closePremiumModal()">
-        <div class="mp-name">Bulanan</div>
-        <div class="mp-price">Rp 29.000</div>
+    <div class="premium-plans">
+      <div class="plan">
+        <h4>Bulanan</h4>
+        <p class="price">Rp 29.000</p>
+        <button onclick="showPaymentInfo('bulanan', 29000); closePremiumModal();">Pilih</button>
       </div>
-      <div class="modal-plan modal-plan-best" onclick="showPaymentInfo('tahunan',199000);closePremiumModal()">
-        <div class="mp-badge">HEMAT 53%</div>
-        <div class="mp-name">Tahunan</div>
-        <div class="mp-price">Rp 199.000</div>
+      <div class="plan">
+        <div class="save-badge">HEMAT 53%</div>
+        <h4>Tahunan</h4>
+        <p class="price">Rp 199.000</p>
+        <button onclick="showPaymentInfo('tahunan', 199000); closePremiumModal();">Pilih</button>
       </div>
-      <div class="modal-plan" onclick="showPaymentInfo('3bulan',69000);closePremiumModal()">
-        <div class="mp-name">3 Bulan</div>
-        <div class="mp-price">Rp 69.000</div>
+      <div class="plan">
+        <div class="save-badge">3 BULAN</div>
+        <h4>3 BULAN</h4>
+        <p class="price">Rp 69.000</p>
+        <button onclick="showPaymentInfo('3bulan', 69000); closePremiumModal();">Pilih</button>
       </div>
     </div>
-    <p class="modal-note">BRI 3593 0100 9186 508 · a.n. Ardian Nurraihan</p>
+    <p class="premium-note">*BRI 3593 0100 9186 508 a.n. Ardian Nurraihan</p>
   </div>
 </div>
 
-<!-- Voice Modal -->
-<div id="voiceModal" class="modal-overlay">
-  <div class="modal-box voice-modal">
-    <div class="modal-head">
-      <h3>🎙️ AI Voice to Invoice</h3>
-      <button class="modal-close" onclick="closeVoiceModal()">✕</button>
-    </div>
-    <p class="voice-desc">Ucapkan produk dan harga Anda, AI akan langsung mengisi nota secara otomatis.</p>
-    <div class="voice-examples">
-      <div class="ve-label">Contoh kalimat:</div>
-      <div class="ve-example">"Jual 3 batik harga 150 ribu dan 2 tas 200 ribu"</div>
-      <div class="ve-example">"Kain lurik 5 meter at 85 ribu, bros perak 10 buah 25 ribu"</div>
-    </div>
-    <div class="voice-input-area">
-      <textarea id="voiceTextInput" placeholder="Atau ketik deskripsi produk di sini..." rows="4"></textarea>
-    </div>
-    <div class="voice-actions">
-      <button id="voiceRecordBtn" class="voice-record-btn" onclick="toggleVoiceRecording()">
-        <div class="vrb-icon" id="vrbIcon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-        </div>
-        <span id="vrbText">Tap untuk mulai bicara</span>
-      </button>
-      <button class="modal-action-btn" onclick="processVoiceInput()" style="margin-top:0.8rem">
-        🤖 Proses dengan AI
-      </button>
-    </div>
-    <div id="voiceResult" class="voice-result" style="display:none"></div>
-  </div>
-</div>
-
-<!-- Template Demo Modal -->
-<div id="templateDemoModal" class="modal-overlay">
-  <div class="modal-box template-demo-modal">
-    <div class="modal-head">
-      <h3 id="demoModalTitle">Preview Template</h3>
-      <button class="modal-close" onclick="closeTemplateDemo()">✕</button>
-    </div>
-    <div id="templateDemoPreview" class="tdm-preview"></div>
-    <div class="tdm-actions">
-      <button class="modal-action-btn" onclick="applyDemoTemplate(); closeTemplateDemo()">✓ Gunakan Template Ini</button>
-      <button class="ghost-btn" onclick="closeTemplateDemo()">Tutup</button>
-    </div>
-  </div>
-</div>
-
-<!-- Cursor glow -->
+<!-- Cursor glow script -->
 <script>
   const glow = document.getElementById('cursorGlow');
   document.addEventListener('mousemove', e => {
