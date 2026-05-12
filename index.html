@@ -31,13 +31,6 @@
   }
   </script>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
-
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -68,6 +61,7 @@
         UMKM Indonesia 🇮🇩
       </div>
       <a href="#premium" class="nav-premium-btn">✦ Premium</a>
+      <button id="darkModeToggle" class="nav-premium-btn dark-toggle" style="background: transparent; border: 1px solid rgba(201,149,42,0.4);">🌙 Mode</button>
     </div>
   </nav>
 
@@ -384,7 +378,10 @@
     <div class="glass-panel stats-container">
       <div class="stats-header">
         <h2 class="panel-title">Statistik Penjualan</h2>
-        <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="reset-stats-btn export-btn" onclick="exportStats()" style="background: #2a7a4b; border-color: #2a7a4b;">📊 Export CSV</button>
+          <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
+        </div>
       </div>
       <div class="stats-grid">
         <div class="stat-card">
