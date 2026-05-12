@@ -1,9 +1,8 @@
 // ============================================
-//   NOTAKU — MAIN SCRIPT (FULL VERSION + DASHBOARD + VOICE)
-//   Supports: 11 Templates, AI Superior, WA Share, Excel Export, Logo Upload, History, Chat, Voice
+//   NOTAKU — MAIN SCRIPT (FULL VERSION)
+//   Supports: Voice, Templates, AI, WA Share, Excel, Logo, History, Chat
 // ============================================
 
-// ────────── KONFIGURASI ─────────────────────
 let itemCount = 0;
 let currentTemplate = 'classic';
 let revenueChart = null;
@@ -17,10 +16,9 @@ let demoPendingTemplate = null;
 const GEMINI_API_KEY = 'AIzaSyB4kY3ZXsINoRbMRBZmSihV_7YSjkG_x44';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
-// ────────── VOICE RECOGNITION ───────────────
+// ========== VOICE RECOGNITION ==========
 function initSpeechRecognition() {
   if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    console.warn('Speech recognition not supported');
     return null;
   }
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -32,65 +30,43 @@ function initSpeechRecognition() {
 }
 
 function toggleVoiceRecording() {
-  if (isRecording) {
-    stopVoiceRecording();
-  } else {
-    startVoiceRecording();
-  }
+  if (isRecording) stopVoiceRecording();
+  else startVoiceRecording();
 }
 
 function startVoiceRecording() {
   if (!recognition) {
     recognition = initSpeechRecognition();
     if (!recognition) {
-      showToast('Browser Anda tidak support voice recognition', 'error');
+      showToast('Browser tidak support voice recognition', 'error');
       return;
     }
-    
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      document.getElementById('voiceTextInput').value = transcript;
+      document.getElementById('voiceTextInput').value = event.results[0][0].transcript;
       stopVoiceRecording();
-      showToast('✅ Suara terdeteksi! Klik "Proses dengan AI"', 'success');
+      showToast('Suara terdeteksi! Klik Proses dengan AI', 'success');
     };
-    
-    recognition.onerror = (event) => {
-      console.error('Speech error:', event.error);
-      stopVoiceRecording();
-      showToast('Gagal mendeteksi suara. Coba lagi atau ketik manual.', 'error');
-    };
-    
-    recognition.onend = () => {
-      stopVoiceRecording();
-    };
+    recognition.onerror = () => { stopVoiceRecording(); showToast('Gagal deteksi suara', 'error'); };
+    recognition.onend = () => { stopVoiceRecording(); };
   }
-  
   try {
     recognition.start();
     isRecording = true;
     const btn = document.getElementById('voiceRecordBtn');
     const textSpan = document.getElementById('vrbText');
-    const iconDiv = document.getElementById('vrbIcon');
     if (btn) btn.classList.add('recording');
-    if (textSpan) textSpan.innerHTML = '🎙️ Mendengarkan... (bicara sekarang)';
-    if (iconDiv) iconDiv.innerHTML = '<div class="pulse-ring"></div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+    if (textSpan) textSpan.innerHTML = '🎙️ Mendengarkan...';
     showToast('🎤 Bicara sekarang...', 'info');
-  } catch(e) {
-    showToast('Gagal memulai voice recognition', 'error');
-  }
+  } catch(e) { showToast('Gagal voice recognition', 'error'); }
 }
 
 function stopVoiceRecording() {
-  if (recognition) {
-    try { recognition.stop(); } catch(e) {}
-  }
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
   isRecording = false;
   const btn = document.getElementById('voiceRecordBtn');
   const textSpan = document.getElementById('vrbText');
-  const iconDiv = document.getElementById('vrbIcon');
   if (btn) btn.classList.remove('recording');
   if (textSpan) textSpan.innerHTML = '🎙️ Tap untuk mulai bicara';
-  if (iconDiv) iconDiv.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
 }
 
 function openVoiceModal() {
@@ -111,24 +87,14 @@ function closeVoiceModal() {
 async function processVoiceInput() {
   const textarea = document.getElementById('voiceTextInput');
   const text = textarea?.value.trim();
-  if (!text) {
-    showToast('Masukkan deskripsi produk atau rekam suara dulu!', 'warn');
-    return;
-  }
-  
-  showToast('🤖 AI sedang memproses...', 'info');
+  if (!text) { showToast('Masukkan deskripsi produk!', 'warn'); return; }
+  showToast('🤖 AI memproses...', 'info');
   const resultDiv = document.getElementById('voiceResult');
-  if (resultDiv) {
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '<div style="padding:1rem;text-align:center">🧠 AI menganalisis teks...</div>';
-  }
-  
-  const prompt = `Anda adalah AI parser untuk nota UMKM. Ekstrak daftar produk dari teks berikut: "${text}". Format output JSON: {"items":[{"name":"nama produk","qty":jumlah,"price":harga_per_unit}]}. Harga dalam angka, qty default 1 jika tidak disebut. Hanya output JSON, tanpa penjelasan lain. Contoh: {"items":[{"name":"batik","qty":3,"price":150000},{"name":"tas rotan","qty":2,"price":200000}]}`;
-  
+  if (resultDiv) { resultDiv.style.display = 'block'; resultDiv.innerHTML = '<div style="padding:1rem;text-align:center">🧠 AI menganalisis teks...</div>'; }
+  const prompt = `Ekstrak daftar produk dari: "${text}". Format JSON: {"items":[{"name":"nama","qty":jumlah,"price":harga}]}. Hanya JSON.`;
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
     const data = await response.json();
@@ -136,78 +102,42 @@ async function processVoiceInput() {
     aiText = aiText.replace(/```json\n?/g,'').replace(/```\n?/g,'');
     let parsed;
     try { parsed = JSON.parse(aiText); } catch(e) { parsed = { items: [] }; }
-    
     if (parsed.items && parsed.items.length > 0) {
       const container = document.getElementById('itemsList');
       if (container) container.innerHTML = '';
       itemCount = 0;
-      parsed.items.forEach(item => {
-        const qty = parseInt(item.qty) || 1;
-        const price = parseInt(item.price) || 0;
-        addItem(item.name, qty, price);
-      });
-      if (resultDiv) {
-        resultDiv.innerHTML = `<div style="background:rgba(74,222,128,0.15);padding:1rem;border-radius:12px;">
-          ✅ Berhasil menambahkan ${parsed.items.length} produk!<br/>
-          ${parsed.items.map(i => `• ${i.name} (${i.qty||1}x Rp ${(i.price||0).toLocaleString('id-ID')})`).join('<br/>')}
-        </div>`;
-      }
+      parsed.items.forEach(item => { addItem(item.name, parseInt(item.qty)||1, parseInt(item.price)||0); });
+      if (resultDiv) resultDiv.innerHTML = `<div style="background:rgba(74,222,128,0.15);padding:1rem;border-radius:12px;">✅ Menambahkan ${parsed.items.length} produk!</div>`;
       showToast(`${parsed.items.length} produk ditambahkan!`, 'success');
       setTimeout(() => closeVoiceModal(), 2000);
-    } else {
-      throw new Error('No items parsed');
-    }
+    } else throw new Error('No items');
   } catch(e) {
-    console.error('Voice AI error:', e);
-    if (resultDiv) {
-      resultDiv.innerHTML = '<div style="background:rgba(239,68,68,0.15);padding:1rem;border-radius:12px;">⚠️ Gagal memproses. Coba format: "3 batik 150rb, 2 tas 200rb"</div>';
-    }
+    if (resultDiv) resultDiv.innerHTML = '<div style="background:rgba(239,68,68,0.15);padding:1rem;border-radius:12px;">⚠️ Gagal. Coba: "3 batik 150rb, 2 tas 200rb"</div>';
   }
 }
 
-// ────────── TEMPLATE DEMO ──────────────────
+// ========== TEMPLATE DEMO ==========
 function showTemplateDemo(templateName) {
   demoPendingTemplate = templateName;
   const modal = document.getElementById('templateDemoModal');
   const title = document.getElementById('demoModalTitle');
   const previewDiv = document.getElementById('templateDemoPreview');
   if (!modal || !previewDiv) return;
-  
-  const templateNames = {
-    'premium-luxury': '💎 Luxury Gold',
-    'premium-dark': '🌙 Dark Executive',
-    'premium-neon': '⚡ Neon Cyber',
-    'premium-sakura': '🌸 Sakura Soft',
-    'premium-royal': '👑 Royal Marble',
-    'premium-nature': '🍃 Nature Fresh',
-    'premium-elegant': '🦢 Elegant Silk',
-    'premium-art': '🎨 Art Deco'
-  };
-  if (title) title.innerHTML = `Preview: ${templateNames[templateName] || templateName}`;
-  
-  const demoItems = [
-    { name: 'Produk Premium A', qty: 2, price: 250000, subtotal: 500000 },
-    { name: 'Produk Premium B', qty: 1, price: 350000, subtotal: 350000 }
-  ];
-  const subtotal = 850000;
-  const total = 850000;
-  
-  let templateClass = `invoice-template template-${templateName}`;
-  let html = `<div class="${templateClass}" style="max-width:400px;margin:0 auto;font-size:0.8rem;">
+  const names = { 'premium-luxury':'💎 Luxury', 'premium-dark':'🌙 Dark', 'premium-neon':'⚡ Neon', 'premium-sakura':'🌸 Sakura', 'premium-royal':'👑 Royal', 'premium-nature':'🍃 Nature', 'premium-elegant':'🦢 Elegant', 'premium-art':'🎨 Art' };
+  if (title) title.innerHTML = `Preview: ${names[templateName] || templateName}`;
+  let html = `<div class="invoice-template template-${templateName}" style="max-width:400px;margin:0 auto;font-size:0.8rem;padding:1rem;">
     <div class="inv-header"><div class="inv-store"><div class="inv-store-name">Demo Store</div><div class="inv-store-sub">Jl. Contoh No. 123</div></div>
     <div class="inv-meta"><div class="inv-label">NOTA</div><div class="inv-num">DEMO/001</div><div class="inv-date">${new Date().toLocaleDateString('id-ID')}</div></div></div>
     <div class="inv-divider"></div>
     <div class="inv-buyer"><div class="inv-buyer-label">Kepada Yth.</div><div class="inv-buyer-name">Customer Demo</div></div>
-    <table class="inv-table"><thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr></thead><tbody>
-    ${demoItems.map(i => `<tr><td>${i.name}</td><td style="text-align:center">${i.qty}</td><td>Rp ${i.price.toLocaleString('id-ID')}</td><td><span style="font-weight:600">Rp ${i.subtotal.toLocaleString('id-ID')}</span></td>`).join('')}
-    </tbody></table>
-    <div class="inv-summary"><div class="inv-sum-row"><span>Subtotal</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
-    <div class="inv-sum-row total"><span>TOTAL</span><span>Rp ${total.toLocaleString('id-ID')}</span></div></div>
+    <table class="inv-table"><thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr></thead>
+    <tbody><tr><td>Produk Premium A</td><td style="text-align:center">2</td><td>Rp 250.000</td><td style="text-align:right">Rp 500.000</td></tr>
+    <tr><td>Produk Premium B</td><td style="text-align:center">1</td><td>Rp 350.000</td><td style="text-align:right">Rp 350.000</td></tr></tbody></table>
+    <div class="inv-summary"><div class="inv-sum-row"><span>Subtotal</span><span>Rp 850.000</span></div>
+    <div class="inv-sum-row total"><span>TOTAL</span><span>Rp 850.000</span></div></div>
     <div class="inv-footer"><div class="inv-footer-left"><div>Hormat kami,</div><div class="inv-sig-space"></div><div>Demo Store</div></div>
     <div class="inv-footer-right"><div class="inv-stamp">LUNAS</div></div></div>
-    <div class="inv-powered">NotaKu AI · DEMO</div>
-  </div>`;
-  
+    <div class="inv-powered">NotaKu AI · DEMO</div></div>`;
   previewDiv.innerHTML = html;
   modal.style.display = 'flex';
 }
@@ -219,28 +149,20 @@ function closeTemplateDemo() {
 }
 
 function applyDemoTemplate() {
-  if (demoPendingTemplate) {
-    switchTemplate(demoPendingTemplate);
-    showToast(`Template ${demoPendingTemplate} diterapkan!`, 'success');
-  }
+  if (demoPendingTemplate) { switchTemplate(demoPendingTemplate); showToast(`Template ${demoPendingTemplate} diterapkan!`, 'success'); }
   closeTemplateDemo();
 }
 
-// ────────── AI QUICK GENERATE ──────────────
+// ========== AI QUICK GENERATE ==========
 async function aiQuickGenerate() {
   const input = document.getElementById('aiQuickInput');
   const text = input?.value.trim();
-  if (!text) {
-    showToast('Masukkan deskripsi produk!', 'warn');
-    return;
-  }
+  if (!text) { showToast('Masukkan deskripsi produk!', 'warn'); return; }
   showToast('🤖 AI memproses...', 'info');
-  
   const prompt = `Ekstrak daftar produk dari: "${text}". Output JSON: {"items":[{"name":"nama","qty":jumlah,"price":harga}]}. Hanya JSON.`;
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
     const data = await response.json();
@@ -248,22 +170,15 @@ async function aiQuickGenerate() {
     aiText = aiText.replace(/```json\n?/g,'').replace(/```\n?/g,'');
     let parsed;
     try { parsed = JSON.parse(aiText); } catch(e) { parsed = { items: [] }; }
-    
     if (parsed.items && parsed.items.length > 0) {
       const container = document.getElementById('itemsList');
       if (container) container.innerHTML = '';
       itemCount = 0;
-      parsed.items.forEach(item => {
-        addItem(item.name, parseInt(item.qty)||1, parseInt(item.price)||0);
-      });
+      parsed.items.forEach(item => { addItem(item.name, parseInt(item.qty)||1, parseInt(item.price)||0); });
       showToast(`${parsed.items.length} produk ditambahkan!`, 'success');
       if (input) input.value = '';
-    } else {
-      showToast('Gagal memproses, coba format lain', 'error');
-    }
-  } catch(e) {
-    showToast('AI error, coba lagi', 'error');
-  }
+    } else showToast('Gagal memproses', 'error');
+  } catch(e) { showToast('AI error', 'error'); }
 }
 
 function setChatInput(text) {
@@ -277,36 +192,24 @@ function scrollToPremium() {
   if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function openRevenuePrediction() {
-  calculatePrediction();
-}
+function openRevenuePrediction() { calculatePrediction(); }
 
-// ────────── SAVE & LOAD ────────────────────
+// ========== SAVE & LOAD ==========
 function saveCurrentInvoice() {
   const invoiceData = {
-    id: Date.now(),
-    storeName: document.getElementById('storeName')?.value || '',
-    storeAddress: document.getElementById('storeAddress')?.value || '',
-    storePhone: document.getElementById('storePhone')?.value || '',
-    buyerName: document.getElementById('buyerName')?.value || '',
-    buyerPhone: document.getElementById('buyerPhone')?.value || '',
-    invoiceNumber: document.getElementById('invoiceNumber')?.value || '',
-    invoiceDate: document.getElementById('invoiceDate')?.value || '',
-    discount: document.getElementById('discount')?.value || '0',
-    tax: document.getElementById('tax')?.value || '0',
-    notes: document.getElementById('notes')?.value || '',
-    template: currentTemplate,
-    items: [],
-    createdAt: new Date().toISOString()
+    id: Date.now(), storeName: document.getElementById('storeName')?.value || '', storeAddress: document.getElementById('storeAddress')?.value || '',
+    storePhone: document.getElementById('storePhone')?.value || '', buyerName: document.getElementById('buyerName')?.value || '',
+    buyerPhone: document.getElementById('buyerPhone')?.value || '', invoiceNumber: document.getElementById('invoiceNumber')?.value || '',
+    invoiceDate: document.getElementById('invoiceDate')?.value || '', discount: document.getElementById('discount')?.value || '0',
+    tax: document.getElementById('tax')?.value || '0', notes: document.getElementById('notes')?.value || '', template: currentTemplate,
+    items: [], createdAt: new Date().toISOString()
   };
-
   document.querySelectorAll('.item-row').forEach(row => {
     const name = row.querySelector('.item-name')?.value || '';
     const qty = row.querySelector('.item-qty')?.value || '1';
     const price = row.querySelector('.item-price')?.value || '0';
     if (name) invoiceData.items.push({ name, qty, price });
   });
-
   invoiceHistory.unshift(invoiceData);
   if (invoiceHistory.length > 50) invoiceHistory.pop();
   localStorage.setItem('notaku_invoice_history', JSON.stringify(invoiceHistory));
@@ -333,20 +236,14 @@ function loadLastInvoice() {
     if (itemsContainer && data.items && data.items.length) {
       itemsContainer.innerHTML = '';
       itemCount = 0;
-      data.items.forEach(item => {
-        addItem(item.name, parseFloat(item.qty), parseFloat(item.price));
-      });
+      data.items.forEach(item => { addItem(item.name, parseFloat(item.qty), parseFloat(item.price)); });
     }
   } catch(e) { console.warn("Gagal memuat nota terakhir:", e); }
 }
 
 function loadInvoiceHistory() {
   const saved = localStorage.getItem('notaku_invoice_history');
-  if (saved) {
-    try {
-      invoiceHistory = JSON.parse(saved);
-    } catch(e) {}
-  }
+  if (saved) { try { invoiceHistory = JSON.parse(saved); } catch(e) {} }
 }
 
 function loadInvoiceById(id) {
@@ -366,9 +263,7 @@ function loadInvoiceById(id) {
   if (itemsContainer) {
     itemsContainer.innerHTML = '';
     itemCount = 0;
-    invoice.items.forEach(item => {
-      addItem(item.name, parseFloat(item.qty), parseFloat(item.price));
-    });
+    invoice.items.forEach(item => { addItem(item.name, parseFloat(item.qty), parseFloat(item.price)); });
   }
   switchTemplate(invoice.template);
   showToast('Nota berhasil dimuat!', 'success');
@@ -391,7 +286,7 @@ function deleteInvoice(id) {
   }
 }
 
-// ────────── UPLOAD LOGO ────────────────────
+// ========== UPLOAD LOGO ==========
 function uploadLogo() {
   const input = document.createElement('input');
   input.type = 'file';
@@ -407,10 +302,7 @@ function uploadLogo() {
         updateDashboardStats();
         const logoArea = document.getElementById('invLogoArea');
         const logoImg = document.getElementById('invLogoImg');
-        if (logoArea && logoImg) {
-          logoArea.style.display = 'block';
-          logoImg.src = userLogo;
-        }
+        if (logoArea && logoImg) { logoArea.style.display = 'block'; logoImg.src = userLogo; }
         if (document.getElementById('invoicePreview').style.display !== 'none') generateInvoice();
       };
       reader.readAsDataURL(file);
@@ -434,13 +326,10 @@ function loadUserLogo() {
   if (saved) userLogo = saved;
 }
 
-// ────────── KIRIM WA ───────────────────────
+// ========== SHARE WA & EXPORT ==========
 async function shareToWhatsApp() {
   const invoice = document.getElementById('invoicePreview');
-  if (!invoice || invoice.style.display === 'none') {
-    showToast('Generate nota dulu!', 'warn');
-    return;
-  }
+  if (!invoice || invoice.style.display === 'none') { showToast('Generate nota dulu!', 'warn'); return; }
   showToast('Menyiapkan gambar...', 'info');
   const canvas = await html2canvas(invoice, { scale: 2, backgroundColor: '#ffffff', logging: false });
   const imgData = canvas.toDataURL('image/jpeg', 0.9);
@@ -448,23 +337,22 @@ async function shareToWhatsApp() {
   const buyerName = document.getElementById('buyerName')?.value || 'Pelanggan';
   const total = document.getElementById('inv-total')?.textContent || 'Rp 0';
   const invoiceNum = document.getElementById('invoiceNumber')?.value || '';
-  const text = `Halo! Berikut nota dari ${storeName} untuk ${buyerName}\nNo: ${invoiceNum}\nTotal: ${total}\n\nDibuat dengan NotaKu - Generator Nota Gratis untuk UMKM Indonesia`;
+  const text = `Halo! Berikut nota dari ${storeName} untuk ${buyerName}\nNo: ${invoiceNum}\nTotal: ${total}\n\nDibuat dengan NotaKu`;
   const link = document.createElement('a');
   link.href = imgData;
   link.download = `nota-${invoiceNum.replace(/\//g, '-')}.jpg`;
   link.click();
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n\n*Nota terlampir sebagai gambar yang sudah didownload*')}`;
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
   window.open(waUrl, '_blank');
-  showToast('Gambar nota terdownload! Buka WA untuk share', 'success');
+  showToast('Gambar nota terdownload!', 'success');
 }
 
-// ────────── EXPORT EXCEL ───────────────────
 function exportToExcel() {
-  if (transactionHistory.length === 0) {
-    showToast('Belum ada data transaksi!', 'warn');
-    return;
-  }
-  let html = `<html><head><meta charset="UTF-8"><title>NotaKu - Laporan Penjualan</title><style>body{font-family:Arial;margin:20px;}h1{color:#c9952a;}table{border-collapse:collapse;width:100%;margin-top:20px;}th,td{border:1px solid #ddd;padding:8px;}th{background-color:#c9952a;color:white;}.total{font-weight:bold;background-color:#f2ead8;}</style></head><body><h1>📊 NotaKu - Laporan Penjualan</h1><p>Periode: ${new Date().toLocaleDateString('id-ID')}</p><p>Total Transaksi: ${transactionHistory.length}</p><p>Total Pendapatan: ${formatRupiah(transactionHistory.reduce((s,t)=>s+t.total,0))}</p><hr/><table><thead><tr><th>Tanggal</th><th>Total (Rp)</th></tr></thead><tbody>${transactionHistory.map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('id-ID')}</td><td>${Number(t.total).toLocaleString('id-ID')}</td></tr>`).join('')}<tr class="total"><td><strong>TOTAL</strong></td><td><strong>${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}</strong></td></tr></tbody></table><p style="margin-top:30px;color:#999;">Dibuat dengan NotaKu - Generator Nota Gratis untuk UMKM Indonesia</p></body></html>`;
+  if (transactionHistory.length === 0) { showToast('Belum ada data transaksi!', 'warn'); return; }
+  let html = `<html><head><meta charset="UTF-8"><title>NotaKu - Laporan Penjualan</title><style>body{font-family:Arial}th{background:#c9952a;color:white}</style></head><body>
+    <h1>📊 NotaKu - Laporan Penjualan</h1><p>Total Transaksi: ${transactionHistory.length}</p><p>Total Pendapatan: ${formatRupiah(transactionHistory.reduce((s,t)=>s+t.total,0))}</p>
+    <table border="1"><thead><tr><th>Tanggal</th><th>Total (Rp)</th></tr></thead><tbody>${transactionHistory.map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('id-ID')}</td><td>${Number(t.total).toLocaleString('id-ID')}</td></tr>`).join('')}
+    <tr style="font-weight:bold"><td>TOTAL</td><td>${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}</td></tr></tbody></table></body></html>`;
   const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -475,7 +363,7 @@ function exportToExcel() {
   showToast('✅ Laporan Excel berhasil diunduh!', 'success');
 }
 
-// ────────── DASHBOARD FUNCTIONS ─────────────
+// ========== DASHBOARD ==========
 function updateDashboardStats() {
   const historyCount = document.getElementById('historyCount');
   const logoStatus = document.getElementById('logoStatus');
@@ -483,7 +371,7 @@ function updateDashboardStats() {
   const predictionPreview = document.getElementById('predictionPreview');
   if (historyCount) historyCount.innerHTML = `${invoiceHistory.length} nota`;
   if (logoStatus) logoStatus.innerHTML = userLogo ? '✓ Logo terpasang' : 'Belum ada logo';
-  if (aiPreview) aiPreview.innerHTML = transactionHistory.length > 0 ? `${transactionHistory.length} transaksi, siap analisis` : 'Buat nota dulu';
+  if (aiPreview) aiPreview.innerHTML = transactionHistory.length > 0 ? `${transactionHistory.length} transaksi` : 'Buat nota dulu';
   if (predictionPreview && transactionHistory.length > 0) {
     const avg = transactionHistory.reduce((s,t) => s + t.total, 0) / transactionHistory.length;
     predictionPreview.innerHTML = `Prediksi: ${formatRupiah(avg * 30)}/bulan`;
@@ -493,19 +381,10 @@ function updateDashboardStats() {
 function openAIAnalyst() {
   const modal = document.createElement('div');
   modal.className = 'modal-detail active';
-  modal.innerHTML = `
-    <div class="modal-detail-content">
-      <div class="modal-detail-header">
-        <h3 style="color:var(--gold);">🤖 AI Smart Analyst</h3>
-        <button class="modal-detail-close" onclick="this.closest('.modal-detail').remove()">✕</button>
-      </div>
-      <div class="modal-detail-body">
-        <div id="aiAnalystResult" style="margin-bottom:1rem;">Menganalisis data...</div>
-        <button onclick="runDeepAnalysis()" style="background:linear-gradient(135deg,#6b3fa0,#c9952a);border:none;padding:0.8rem;border-radius:12px;cursor:pointer;width:100%;">🔍 Analisis Mendalam</button>
-        <div id="deepAnalysisResult" style="margin-top:1rem;font-size:0.8rem;color:var(--muted);"></div>
-      </div>
-    </div>
-  `;
+  modal.innerHTML = `<div class="modal-detail-content"><div class="modal-detail-header"><h3 style="color:var(--gold);">🤖 AI Smart Analyst</h3><button class="modal-detail-close" onclick="this.closest('.modal-detail').remove()">✕</button></div>
+    <div class="modal-detail-body"><div id="aiAnalystResult" style="margin-bottom:1rem;">Menganalisis data...</div>
+    <button onclick="runDeepAnalysis()" style="background:linear-gradient(135deg,#6b3fa0,#c9952a);border:none;padding:0.8rem;border-radius:12px;cursor:pointer;width:100%;">🔍 Analisis Mendalam</button>
+    <div id="deepAnalysisResult" style="margin-top:1rem;font-size:0.8rem;color:var(--muted);"></div></div></div>`;
   document.body.appendChild(modal);
   runSmartAnalysis();
 }
@@ -513,129 +392,81 @@ function openAIAnalyst() {
 async function runSmartAnalysis() {
   const resultDiv = document.getElementById('aiAnalystResult');
   if (!resultDiv) return;
-  if (transactionHistory.length === 0) {
-    resultDiv.innerHTML = '⚠️ Belum ada data transaksi. Buat nota dulu untuk analisis.';
-    return;
-  }
-  resultDiv.innerHTML = '🤔 AI sedang menganalisis...';
+  if (transactionHistory.length === 0) { resultDiv.innerHTML = '⚠️ Belum ada data transaksi.'; return; }
+  resultDiv.innerHTML = '🤔 AI menganalisis...';
   const totalRevenue = transactionHistory.reduce((s,t) => s + t.total, 0);
   const avgTransaction = totalRevenue / transactionHistory.length;
-  const prompt = `Anda adalah AI Business Analyst super cerdas. Analisis bisnis: Total pendapatan Rp ${totalRevenue.toLocaleString('id-ID')}, rata-rata transaksi Rp ${avgTransaction.toLocaleString('id-ID')}, total transaksi ${transactionHistory.length}. Beri 3 insight penting untuk meningkatkan penjualan UMKM. Format: singkat, actionable. Gunakan emoji. Maksimal 200 kata.`;
+  const prompt = `Analisis bisnis: Total pendapatan Rp ${totalRevenue.toLocaleString('id-ID')}, rata-rata Rp ${avgTransaction.toLocaleString('id-ID')}, total ${transactionHistory.length} transaksi. Beri 3 insight actionable. Gunakan emoji.`;
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
     const data = await response.json();
-    let analysis = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Analisis siap. Klik "Analisis Mendalam" untuk hasil lebih detail.';
+    let analysis = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Analisis siap.';
     resultDiv.innerHTML = `<div style="background:rgba(201,149,42,0.1);padding:1rem;border-radius:12px;">${analysis.replace(/\n/g, '<br>')}</div>`;
-  } catch(e) {
-    resultDiv.innerHTML = '⚠️ AI sedang sibuk. Coba lagi nanti.';
-  }
+  } catch(e) { resultDiv.innerHTML = '⚠️ AI sibuk. Coba lagi.'; }
 }
 
 async function runDeepAnalysis() {
   const resultDiv = document.getElementById('deepAnalysisResult');
   if (!resultDiv) return;
-  resultDiv.innerHTML = '🧠 AI melakukan analisis mendalam...';
+  resultDiv.innerHTML = '🧠 AI analisis mendalam...';
   const totalRevenue = transactionHistory.reduce((s,t) => s + t.total, 0);
   const avgTransaction = totalRevenue / transactionHistory.length;
-  const last7Days = transactionHistory.slice(-7);
-  const trend = last7Days.length > 0 ? (last7Days[last7Days.length-1]?.total > last7Days[0]?.total ? 'naik' : 'turun') : 'stabil';
-  const prompt = `Anda adalah AI canggih dari tahun 2030. Analisis mendalam bisnis UMKM: Total pendapatan Rp ${totalRevenue.toLocaleString('id-ID')}, rata-rata transaksi Rp ${avgTransaction.toLocaleString('id-ID')}, tren 7 hari ${trend}, total transaksi ${transactionHistory.length}. Beri 5 rekomendasi strategis untuk meningkatkan pendapatan 2x lipat dalam 3 bulan. Format: bullet point dengan emoji.`;
+  const prompt = `Analisis mendalam bisnis UMKM: Pendapatan Rp ${totalRevenue.toLocaleString('id-ID')}, rata-rata Rp ${avgTransaction.toLocaleString('id-ID')}, total ${transactionHistory.length} transaksi. Beri 5 rekomendasi strategis. Format bullet point dengan emoji.`;
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
     const data = await response.json();
     let analysis = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Analisis selesai.';
     resultDiv.innerHTML = `<div style="background:rgba(201,149,42,0.08);padding:1rem;border-radius:12px;">${analysis.replace(/\n/g, '<br>')}</div>`;
-  } catch(e) {
-    resultDiv.innerHTML = '⚠️ Gagal mendapatkan analisis mendalam. Coba lagi.';
-  }
+  } catch(e) { resultDiv.innerHTML = '⚠️ Gagal.'; }
 }
 
-function openLogoUpload() {
-  uploadLogo();
-}
+function openLogoUpload() { uploadLogo(); }
 
 function openInvoiceHistory() {
   const modal = document.createElement('div');
   modal.className = 'modal-detail active';
-  modal.innerHTML = `
-    <div class="modal-detail-content" style="max-width:700px;">
-      <div class="modal-detail-header">
-        <h3 style="color:var(--gold);">📜 Riwayat Nota</h3>
-        <button class="modal-detail-close" onclick="this.closest('.modal-detail').remove()">✕</button>
-      </div>
-      <div class="modal-detail-body">
-        <div id="historyModalList" style="max-height:400px;overflow-y:auto;"></div>
-      </div>
-    </div>
-  `;
+  modal.innerHTML = `<div class="modal-detail-content" style="max-width:700px;"><div class="modal-detail-header"><h3 style="color:var(--gold);">📜 Riwayat Nota</h3><button class="modal-detail-close" onclick="this.closest('.modal-detail').remove()">✕</button></div>
+    <div class="modal-detail-body"><div id="historyModalList" style="max-height:400px;overflow-y:auto;"></div></div></div>`;
   document.body.appendChild(modal);
   const container = document.getElementById('historyModalList');
-  if (invoiceHistory.length === 0) {
-    container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:2rem;">Belum ada riwayat nota</div>';
-  } else {
-    container.innerHTML = invoiceHistory.map(inv => `
-      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:1rem;margin-bottom:0.8rem;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
-          <strong style="color:var(--gold);">${inv.invoiceNumber}</strong>
-          <span style="font-size:0.7rem;color:var(--muted);">${new Date(inv.createdAt).toLocaleDateString('id-ID')}</span>
-        </div>
-        <div style="font-size:0.8rem;">${inv.storeName || 'Nama Toko'} → ${inv.buyerName || 'Pelanggan'}</div>
-        <div style="font-size:0.75rem;color:var(--muted);">${inv.items.length} produk</div>
-        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-          <button onclick="event.stopPropagation(); loadInvoiceById(${inv.id}); document.querySelector('.modal-detail').remove();" style="background:var(--gold);border:none;padding:0.3rem 0.8rem;border-radius:6px;cursor:pointer;">📋 Muat</button>
-          <button onclick="event.stopPropagation(); duplicateInvoice(${inv.id}); setTimeout(()=> document.querySelector('.modal-detail')?.remove(), 500);" style="background:var(--gold);border:none;padding:0.3rem 0.8rem;border-radius:6px;cursor:pointer;">📋 Duplikat</button>
-          <button onclick="event.stopPropagation(); deleteInvoice(${inv.id}); updateDashboardStats(); location.reload();" style="background:transparent;border:1px solid var(--rust);padding:0.3rem 0.8rem;border-radius:6px;cursor:pointer;color:var(--rust);">🗑️ Hapus</button>
-        </div>
-      </div>
-    `).join('');
+  if (invoiceHistory.length === 0) container.innerHTML = '<div style="text-align:center;padding:2rem;">Belum ada riwayat nota</div>';
+  else {
+    container.innerHTML = invoiceHistory.map(inv => `<div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:1rem;margin-bottom:0.8rem;">
+      <div style="display:flex;justify-content:space-between;"><strong style="color:var(--gold);">${inv.invoiceNumber}</strong><span style="font-size:0.7rem;">${new Date(inv.createdAt).toLocaleDateString('id-ID')}</span></div>
+      <div style="font-size:0.8rem;">${inv.storeName || 'Toko'} → ${inv.buyerName || 'Pelanggan'}</div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button onclick="event.stopPropagation(); loadInvoiceById(${inv.id}); document.querySelector('.modal-detail').remove();" style="background:var(--gold);border:none;padding:0.3rem 0.8rem;border-radius:6px;cursor:pointer;">📋 Muat</button>
+        <button onclick="event.stopPropagation(); duplicateInvoice(${inv.id});" style="background:var(--gold);border:none;padding:0.3rem 0.8rem;border-radius:6px;cursor:pointer;">📋 Duplikat</button>
+        <button onclick="event.stopPropagation(); deleteInvoice(${inv.id}); updateDashboardStats();" style="background:transparent;border:1px solid var(--rust);padding:0.3rem 0.8rem;border-radius:6px;cursor:pointer;color:var(--rust);">🗑️ Hapus</button>
+      </div></div>`).join('');
   }
 }
 
 function calculatePrediction() {
   const resultDiv = document.getElementById('predictionResult');
-  if (!resultDiv) {
-    openRevenuePrediction();
-    return;
-  }
-  if (transactionHistory.length < 3) {
-    resultDiv.innerHTML = '⚠️ Butuh minimal 3 transaksi untuk prediksi yang akurat.';
-    return;
-  }
+  if (!resultDiv) { openRevenuePrediction(); return; }
+  if (transactionHistory.length < 3) { resultDiv.innerHTML = '⚠️ Butuh minimal 3 transaksi.'; return; }
   const totalRevenue = transactionHistory.reduce((s,t) => s + t.total, 0);
   const avgDaily = totalRevenue / transactionHistory.length;
   const nextMonth = avgDaily * 30;
   resultDiv.innerHTML = `<div style="background:rgba(201,149,42,0.1);padding:1rem;border-radius:12px;">
     <p><strong>📊 Berdasarkan ${transactionHistory.length} transaksi:</strong></p>
-    <p>💰 <strong>Prediksi pendapatan bulan depan:</strong> ${formatRupiah(nextMonth)}</p>
-    <p>📈 <strong>Target 3 bulan:</strong> ${formatRupiah(nextMonth * 3)}</p>
-    <p>🎯 <strong>Untuk mencapai target:</strong> Rata-rata ${formatRupiah(nextMonth / 30)}/hari</p>
-    <hr style="margin:0.5rem 0;border-color:rgba(201,149,42,0.2);">
-    <p style="font-size:0.7rem;color:var(--muted);">💡 AI Saran: Promosi rutin dan loyalty program bisa meningkatkan 20-30%</p>
-  </div>`;
+    <p>💰 Prediksi bulan depan: ${formatRupiah(nextMonth)}</p>
+    <p>📈 Target 3 bulan: ${formatRupiah(nextMonth * 3)}</p>
+    <p>🎯 Target harian: ${formatRupiah(nextMonth / 30)}/hari</p></div>`;
 }
 
 function openRevenuePrediction() {
   const modal = document.createElement('div');
   modal.className = 'modal-detail active';
-  modal.innerHTML = `
-    <div class="modal-detail-content">
-      <div class="modal-detail-header">
-        <h3 style="color:var(--gold);">📈 Prediksi Pendapatan</h3>
-        <button class="modal-detail-close" onclick="this.closest('.modal-detail').remove()">✕</button>
-      </div>
-      <div class="modal-detail-body">
-        <div id="predictionResult">Menghitung prediksi...</div>
-      </div>
-    </div>
-  `;
+  modal.innerHTML = `<div class="modal-detail-content"><div class="modal-detail-header"><h3 style="color:var(--gold);">📈 Prediksi Pendapatan</h3><button class="modal-detail-close" onclick="this.closest('.modal-detail').remove()">✕</button></div>
+    <div class="modal-detail-body"><div id="predictionResult">Menghitung...</div></div></div>`;
   document.body.appendChild(modal);
   calculatePrediction();
 }
@@ -654,71 +485,50 @@ async function sendChatMessage() {
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
   const aiLoadingDiv = document.createElement('div');
   aiLoadingDiv.className = 'acw-msg ai';
-  aiLoadingDiv.innerHTML = `<div class="acw-avatar">🧠</div><div class="acw-bubble">🧠 AI sedang berpikir...</div>`;
+  aiLoadingDiv.innerHTML = `<div class="acw-avatar">🧠</div><div class="acw-bubble">🧠 Berpikir...</div>`;
   messagesDiv.appendChild(aiLoadingDiv);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  const context = `Anda adalah AI Business Assistant super cerdas (tahun 2030). Data bisnis: Total transaksi ${transactionHistory.length}, total pendapatan Rp ${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}. Pertanyaan: ${message}. Jawab ramah, profesional, actionable. Gunakan emoji. Maksimal 300 kata.`;
+  const context = `Data bisnis: ${transactionHistory.length} transaksi, pendapatan Rp ${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}. Pertanyaan: ${message}. Jawab ramah, actionable, max 200 kata.`;
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
     });
     const data = await response.json();
-    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf, AI sedang sibuk. Coba lagi nanti.';
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Maaf, AI sibuk.';
     aiLoadingDiv.innerHTML = `<div class="acw-avatar">🧠</div><div class="acw-bubble">${aiResponse.replace(/\n/g, '<br>')}</div>`;
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  } catch(e) {
-    aiLoadingDiv.innerHTML = `<div class="acw-avatar">🧠</div><div class="acw-bubble">⚠️ Gagal terhubung ke AI. Coba lagi nanti.</div>`;
-  }
+  } catch(e) { aiLoadingDiv.innerHTML = `<div class="acw-avatar">🧠</div><div class="acw-bubble">⚠️ Gagal terhubung ke AI.</div>`; }
 }
 
-// ────────── AI SMART INVOICE ───────────────
+// ========== AI SMART INVOICE ==========
 async function aiSmartSuggest() {
   const items = [];
   document.querySelectorAll('.item-row').forEach(row => {
     const name = row.querySelector('.item-name')?.value.trim();
-    const qty = row.querySelector('.item-qty')?.value || 1;
-    if (name) items.push({ name, qty });
+    if (name) items.push({ name });
   });
-  if (items.length === 0) {
-    showToast('Tambahkan produk dulu!', 'warn');
-    return;
-  }
-  showToast('🤖 AI sedang berpikir...', 'info');
-  const prompt = `Anda adalah asisten bisnis untuk UMKM Indonesia. Berdasarkan daftar produk: ${items.map(i => `${i.name} (${i.qty}x)`).join(', ')}, berikan 3 saran singkat: 1. Saran harga jual fair (dalam Rupiah), 2. Saran diskon menarik (persen), 3. Saran deskripsi nota profesional (maks 50 kata). Format JSON dengan key: hargaSaran, diskonSaran, deskripsiSaran`;
+  if (items.length === 0) { showToast('Tambahkan produk dulu!', 'warn'); return; }
+  showToast('🤖 AI berpikir...', 'info');
+  const prompt = `Berdasarkan produk: ${items.map(i => i.name).join(', ')}, berikan 3 saran: 1. Saran harga fair (Rupiah), 2. Saran diskon (persen), 3. Deskripsi nota profesional. Format JSON: {"hargaSaran":"...","diskonSaran":"...","deskripsiSaran":"..."}`;
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
     const data = await response.json();
     let aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     aiText = aiText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
     let suggestion;
-    try {
-      suggestion = JSON.parse(aiText);
-    } catch(e) {
-      suggestion = { hargaSaran: 'Rp 25.000 - 50.000', diskonSaran: '5', deskripsiSaran: 'Terima kasih telah berbelanja!' };
-    }
+    try { suggestion = JSON.parse(aiText); } catch(e) { suggestion = { hargaSaran: 'Rp 25.000 - 50.000', diskonSaran: '5', deskripsiSaran: 'Terima kasih!' }; }
     const resultDiv = document.getElementById('aiSuggestionResult');
-    if (resultDiv) {
-      resultDiv.innerHTML = `
-        <div style="background:rgba(201,149,42,0.1); padding:1rem; border-radius:8px; margin-top:0.5rem;">
-          <div style="color:var(--gold); margin-bottom:0.5rem;">🤖 AI Suggestion</div>
-          <div><strong>💰 Harga:</strong> ${suggestion.hargaSaran || 'Rp 25.000 - 50.000'}</div>
-          <div><strong>🎯 Diskon:</strong> ${suggestion.diskonSaran || '5-10%'}</div>
-          <div><strong>📝 Deskripsi:</strong> ${suggestion.deskripsiSaran || 'Terima kasih telah berbelanja!'}</div>
-          <button onclick="applyAIDiscount('${suggestion.diskonSaran || '5'}')" style="margin-top:0.5rem;background:var(--gold);border:none;padding:0.2rem 0.8rem;border-radius:4px;cursor:pointer;">✨ Terapkan Diskon</button>
-        </div>
-      `;
-    }
+    if (resultDiv) resultDiv.innerHTML = `<div style="background:rgba(201,149,42,0.1);padding:1rem;border-radius:8px;margin-top:0.5rem;">
+      <div style="color:var(--gold);margin-bottom:0.5rem;">🤖 AI Suggestion</div>
+      <div><strong>💰 Harga:</strong> ${suggestion.hargaSaran}</div><div><strong>🎯 Diskon:</strong> ${suggestion.diskonSaran}</div>
+      <div><strong>📝 Deskripsi:</strong> ${suggestion.deskripsiSaran}</div>
+      <button onclick="applyAIDiscount('${suggestion.diskonSaran || '5'}')" style="margin-top:0.5rem;background:var(--gold);border:none;padding:0.2rem 0.8rem;border-radius:4px;cursor:pointer;">✨ Terapkan Diskon</button></div>`;
     showToast('AI saran siap!', 'success');
-  } catch(e) {
-    console.error('AI Error:', e);
-    showToast('AI sedang sibuk, coba lagi', 'error');
-  }
+  } catch(e) { showToast('AI sibuk, coba lagi', 'error'); }
 }
 
 function applyAIDiscount(discountStr) {
@@ -729,27 +539,18 @@ function applyAIDiscount(discountStr) {
   showToast(`✅ Diskon ${disc}% diterapkan!`, 'success');
 }
 
-// ────────── LOAD DATA ─────────────────────
+// ========== LOAD DATA ==========
 function loadData() {
   const saved = localStorage.getItem('notaku_products');
-  if (saved) {
-    try {
-      displaySavedProducts(JSON.parse(saved));
-    } catch (e) { localStorage.removeItem('notaku_products'); }
-  }
+  if (saved) { try { displaySavedProducts(JSON.parse(saved)); } catch(e) { localStorage.removeItem('notaku_products'); } }
   const stats = localStorage.getItem('notaku_stats');
-  if (stats) {
-    try {
-      transactionHistory = JSON.parse(stats);
-      updateStats();
-    } catch (e) { localStorage.removeItem('notaku_stats'); }
-  }
+  if (stats) { try { transactionHistory = JSON.parse(stats); updateStats(); } catch(e) { localStorage.removeItem('notaku_stats'); } }
   loadUserLogo();
   loadInvoiceHistory();
   updateDashboardStats();
 }
 
-// ────────── PREMIUM TEMPLATES ──────────────
+// ========== PREMIUM ==========
 function showPremiumTemplates() {
   const premiumGroup = document.getElementById('premiumTemplates');
   const freeGroup = document.getElementById('freeTemplates');
@@ -759,23 +560,15 @@ function showPremiumTemplates() {
   const tabFree = document.querySelector('.ttab[data-tab="free"]');
   const tabPremium = document.querySelector('.ttab[data-tab="premium"]');
   if (tabFree && tabPremium) {
-    if (isPremium) {
-      tabFree.classList.remove('active');
-      tabPremium.classList.add('active');
-    } else {
-      tabFree.classList.add('active');
-      tabPremium.classList.remove('active');
-    }
+    if (isPremium) { tabFree.classList.remove('active'); tabPremium.classList.add('active'); }
+    else { tabFree.classList.add('active'); tabPremium.classList.remove('active'); }
   }
   const premiumTabLock = document.getElementById('premiumTabLock');
   if (premiumTabLock) premiumTabLock.innerHTML = isPremium ? '✓' : '🔒';
 }
 
 function checkPremiumStatus() {
-  if (!window.PremiumAPI) {
-    console.warn('PremiumAPI not loaded yet');
-    return;
-  }
+  if (!window.PremiumAPI) return;
   const isPremium = window.PremiumAPI.isPremium && window.PremiumAPI.isPremium();
   const isExpired = window.PremiumAPI.isExpired && window.PremiumAPI.isExpired();
   const watermark = document.getElementById('watermark');
@@ -783,7 +576,6 @@ function checkPremiumStatus() {
   const statusDiv = document.getElementById('premiumStatus');
   const pdExpiry = document.getElementById('pdExpiry');
   const aiInsightBar = document.getElementById('aiInsightBar');
-  
   if (isPremium && !isExpired) {
     if (watermark) watermark.style.display = 'none';
     if (premiumDashboard) premiumDashboard.style.display = 'block';
@@ -792,27 +584,15 @@ function checkPremiumStatus() {
       const days = window.PremiumAPI.getRemainingDays ? window.PremiumAPI.getRemainingDays() : 0;
       const until = window.PremiumAPI.getUntilFormatted ? window.PremiumAPI.getUntilFormatted() : '-';
       const plan = window.PremiumAPI.getPlanName ? window.PremiumAPI.getPlanName() : 'bulanan';
-      statusDiv.innerHTML = `✅ Premium <strong>${plan}</strong> aktif hingga ${until} (${days} hari lagi)<br>✨ Akses semua template premium + AI lengkap!`;
-      statusDiv.style.color = '#c9952a';
+      statusDiv.innerHTML = `✅ Premium ${plan} aktif hingga ${until} (${days} hari)<br>✨ Akses semua template premium!`;
     }
-    if (pdExpiry) {
-      const until = window.PremiumAPI.getUntilFormatted ? window.PremiumAPI.getUntilFormatted() : '-';
-      pdExpiry.innerHTML = `Berlaku hingga: ${until}`;
-    }
+    if (pdExpiry) pdExpiry.innerHTML = `Berlaku hingga: ${window.PremiumAPI.getUntilFormatted ? window.PremiumAPI.getUntilFormatted() : '-'}`;
     updateDashboardStats();
   } else {
     if (watermark) watermark.style.display = 'block';
     if (premiumDashboard) premiumDashboard.style.display = 'none';
     if (aiInsightBar) aiInsightBar.style.display = 'none';
-    if (statusDiv) {
-      if (isPremium && isExpired) {
-        statusDiv.innerHTML = '⚠️ Premium sudah kadaluarsa. Perpanjang untuk akses fitur eksklusif!';
-        statusDiv.style.color = '#c0431a';
-      } else {
-        statusDiv.innerHTML = '🔒 Upgrade ke Premium untuk: ✓ Hapus watermark · ✓ 11 template eksklusif · ✓ AI Smart Invoice · ✓ Logo Custom · ✓ Riwayat Nota';
-        statusDiv.style.color = 'rgba(250,248,243,0.4)';
-      }
-    }
+    if (statusDiv) statusDiv.innerHTML = '🔒 Upgrade ke Premium untuk: Hapus watermark · 11 template eksklusif · AI Smart · Logo Custom · Riwayat Nota';
   }
   showPremiumTemplates();
 }
@@ -820,39 +600,27 @@ function checkPremiumStatus() {
 function activatePremium() {
   const input = document.getElementById('premiumKey');
   const key = input ? input.value.trim() : '';
-  if (!key) {
-    showToast('⚠️ Masukkan kode premium!', 'warn');
-    return;
-  }
+  if (!key) { showToast('⚠️ Masukkan kode premium!', 'warn'); return; }
   if (window.PremiumAPI && window.PremiumAPI.activate && window.PremiumAPI.activate(key)) {
-    showToast('✅ Premium aktif! 11 template + AI + Logo Custom + Riwayat siap!', 'success');
+    showToast('✅ Premium aktif!', 'success');
     if (input) input.value = '';
     checkPremiumStatus();
-    setTimeout(() => {
-      const el = document.querySelector('.template-tabs');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 600);
-  } else {
-    showToast('❌ Kode tidak valid. Hubungi admin!', 'error');
-  }
+    setTimeout(() => { const el = document.querySelector('.template-tabs'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 600);
+  } else { showToast('❌ Kode tidak valid.', 'error'); }
 }
 
 function switchTemplate(templateName) {
   currentTemplate = templateName;
   const preview = document.getElementById('invoicePreview');
   if (preview) preview.className = `invoice-template template-${currentTemplate}`;
-  document.querySelectorAll('.tpl-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.template === templateName);
-  });
+  document.querySelectorAll('.tpl-btn').forEach(b => { b.classList.toggle('active', b.dataset.template === templateName); });
 }
 
-// ────────── TAB MANAGEMENT ─────────────────
 function initTabs() {
   const tabFree = document.querySelector('.ttab[data-tab="free"]');
   const tabPremium = document.querySelector('.ttab[data-tab="premium"]');
   const freeTemplates = document.getElementById('freeTemplates');
   const premiumTemplates = document.getElementById('premiumTemplates');
-  
   if (tabFree) {
     tabFree.addEventListener('click', () => {
       tabFree.classList.add('active');
@@ -877,7 +645,7 @@ function initTabs() {
   }
 }
 
-// ────────── ADD ITEM ───────────────────────
+// ========== ADD ITEM ==========
 function addItem(name = '', qty = 1, price = 0) {
   itemCount++;
   const id = itemCount;
@@ -895,29 +663,12 @@ function removeItem(id) {
   if (row) row.remove();
 }
 
-// ────────── SAVED PRODUCTS ─────────────────
-function showSaveProductModal() { 
-  const modal = document.getElementById('saveProductModal');
-  if (modal) modal.style.display = 'flex';
-}
-function closeSaveProductModal() { 
-  const modal = document.getElementById('saveProductModal');
-  if (modal) modal.style.display = 'none';
-}
-function showPremiumModal() { 
-  const modal = document.getElementById('premiumModal');
-  if (modal) modal.style.display = 'flex';
-}
-function closePremiumModal() { 
-  const modal = document.getElementById('premiumModal');
-  if (modal) modal.style.display = 'none';
-}
-
-window.onclick = function(event) { 
-  if (event.target.classList.contains('modal-overlay')) { 
-    event.target.style.display = 'none'; 
-  } 
-};
+// ========== SAVED PRODUCTS ==========
+function showSaveProductModal() { const modal = document.getElementById('saveProductModal'); if (modal) modal.style.display = 'flex'; }
+function closeSaveProductModal() { const modal = document.getElementById('saveProductModal'); if (modal) modal.style.display = 'none'; }
+function showPremiumModal() { const modal = document.getElementById('premiumModal'); if (modal) modal.style.display = 'flex'; }
+function closePremiumModal() { const modal = document.getElementById('premiumModal'); if (modal) modal.style.display = 'none'; }
+window.onclick = function(event) { if (event.target.classList.contains('modal-overlay')) { event.target.style.display = 'none'; } };
 
 function saveProduct() {
   const name = document.getElementById('saveProductName').value.trim();
@@ -961,7 +712,7 @@ function deleteProduct(e, index) {
 function addSavedProductToItems(name, price) { addItem(name, 1, price); showToast(`✅ "${name}" ditambahkan!`, 'success'); }
 function saveProducts(products) { localStorage.setItem('notaku_products', JSON.stringify(products)); }
 
-// ────────── TRANSACTIONS ───────────────────
+// ========== TRANSACTIONS ==========
 function saveTransaction(total) {
   transactionHistory.push({ date: new Date().toISOString(), total: total });
   localStorage.setItem('notaku_stats', JSON.stringify(transactionHistory));
@@ -994,7 +745,7 @@ function updateChart() {
   if (!canvas) return;
   revenueChart = new Chart(canvas.getContext('2d'), {
     type: 'line', data: { labels: last7Days, datasets: [{ label: 'Pendapatan (Rp)', data: last7Revenue, borderColor: '#c9952a', backgroundColor: 'rgba(201,149,42,0.08)', pointBackgroundColor: '#c9952a', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.4, fill: true, borderWidth: 2.5 }] },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID') } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: (v) => 'Rp ' + Number(v).toLocaleString('id-ID') } }, x: { grid: { display: false } } } }
+    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID') } } }, scales: { y: { beginAtZero: true } } }
   });
 }
 
@@ -1017,7 +768,7 @@ function exportStats() {
   showToast('CSV terdownload!', 'success');
 }
 
-// ────────── GENERATE INVOICE ───────────────
+// ========== GENERATE INVOICE ==========
 function generateInvoice() {
   const rows = document.querySelectorAll('.item-row');
   const items = [];
@@ -1042,7 +793,7 @@ function generateInvoice() {
   const subtotal = items.reduce((s, i) => s + i.subtotal, 0);
   const taxAmt = Math.round(subtotal * taxPct / 100);
   const total = Math.max(0, subtotal - discount + taxAmt);
-  if (typeof gtag === 'function') { gtag('event', 'generate_invoice', { event_category: 'engagement', event_label: storeName, value: total }); }
+  if (typeof gtag === 'function') gtag('event', 'generate_invoice', { event_category: 'engagement', event_label: storeName, value: total });
   saveTransaction(total);
   saveCurrentInvoice();
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -1086,7 +837,7 @@ function generateInvoice() {
   showToast('✅ Nota berhasil dibuat!', 'success');
 }
 
-// ────────── PRINT & PDF ────────────────────
+// ========== PRINT & PDF ==========
 async function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const invoice = document.getElementById('invoicePreview');
@@ -1109,7 +860,7 @@ async function downloadPDF() {
     const filename = `nota-${document.getElementById('invoiceNumber')?.value.replace(/\//g, '-') || 'notaku'}.pdf`;
     pdf.save(filename);
     showToast('✅ PDF siap!', 'success');
-  } catch (err) { showToast('❌ Gagal buat PDF', 'error'); }
+  } catch(err) { showToast('❌ Gagal buat PDF', 'error'); }
   invoice.style.width = orig.width; invoice.style.maxWidth = orig.maxWidth; invoice.style.margin = orig.margin;
   if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
 }
@@ -1118,87 +869,35 @@ function printInvoice() {
   const invoice = document.getElementById('invoicePreview');
   if (!invoice) { showToast('Generate nota dulu!', 'warn'); return; }
   const printWin = window.open('', '_blank');
-  printWin.document.write(`<!DOCTYPE html><html><head><title>NotaKu</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet"><style>${getStylesForPrint()}</style></head><body>${invoice.outerHTML}<script>window.onload=()=>{window.print();window.close();};<\/script></body></html>`);
+  printWin.document.write(`<!DOCTYPE html><html><head><title>NotaKu</title><style>${getStylesForPrint()}</style></head><body>${invoice.outerHTML}<script>window.onload=()=>{window.print();window.close();};<\/script></body></html>`);
   printWin.document.close();
 }
 
 function getStylesForPrint() {
-  return `
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { padding: 1rem; background: #fff; font-family: 'DM Sans', system-ui; }
-    .invoice-template { max-width: 600px; margin: 0 auto; background: #fff; padding: 1.5rem; border: 1px solid #e0d8c8; border-radius: 4px; }
-    .inv-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
-    .inv-store-name { font-weight: 800; font-size: 1.2rem; }
-    .inv-store-sub { font-size: 0.7rem; color: #666; }
-    .inv-meta { text-align: right; }
-    .inv-num { font-weight: 700; color: #c9952a; }
-    .inv-divider { height: 1px; background: #e0d8c8; margin: 0.8rem 0; }
-    .inv-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-    .inv-table th, .inv-table td { padding: 0.5rem; border-bottom: 1px solid #e0d8c8; text-align: left; }
-    .inv-summary { margin-top: 1rem; }
-    .inv-sum-row { display: flex; justify-content: space-between; padding: 0.3rem 0; }
-    .inv-sum-row.total { font-weight: 800; font-size: 1.1rem; border-top: 1px solid #000; margin-top: 0.3rem; padding-top: 0.5rem; }
-    .inv-stamp { font-weight: 800; color: #2a7a4b; border: 2px solid #2a7a4b; display: inline-block; padding: 0.2rem 0.8rem; transform: rotate(-6deg); }
-    .inv-powered { text-align: center; font-size: 0.6rem; color: #ccc; margin-top: 1rem; }
-    @media print { body { padding: 0; } .inv-watermark { display: none; } }
-  `;
+  return `*{margin:0;padding:0;box-sizing:border-box}body{padding:1rem;font-family:'DM Sans',sans-serif}.invoice-template{max-width:600px;margin:0 auto;background:#fff;padding:1.5rem;border:1px solid #e0d8c8}.inv-header{display:flex;justify-content:space-between}.inv-store-name{font-weight:800;font-size:1.2rem}.inv-num{font-weight:700;color:#c9952a}.inv-divider{height:1px;background:#e0d8c8;margin:0.8rem 0}.inv-table{width:100%;border-collapse:collapse;margin:1rem 0}.inv-table th,.inv-table td{padding:0.5rem;border-bottom:1px solid #e0d8c8;text-align:left}.inv-sum-row{display:flex;justify-content:space-between;padding:0.3rem 0}.inv-sum-row.total{font-weight:800;border-top:1px solid #000;margin-top:0.3rem;padding-top:0.5rem}.inv-stamp{font-weight:800;color:#2a7a4b;border:2px solid #2a7a4b;display:inline-block;padding:0.2rem 0.8rem;transform:rotate(-6deg)}@media print{body{padding:0}}`;
 }
 
-// ────────── PAYMENT INFO (INI YANG PENTING!) ────────────────
+// ========== PAYMENT INFO ==========
 function showPaymentInfo(paket, nominal) {
   const paymentDiv = document.getElementById('paymentInfo');
   const amountSpan = document.getElementById('paymentAmount');
-  
-  if (!paymentDiv) {
-    console.error('Element paymentInfo tidak ditemukan!');
-    showToast('Error: Element payment tidak ditemukan', 'error');
-    return;
-  }
-  if (!amountSpan) {
-    console.error('Element paymentAmount tidak ditemukan!');
-    showToast('Error: Element amount tidak ditemukan', 'error');
-    return;
-  }
-  
-  // Update nominal
+  if (!paymentDiv || !amountSpan) return;
   amountSpan.textContent = `Rp ${nominal.toLocaleString('id-ID')}`;
-  
-  // Tampilkan payment card
   paymentDiv.style.display = 'block';
-  
-  // Scroll ke payment info
+  paymentDiv.classList.add('show');
   paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  
-  // Toast notifikasi
   showToast(`💳 Transfer Rp ${nominal.toLocaleString('id-ID')} ke BRI a.n. Ardian Nurraihan`, 'success');
-  
-  // Send ke Google Analytics jika ada
-  if (typeof gtag === 'function') {
-    gtag('event', 'view_payment_info', { 
-      event_category: 'premium', 
-      event_label: paket, 
-      value: nominal 
-    });
-  }
+  if (typeof gtag === 'function') gtag('event', 'view_payment_info', { event_category: 'premium', event_label: paket, value: nominal });
 }
 
 function copyPaymentInfo() {
   const rekening = '359301009186508';
   const nama = 'Ardian Nurraihan';
-  const textToCopy = `${rekening} a.n. ${nama}`;
-  
-  navigator.clipboard?.writeText(rekening).then(() => {
-    showToast(`✅ No. rekening ${rekening} a.n. ${nama} sudah di-copy!`, 'success');
-  }).catch(() => {
-    showToast(`✅ No. rekening: ${rekening}`, 'success');
-  });
-  
-  if (typeof gtag === 'function') {
-    gtag('event', 'copy_rekening', { event_category: 'premium', event_label: 'BRI' });
-  }
+  navigator.clipboard?.writeText(rekening).then(() => showToast(`✅ No. rekening ${rekening} a.n. ${nama} sudah di-copy!`, 'success')).catch(() => showToast(`✅ No. rekening: ${rekening}`, 'success'));
+  if (typeof gtag === 'function') gtag('event', 'copy_rekening', { event_category: 'premium', event_label: 'BRI' });
 }
 
-// ────────── HELPERS ────────────────────────
+// ========== HELPERS ==========
 function showToast(message, type = 'info') {
   const existing = document.querySelector('.nk-toast');
   if (existing) existing.remove();
@@ -1215,6 +914,7 @@ function showToast(message, type = 'info') {
 function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m); }
 function formatRupiah(num) { return 'Rp ' + Number(num || 0).toLocaleString('id-ID'); }
 function formatDate(str) { if (!str) return ''; const d = new Date(str); if (isNaN(d.getTime())) return ''; return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); }
+
 function incrementInvoiceNumber() {
   const invoiceField = document.getElementById('invoiceNumber');
   if (!invoiceField) return;
@@ -1224,7 +924,7 @@ function incrementInvoiceNumber() {
   else { const random = Math.floor(Math.random() * 9000) + 1000; const date = new Date(); const month = (date.getMonth() + 1).toString().padStart(2, '0'); invoiceField.value = `INV/${date.getFullYear()}/${month}/${random}`; }
 }
 
-// ────────── INIT ───────────────────────────
+// ========== INIT ==========
 window.addEventListener('DOMContentLoaded', () => {
   const today = new Date().toISOString().split('T')[0];
   const dateEl = document.getElementById('invoiceDate');
@@ -1261,17 +961,12 @@ window.addEventListener('DOMContentLoaded', () => {
       const isDark = document.body.classList.contains('dark-mode');
       localStorage.setItem('notaku_dark_mode', isDark);
     });
-    if (localStorage.getItem('notaku_dark_mode') === 'true') {
-      document.body.classList.add('dark-mode');
-    }
+    if (localStorage.getItem('notaku_dark_mode') === 'true') document.body.classList.add('dark-mode');
   }
   
   if (userLogo) {
     const logoArea = document.getElementById('invLogoArea');
     const logoImg = document.getElementById('invLogoImg');
-    if (logoArea && logoImg) {
-      logoArea.style.display = 'block';
-      logoImg.src = userLogo;
-    }
+    if (logoArea && logoImg) { logoArea.style.display = 'block'; logoImg.src = userLogo; }
   }
 });
