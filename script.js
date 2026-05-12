@@ -128,7 +128,7 @@ async function processVoiceInput() {
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
-      headers: { 'Content-Type':application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
     const data = await response.json();
@@ -138,7 +138,6 @@ async function processVoiceInput() {
     try { parsed = JSON.parse(aiText); } catch(e) { parsed = { items: [] }; }
     
     if (parsed.items && parsed.items.length > 0) {
-      // Clear existing items & add new ones
       const container = document.getElementById('itemsList');
       if (container) container.innerHTML = '';
       itemCount = 0;
@@ -186,16 +185,11 @@ function showTemplateDemo(templateName) {
   };
   if (title) title.innerHTML = `Preview: ${templateNames[templateName] || templateName}`;
   
-  // Create preview HTML
-  const demoStore = { storeName: 'Demo Store', storeAddress: 'Jl. Contoh No. 123', storePhone: '08123456789' };
-  const demoBuyer = { buyerName: 'Customer Demo', buyerPhone: '081234567890' };
   const demoItems = [
     { name: 'Produk Premium A', qty: 2, price: 250000, subtotal: 500000 },
     { name: 'Produk Premium B', qty: 1, price: 350000, subtotal: 350000 }
   ];
   const subtotal = 850000;
-  const discount = 0;
-  const taxAmt = 0;
   const total = 850000;
   
   let templateClass = `invoice-template template-${templateName}`;
@@ -205,7 +199,7 @@ function showTemplateDemo(templateName) {
     <div class="inv-divider"></div>
     <div class="inv-buyer"><div class="inv-buyer-label">Kepada Yth.</div><div class="inv-buyer-name">Customer Demo</div></div>
     <table class="inv-table"><thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr></thead><tbody>
-    ${demoItems.map(i => `<tr><td>${i.name}</td><td style="text-align:center">${i.qty}</td><td>Rp ${i.price.toLocaleString('id-ID')}</td><td style="text-align:right">Rp ${i.subtotal.toLocaleString('id-ID')}</td></tr>`).join('')}
+    ${demoItems.map(i => `<tr><td>${i.name}</td><td style="text-align:center">${i.qty}</td><td>Rp ${i.price.toLocaleString('id-ID')}</td><td><span style="font-weight:600">Rp ${i.subtotal.toLocaleString('id-ID')}</span></td>`).join('')}
     </tbody></table>
     <div class="inv-summary"><div class="inv-sum-row"><span>Subtotal</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
     <div class="inv-sum-row total"><span>TOTAL</span><span>Rp ${total.toLocaleString('id-ID')}</span></div></div>
@@ -470,7 +464,7 @@ function exportToExcel() {
     showToast('Belum ada data transaksi!', 'warn');
     return;
   }
-  let html = `<html><head><meta charset="UTF-8"><title>NotaKu - Laporan Penjualan</title><style>body{font-family:Arial;margin:20px;}h1{color:#c9952a;}table{border-collapse:collapse;width:100%;margin-top:20px;}th,td{border:1px solid #ddd;padding:8px;}th{background-color:#c9952a;color:white;}.total{font-weight:bold;background-color:#f2ead8;}</style></head><body><h1>📊 NotaKu - Laporan Penjualan</h1><p>Periode: ${new Date().toLocaleDateString('id-ID')}</p><p>Total Transaksi: ${transactionHistory.length}</p><p>Total Pendapatan: ${formatRupiah(transactionHistory.reduce((s,t)=>s+t.total,0))}</p><hr/></td><thead><tr><th>Tanggal</th><th>Total (Rp)</th></tr></thead><tbody>${transactionHistory.map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('id-ID')}</td><td>${Number(t.total).toLocaleString('id-ID')}</td></tr>`).join('')}<tr class="total"><td><strong>TOTAL</strong></td><td><strong>${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}</strong></td></tr></tbody></table><p style="margin-top:30px;color:#999;">Dibuat dengan NotaKu - Generator Nota Gratis untuk UMKM Indonesia</p></body></html>`;
+  let html = `<html><head><meta charset="UTF-8"><title>NotaKu - Laporan Penjualan</title><style>body{font-family:Arial;margin:20px;}h1{color:#c9952a;}table{border-collapse:collapse;width:100%;margin-top:20px;}th,td{border:1px solid #ddd;padding:8px;}th{background-color:#c9952a;color:white;}.total{font-weight:bold;background-color:#f2ead8;}</style></head><body><h1>📊 NotaKu - Laporan Penjualan</h1><p>Periode: ${new Date().toLocaleDateString('id-ID')}</p><p>Total Transaksi: ${transactionHistory.length}</p><p>Total Pendapatan: ${formatRupiah(transactionHistory.reduce((s,t)=>s+t.total,0))}</p><hr/><table><thead><tr><th>Tanggal</th><th>Total (Rp)</th></tr></thead><tbody>${transactionHistory.map(t=>`<tr><td>${new Date(t.date).toLocaleDateString('id-ID')}</td><td>${Number(t.total).toLocaleString('id-ID')}</td></tr>`).join('')}<tr class="total"><td><strong>TOTAL</strong></td><td><strong>${transactionHistory.reduce((s,t)=>s+t.total,0).toLocaleString('id-ID')}</strong></td></tr></tbody></table><p style="margin-top:30px;color:#999;">Dibuat dengan NotaKu - Generator Nota Gratis untuk UMKM Indonesia</p></body></html>`;
   const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -608,7 +602,6 @@ function openInvoiceHistory() {
 function calculatePrediction() {
   const resultDiv = document.getElementById('predictionResult');
   if (!resultDiv) {
-    // create modal if needed
     openRevenuePrediction();
     return;
   }
@@ -707,17 +700,20 @@ async function aiSmartSuggest() {
     try {
       suggestion = JSON.parse(aiText);
     } catch(e) {
-      suggestion = { hargaSaran: 'Rp 25.000 - 50.000', diskonSaran: '5-10%', deskripsiSaran: 'Terima kasih telah berbelanja!' };
+      suggestion = { hargaSaran: 'Rp 25.000 - 50.000', diskonSaran: '5', deskripsiSaran: 'Terima kasih telah berbelanja!' };
     }
-    document.getElementById('aiSuggestionResult').innerHTML = `
-      <div style="background:rgba(201,149,42,0.1); padding:1rem; border-radius:8px; margin-top:0.5rem;">
-        <div style="color:var(--gold); margin-bottom:0.5rem;">🤖 AI Suggestion</div>
-        <div><strong>💰 Harga:</strong> ${suggestion.hargaSaran || 'Rp 25.000 - 50.000'}</div>
-        <div><strong>🎯 Diskon:</strong> ${suggestion.diskonSaran || '5-10%'}</div>
-        <div><strong>📝 Deskripsi:</strong> ${suggestion.deskripsiSaran || 'Terima kasih telah berbelanja!'}</div>
-        <button onclick="applyAIDiscount('${suggestion.diskonSaran || '5'}')" style="margin-top:0.5rem;background:var(--gold);border:none;padding:0.2rem 0.8rem;border-radius:4px;cursor:pointer;">✨ Terapkan Diskon</button>
-      </div>
-    `;
+    const resultDiv = document.getElementById('aiSuggestionResult');
+    if (resultDiv) {
+      resultDiv.innerHTML = `
+        <div style="background:rgba(201,149,42,0.1); padding:1rem; border-radius:8px; margin-top:0.5rem;">
+          <div style="color:var(--gold); margin-bottom:0.5rem;">🤖 AI Suggestion</div>
+          <div><strong>💰 Harga:</strong> ${suggestion.hargaSaran || 'Rp 25.000 - 50.000'}</div>
+          <div><strong>🎯 Diskon:</strong> ${suggestion.diskonSaran || '5-10%'}</div>
+          <div><strong>📝 Deskripsi:</strong> ${suggestion.deskripsiSaran || 'Terima kasih telah berbelanja!'}</div>
+          <button onclick="applyAIDiscount('${suggestion.diskonSaran || '5'}')" style="margin-top:0.5rem;background:var(--gold);border:none;padding:0.2rem 0.8rem;border-radius:4px;cursor:pointer;">✨ Terapkan Diskon</button>
+        </div>
+      `;
+    }
     showToast('AI saran siap!', 'success');
   } catch(e) {
     console.error('AI Error:', e);
@@ -726,8 +722,10 @@ async function aiSmartSuggest() {
 }
 
 function applyAIDiscount(discountStr) {
-  const disc = parseInt(discountStr) || 5;
-  document.getElementById('discount').value = disc;
+  let disc = parseInt(discountStr);
+  if (isNaN(disc)) disc = 5;
+  const discountInput = document.getElementById('discount');
+  if (discountInput) discountInput.value = disc;
   showToast(`✅ Diskon ${disc}% diterapkan!`, 'success');
 }
 
@@ -755,7 +753,7 @@ function loadData() {
 function showPremiumTemplates() {
   const premiumGroup = document.getElementById('premiumTemplates');
   const freeGroup = document.getElementById('freeTemplates');
-  const isPremium = window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
+  const isPremium = window.PremiumAPI && window.PremiumAPI.isPremium && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
   if (premiumGroup) premiumGroup.style.display = isPremium ? 'grid' : 'none';
   if (freeGroup) freeGroup.style.display = 'grid';
   const tabFree = document.querySelector('.ttab[data-tab="free"]');
@@ -774,9 +772,12 @@ function showPremiumTemplates() {
 }
 
 function checkPremiumStatus() {
-  if (!window.PremiumAPI) return;
-  const isPremium = window.PremiumAPI.isPremium();
-  const isExpired = window.PremiumAPI.isExpired();
+  if (!window.PremiumAPI) {
+    console.warn('PremiumAPI not loaded yet');
+    return;
+  }
+  const isPremium = window.PremiumAPI.isPremium && window.PremiumAPI.isPremium();
+  const isExpired = window.PremiumAPI.isExpired && window.PremiumAPI.isExpired();
   const watermark = document.getElementById('watermark');
   const premiumDashboard = document.getElementById('premiumDashboard');
   const statusDiv = document.getElementById('premiumStatus');
@@ -788,14 +789,14 @@ function checkPremiumStatus() {
     if (premiumDashboard) premiumDashboard.style.display = 'block';
     if (aiInsightBar) aiInsightBar.style.display = 'flex';
     if (statusDiv) {
-      const days = window.PremiumAPI.getRemainingDays();
-      const until = window.PremiumAPI.getUntilFormatted();
-      const plan = window.PremiumAPI.getPlanName();
+      const days = window.PremiumAPI.getRemainingDays ? window.PremiumAPI.getRemainingDays() : 0;
+      const until = window.PremiumAPI.getUntilFormatted ? window.PremiumAPI.getUntilFormatted() : '-';
+      const plan = window.PremiumAPI.getPlanName ? window.PremiumAPI.getPlanName() : 'bulanan';
       statusDiv.innerHTML = `✅ Premium <strong>${plan}</strong> aktif hingga ${until} (${days} hari lagi)<br>✨ Akses semua template premium + AI lengkap!`;
       statusDiv.style.color = '#c9952a';
     }
     if (pdExpiry) {
-      const until = window.PremiumAPI.getUntilFormatted();
+      const until = window.PremiumAPI.getUntilFormatted ? window.PremiumAPI.getUntilFormatted() : '-';
       pdExpiry.innerHTML = `Berlaku hingga: ${until}`;
     }
     updateDashboardStats();
@@ -823,7 +824,7 @@ function activatePremium() {
     showToast('⚠️ Masukkan kode premium!', 'warn');
     return;
   }
-  if (window.PremiumAPI && window.PremiumAPI.activate(key)) {
+  if (window.PremiumAPI && window.PremiumAPI.activate && window.PremiumAPI.activate(key)) {
     showToast('✅ Premium aktif! 11 template + AI + Logo Custom + Riwayat siap!', 'success');
     if (input) input.value = '';
     checkPremiumStatus();
@@ -862,7 +863,7 @@ function initTabs() {
   }
   if (tabPremium) {
     tabPremium.addEventListener('click', () => {
-      const isPremium = window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
+      const isPremium = window.PremiumAPI && window.PremiumAPI.isPremium && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
       if (!isPremium) {
         showToast('👑 Template premium untuk member! Upgrade sekarang!', 'warn');
         document.getElementById('premium')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -885,7 +886,7 @@ function addItem(name = '', qty = 1, price = 0) {
   const row = document.createElement('div');
   row.className = 'item-row';
   row.id = `item-${id}`;
-  row.innerHTML = `<input type="text" placeholder="Nama produk" class="item-name" value="${escapeHtml(name)}" oninput="updateSubtotal(${id})" /><input type="number" placeholder="Qty" class="item-qty" min="1" value="${qty}" oninput="updateSubtotal(${id})" /><input type="number" placeholder="Harga" class="item-price" min="0" value="${price}" oninput="updateSubtotal(${id})" /><button class="remove-btn" onclick="removeItem(${id})">✕</button>`;
+  row.innerHTML = `<input type="text" placeholder="Nama produk" class="item-name" value="${escapeHtml(name)}" /><input type="number" placeholder="Qty" class="item-qty" min="1" value="${qty}" /><input type="number" placeholder="Harga" class="item-price" min="0" value="${price}" /><button class="remove-btn" onclick="removeItem(${id})">✕</button>`;
   list.appendChild(row);
 }
 
@@ -893,8 +894,6 @@ function removeItem(id) {
   const row = document.getElementById(`item-${id}`);
   if (row) row.remove();
 }
-
-function updateSubtotal(id) {}
 
 // ────────── SAVED PRODUCTS ─────────────────
 function showSaveProductModal() { 
@@ -995,7 +994,7 @@ function updateChart() {
   if (!canvas) return;
   revenueChart = new Chart(canvas.getContext('2d'), {
     type: 'line', data: { labels: last7Days, datasets: [{ label: 'Pendapatan (Rp)', data: last7Revenue, borderColor: '#c9952a', backgroundColor: 'rgba(201,149,42,0.08)', pointBackgroundColor: '#c9952a', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.4, fill: true, borderWidth: 2.5 }] },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID') } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: (v) => 'Rp ' + Number(v).toLocaleString('id-ID'), font: { family: "'DM Mono', monospace", size: 11 } } }, x: { grid: { display: false }, ticks: { font: { family: "'DM Mono', monospace", size: 11 } } } } }
+    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => 'Rp ' + Number(ctx.raw).toLocaleString('id-ID') } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: (v) => 'Rp ' + Number(v).toLocaleString('id-ID') } }, x: { grid: { display: false } } } }
   });
 }
 
@@ -1026,7 +1025,7 @@ function generateInvoice() {
     const name = row.querySelector('.item-name')?.value.trim();
     const qty = parseFloat(row.querySelector('.item-qty')?.value) || 0;
     const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
-    if (name || price > 0) items.push({ name: name || '-', qty, price, subtotal: qty * price });
+    if (name && qty > 0) items.push({ name: name, qty, price, subtotal: qty * price });
   });
   if (items.length === 0) { showToast('⚠️ Tambahkan produk!', 'warn'); return; }
   const get = (id) => document.getElementById(id)?.value.trim() || '';
@@ -1091,7 +1090,7 @@ function generateInvoice() {
 async function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const invoice = document.getElementById('invoicePreview');
-  if (!invoice) return;
+  if (!invoice) { showToast('Generate nota dulu!', 'warn'); return; }
   const btn = event?.target?.closest('button');
   const originalHTML = btn ? btn.innerHTML : '';
   if (btn) { btn.innerHTML = '⏳…'; btn.disabled = true; }
@@ -1110,7 +1109,6 @@ async function downloadPDF() {
     const filename = `nota-${document.getElementById('invoiceNumber')?.value.replace(/\//g, '-') || 'notaku'}.pdf`;
     pdf.save(filename);
     showToast('✅ PDF siap!', 'success');
-    if (typeof gtag === 'function') gtag('event', 'download_pdf', { event_category: 'engagement' });
   } catch (err) { showToast('❌ Gagal buat PDF', 'error'); }
   invoice.style.width = orig.width; invoice.style.maxWidth = orig.maxWidth; invoice.style.margin = orig.margin;
   if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
@@ -1118,9 +1116,9 @@ async function downloadPDF() {
 
 function printInvoice() {
   const invoice = document.getElementById('invoicePreview');
-  if (!invoice) return;
+  if (!invoice) { showToast('Generate nota dulu!', 'warn'); return; }
   const printWin = window.open('', '_blank');
-  printWin.document.write(`<!DOCTYPE html><html><head><title>NotaKu</title><style>${getStylesForPrint()}</style></head><body>${invoice.outerHTML}<script>window.onload=()=>{window.print();window.close();};<\/script></body></html>`);
+  printWin.document.write(`<!DOCTYPE html><html><head><title>NotaKu</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet"><style>${getStylesForPrint()}</style></head><body>${invoice.outerHTML}<script>window.onload=()=>{window.print();window.close();};<\/script></body></html>`);
   printWin.document.close();
 }
 
@@ -1146,22 +1144,58 @@ function getStylesForPrint() {
   `;
 }
 
-// ────────── PAYMENT ────────────────────────
+// ────────── PAYMENT INFO (INI YANG PENTING!) ────────────────
 function showPaymentInfo(paket, nominal) {
   const paymentDiv = document.getElementById('paymentInfo');
   const amountSpan = document.getElementById('paymentAmount');
-  if (!paymentDiv || !amountSpan) return;
+  
+  if (!paymentDiv) {
+    console.error('Element paymentInfo tidak ditemukan!');
+    showToast('Error: Element payment tidak ditemukan', 'error');
+    return;
+  }
+  if (!amountSpan) {
+    console.error('Element paymentAmount tidak ditemukan!');
+    showToast('Error: Element amount tidak ditemukan', 'error');
+    return;
+  }
+  
+  // Update nominal
   amountSpan.textContent = `Rp ${nominal.toLocaleString('id-ID')}`;
+  
+  // Tampilkan payment card
   paymentDiv.style.display = 'block';
+  
+  // Scroll ke payment info
   paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  showToast(`💳 Transfer Rp ${nominal.toLocaleString('id-ID')} ke BRI`, 'success');
-  if (typeof gtag === 'function') gtag('event', 'view_payment_info', { event_category: 'premium', event_label: paket, value: nominal });
+  
+  // Toast notifikasi
+  showToast(`💳 Transfer Rp ${nominal.toLocaleString('id-ID')} ke BRI a.n. Ardian Nurraihan`, 'success');
+  
+  // Send ke Google Analytics jika ada
+  if (typeof gtag === 'function') {
+    gtag('event', 'view_payment_info', { 
+      event_category: 'premium', 
+      event_label: paket, 
+      value: nominal 
+    });
+  }
 }
 
 function copyPaymentInfo() {
   const rekening = '359301009186508';
-  navigator.clipboard?.writeText(rekening).then(() => showToast('✅ No. rekening dicopy!', 'success')).catch(() => showToast('✅ No. rekening dicopy!', 'success'));
-  if (typeof gtag === 'function') gtag('event', 'copy_rekening', { event_category: 'premium', event_label: 'BRI' });
+  const nama = 'Ardian Nurraihan';
+  const textToCopy = `${rekening} a.n. ${nama}`;
+  
+  navigator.clipboard?.writeText(rekening).then(() => {
+    showToast(`✅ No. rekening ${rekening} a.n. ${nama} sudah di-copy!`, 'success');
+  }).catch(() => {
+    showToast(`✅ No. rekening: ${rekening}`, 'success');
+  });
+  
+  if (typeof gtag === 'function') {
+    gtag('event', 'copy_rekening', { event_category: 'premium', event_label: 'BRI' });
+  }
 }
 
 // ────────── HELPERS ────────────────────────
@@ -1180,7 +1214,7 @@ function showToast(message, type = 'info') {
 
 function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m); }
 function formatRupiah(num) { return 'Rp ' + Number(num || 0).toLocaleString('id-ID'); }
-function formatDate(str) { if (!str) return ''; return new Date(str).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); }
+function formatDate(str) { if (!str) return ''; const d = new Date(str); if (isNaN(d.getTime())) return ''; return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); }
 function incrementInvoiceNumber() {
   const invoiceField = document.getElementById('invoiceNumber');
   if (!invoiceField) return;
@@ -1206,12 +1240,11 @@ window.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initSpeechRecognition();
   
-  // Template button listeners
   document.querySelectorAll('.tpl-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tpl = btn.dataset.template;
-      if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(tpl)) {
-        if (!window.PremiumAPI.isPremium() || window.PremiumAPI.isExpired()) {
+      if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium && window.PremiumAPI.isTemplatePremium(tpl)) {
+        if (!window.PremiumAPI.isPremium || !window.PremiumAPI.isPremium() || window.PremiumAPI.isExpired()) {
           showToast('👑 Template premium untuk member! Upgrade sekarang!', 'warn');
           document.getElementById('premium')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           return;
@@ -1226,8 +1259,6 @@ window.addEventListener('DOMContentLoaded', () => {
     toggleBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
-      toggleBtn.style.opacity = '0.8';
-      setTimeout(() => toggleBtn.style.opacity = '', 200);
       localStorage.setItem('notaku_dark_mode', isDark);
     });
     if (localStorage.getItem('notaku_dark_mode') === 'true') {
@@ -1235,7 +1266,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // Load logo if exists
   if (userLogo) {
     const logoArea = document.getElementById('invLogoArea');
     const logoImg = document.getElementById('invLogoImg');
