@@ -429,12 +429,12 @@ function addItem(name = '', qty = 1, price = 0) {
   const row = document.createElement('div');
   row.className = 'item-row';
   row.id = `item-${id}`;
-  row.innerHTML = `
-    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${escapeHtml(name)}" oninput="updateSubtotal(${id})" />
-    <input type="text"   placeholder="Qty"                class="item-qty"   inputmode="numeric" pattern="[0-9]*" value="${qty}" oninput="updateSubtotal(${id})" />
-    <input type="text"   placeholder="Harga (Rp)"         class="item-price" inputmode="numeric" pattern="[0-9]*" value="${price}" oninput="updateSubtotal(${id})" />
-    <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
-  `;
+row.innerHTML = `
+  <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${escapeHtml(name)}" enterkeyhint="next" />
+  <input type="text"   placeholder="Qty"                class="item-qty"   inputmode="numeric" pattern="[0-9]*" value="${qty}" enterkeyhint="next" />
+  <input type="text"   placeholder="Harga (Rp)"         class="item-price" inputmode="numeric" pattern="[0-9]*" value="${price}" enterkeyhint="done" />
+  <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
+`;
   list.appendChild(row);
 }
 
