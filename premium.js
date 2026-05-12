@@ -1,15 +1,9 @@
 // ============================================
-//   NOTAKU — PREMIUM LICENSE SYSTEM
-//   Supports 8 exclusive templates
+//   NOTAKU — PREMIUM LICENSE SYSTEM (FULLY INTEGRATED)
+//   Auto-sync with admin-generated keys
 // ============================================
 
 const PREMIUM_CONFIG = {
-
-  // ── Valid license keys ──────────────────
-  validKeys: [
-    "DEMO-PREMIUM-2025",
-    // Tambahkan kode premium Anda di sini
-  ],
 
   // ── Daftar semua template premium ───────
   premiumTemplates: [
@@ -23,24 +17,58 @@ const PREMIUM_CONFIG = {
     'premium-royal'
   ],
 
+  // ── Mendapatkan semua valid keys dari localStorage admin ──
+  getAllValidKeys: function() {
+    const defaultKeys = ["DEMO-PREMIUM-2025"];
+    let adminKeys = [];
+    try {
+      const saved = localStorage.getItem('notaku_all_license_keys');
+      if (saved) {
+        const keys = JSON.parse(saved);
+        adminKeys = keys.filter(k => new Date(k.expiresAt) > new Date()).map(k => k.key);
+      }
+    } catch(e) {}
+    return [...defaultKeys, ...adminKeys];
+  },
+
   // ── Cek apakah user premium ─────────────
   isPremium: function () {
     const saved = localStorage.getItem('notaku_premium_key');
-    return !!(saved && this.validKeys.includes(saved));
+    if (!saved) return false;
+    const validKeys = this.getAllValidKeys();
+    if (!validKeys.includes(saved)) return false;
+    return !this.isExpired();
   },
 
   // ── Aktivasi premium ────────────────────
   activate: function (key) {
     const cleanKey = key.trim().toUpperCase();
-    const matched = this.validKeys.find(k => k.toUpperCase() === cleanKey);
+    const validKeys = this.getAllValidKeys();
+    const matched = validKeys.find(k => k.toUpperCase() === cleanKey);
+    
     if (matched) {
       localStorage.setItem('notaku_premium_key', matched);
-      // Cek apakah key tahunan (mengandung "YEARLY" atau "ANNUAL")
-      const isYearly = matched.includes('YEARLY') || matched.includes('ANNUAL') || matched.includes('TAHUNAN');
-      const days = isYearly ? 365 : 30;
+      
+      // Cari data key untuk mendapatkan tanggal expired
+      try {
+        const saved = localStorage.getItem('notaku_all_license_keys');
+        if (saved) {
+          const keys = JSON.parse(saved);
+          const keyData = keys.find(k => k.key === matched);
+          if (keyData && keyData.expiresAt) {
+            localStorage.setItem('notaku_premium_until', keyData.expiresAt);
+            const isYearly = keyData.duration === 365;
+            localStorage.setItem('notaku_premium_plan', isYearly ? 'tahunan' : (keyData.duration === 90 ? '3bulan' : 'bulanan'));
+            return true;
+          }
+        }
+      } catch(e) {}
+      
+      // Fallback: 30 hari jika tidak ada data
+      const days = matched.includes('YEARLY') || matched.includes('ANNUAL') || matched.includes('TAHUNAN') ? 365 : 30;
       const until = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
       localStorage.setItem('notaku_premium_until', until);
-      localStorage.setItem('notaku_premium_plan', isYearly ? 'tahunan' : 'bulanan');
+      localStorage.setItem('notaku_premium_plan', days === 365 ? 'tahunan' : 'bulanan');
       return true;
     }
     return false;
@@ -75,17 +103,12 @@ const PREMIUM_CONFIG = {
     });
   },
 
-  // ── Apakah watermark perlu disembunyikan ─
-  shouldHideWatermark: function () {
-    return this.isPremium() && !this.isExpired();
-  },
-
   // ── Apakah template ini premium ─────────
   isTemplatePremium: function (templateName) {
     return this.premiumTemplates.includes(templateName);
   },
 
-  // ── Deaktivasi (logout premium) ─────────
+  // ── Deaktivasi ──────────────────────────
   deactivate: function () {
     localStorage.removeItem('notaku_premium_key');
     localStorage.removeItem('notaku_premium_until');
@@ -95,3 +118,18 @@ const PREMIUM_CONFIG = {
 
 // Export ke global
 window.PremiumAPI = PREMIUM_CONFIG;
+
+// Auto-check dan sync ketika halaman dimuat
+document.addEventListener('DOMContentLoaded', function() {
+  // Cek apakah ada premium key yang tersimpan dan masih valid
+  const savedKey = localStorage.getItem('notaku_premium_key');
+  if (savedKey) {
+    const validKeys = PREMIUM_CONFIG.getAllValidKeys();
+    if (!validKeys.includes(savedKey)) {
+      // Key tidak valid lagi, hapus
+      localStorage.removeItem('notaku_premium_key');
+      localStorage.removeItem('notaku_premium_until');
+      localStorage.removeItem('notaku_premium_plan');
+    }
+  }
+});
