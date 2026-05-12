@@ -273,6 +273,15 @@
         <button class="add-item-btn small" onclick="showSaveProductModal()">💾 Simpan Produk</button>
       </div>
 
+      <!-- AI SMART BUTTON (Premium Feature) -->
+      <div class="form-group" id="aiSmartContainer" style="display:none;">
+        <button class="ai-btn" onclick="aiSmartSuggest()">
+          🤖 AI Smart Invoice
+          <span class="premium-feature-badge">PREMIUM</span>
+        </button>
+        <div id="aiSuggestionResult"></div>
+      </div>
+
       <div class="form-group">
         <label class="group-label">💰 Diskon & Catatan</label>
         <div class="input-row">
@@ -313,6 +322,10 @@
           <button class="action-btn secondary" onclick="printInvoice()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             Print
+          </button>
+          <button class="action-btn secondary" onclick="shareToWhatsApp()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.574 2.81.7A2 2 0 0122 16.92z"/></svg>
+            WA
           </button>
         </div>
       </div>
@@ -386,7 +399,8 @@
       <div class="stats-header">
         <h2 class="panel-title">Statistik Penjualan</h2>
         <div style="display: flex; gap: 0.5rem;">
-          <button class="reset-stats-btn export-btn" onclick="exportStats()" style="background: #2a7a4b; border-color: #2a7a4b;">📊 Export CSV</button>
+          <button class="reset-stats-btn export-btn" onclick="exportToExcel()" style="background: #2a7a4b; border-color: #2a7a4b;">📊 Export Excel</button>
+          <button class="reset-stats-btn" onclick="exportStats()" style="background: #c9952a; border-color: #c9952a;">📄 Export CSV</button>
           <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
         </div>
       </div>
@@ -505,16 +519,19 @@
     </div>
   </div>
 
-  <!-- PRICING - HARGA BARU LEBIH TERJANGKAU -->
+  <!-- PRICING -->
   <div class="pricing-grid">
     <div class="pricing-card">
       <div class="pc-badge">BULANAN</div>
       <div class="pc-price">Rp 29.000<span>/bulan</span></div>
       <ul class="pc-features">
-        <li>✓ 8 Template Eksklusif</li>
+        <li>✓ 11 Template Eksklusif</li>
         <li>✓ Tanpa Watermark</li>
-        <li>✓ Prioritas Support</li>
-        <li>✓ Update Template Gratis</li>
+        <li>✓ AI Smart Invoice</li>
+        <li>✓ Upload Logo Sendiri</li>
+        <li>✓ Riwayat Nota Lengkap</li>
+        <li>✓ Kirim Nota via WA</li>
+        <li>✓ Export Excel + Grafik</li>
       </ul>
       <button class="pc-btn" onclick="showPaymentInfo('bulanan', 29000)">Pilih Bulanan</button>
     </div>
@@ -524,10 +541,13 @@
       <div class="pc-price">Rp 69.000<span>/3 bulan</span></div>
       <div class="pc-per">≈ Rp 23.000/bulan</div>
       <ul class="pc-features">
-        <li>✓ 8 Template Eksklusif</li>
+        <li>✓ 11 Template Eksklusif</li>
         <li>✓ Tanpa Watermark</li>
-        <li>✓ Prioritas Support</li>
-        <li>✓ Update Template Gratis</li>
+        <li>✓ AI Smart Invoice</li>
+        <li>✓ Upload Logo Sendiri</li>
+        <li>✓ Riwayat Nota Lengkap</li>
+        <li>✓ Kirim Nota via WA</li>
+        <li>✓ Export Excel + Grafik</li>
       </ul>
       <button class="pc-btn" onclick="showPaymentInfo('3bulan', 69000)">Pilih 3 Bulan</button>
     </div>
@@ -537,13 +557,37 @@
       <div class="pc-price">Rp 199.000<span>/tahun</span></div>
       <div class="pc-per">≈ Rp 16.583/bulan</div>
       <ul class="pc-features">
-        <li>✓ 8 Template Eksklusif</li>
+        <li>✓ 11 Template Eksklusif</li>
         <li>✓ Tanpa Watermark</li>
-        <li>✓ Prioritas Support</li>
-        <li>✓ Update Template Gratis</li>
+        <li>✓ AI Smart Invoice</li>
+        <li>✓ Upload Logo Sendiri</li>
+        <li>✓ Riwayat Nota Lengkap</li>
+        <li>✓ Kirim Nota via WA</li>
+        <li>✓ Export Excel + Grafik</li>
         <li>✓ Template Baru Eksklusif</li>
       </ul>
       <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 199000)">Pilih Tahunan</button>
+    </div>
+  </div>
+
+  <!-- LOGO UPLOAD (Premium Feature) -->
+  <div class="logo-upload premium-feature" id="logoUploadContainer" style="text-align:center; margin: 1rem 0; display: none;">
+    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px;">
+      <h4 style="color: var(--gold);">🖼️ Custom Logo</h4>
+      <div class="logo-actions">
+        <button onclick="uploadLogo()">📤 Upload Logo Toko</button>
+        <button onclick="removeLogo()">🗑️ Hapus Logo</button>
+      </div>
+      <p style="font-size:0.7rem; color:#a89a87; margin-top:0.3rem;">Logo akan muncul di header nota Anda</p>
+    </div>
+  </div>
+
+  <!-- RIWAYAT NOTA (Premium Feature) -->
+  <div class="invoice-history premium-feature" id="invoiceHistoryContainer" style="margin-top: 1rem; display: none;">
+    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px;">
+      <h4 style="color: var(--gold);">📜 Riwayat Nota</h4>
+      <div id="invoiceHistoryList" style="max-height: 300px; overflow-y: auto;"></div>
+      <p style="font-size:0.7rem; color:#a89a87; margin-top:0.5rem;">Klik nota untuk memuat ulang, 📋 duplikat, 🗑️ hapus</p>
     </div>
   </div>
 
@@ -671,9 +715,11 @@
     <h3>✨ Upgrade ke Premium</h3>
     <ul class="modal-features">
       <li>✓ Hapus watermark "NotaKu.id"</li>
-      <li>✓ 8 template eksklusif mewah</li>
-      <li>✓ Tampilan nota lebih profesional</li>
-      <li>✓ Prioritas support</li>
+      <li>✓ 11 template eksklusif mewah</li>
+      <li>✓ AI Smart Invoice</li>
+      <li>✓ Upload logo sendiri</li>
+      <li>✓ Riwayat nota lengkap</li>
+      <li>✓ Kirim nota via WhatsApp</li>
     </ul>
     <div class="premium-plans">
       <div class="plan">
@@ -682,13 +728,13 @@
         <button onclick="showPaymentInfo('bulanan', 29000); closePremiumModal();">Pilih</button>
       </div>
       <div class="plan">
-        <div class="save-badge">Hemat 53%</div>
+        <div class="save-badge">HEMAT 53%</div>
         <h4>Tahunan</h4>
         <p class="price">Rp 199.000</p>
         <button onclick="showPaymentInfo('tahunan', 199000); closePremiumModal();">Pilih</button>
       </div>
       <div class="plan">
-        <div class="save-badge">3 Bulan</div>
+        <div class="save-badge">3 BULAN</div>
         <h4>3 BULAN</h4>
         <p class="price">Rp 69.000</p>
         <button onclick="showPaymentInfo('3bulan', 69000); closePremiumModal();">Pilih</button>
