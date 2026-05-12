@@ -519,6 +519,80 @@
     </div>
   </div>
 
+  <!-- PREMIUM DASHBOARD (RAPI & KEREN) -->
+  <div class="premium-dashboard" id="premiumDashboard" style="display:none;">
+    <div class="dashboard-header">
+      <div class="dashboard-title">
+        <span class="dashboard-icon">✨</span>
+        <span>Premium Dashboard</span>
+        <span class="premium-badge-dash">AKTIF</span>
+      </div>
+      <div class="dashboard-date" id="dashboardDate"></div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dash-card" onclick="openAIAnalyst()">
+        <div class="dash-card-icon">🤖</div>
+        <div class="dash-card-title">AI Smart Analyst</div>
+        <div class="dash-card-desc">Analisis penjualan & rekomendasi cerdas</div>
+        <div class="dash-card-stats" id="aiAnalystPreview">Siap menganalisis...</div>
+      </div>
+
+      <div class="dash-card" onclick="openLogoUpload()">
+        <div class="dash-card-icon">🖼️</div>
+        <div class="dash-card-title">Custom Logo</div>
+        <div class="dash-card-desc">Upload logo toko Anda</div>
+        <div class="dash-card-stats" id="logoStatus">Belum ada logo</div>
+      </div>
+
+      <div class="dash-card" onclick="openInvoiceHistory()">
+        <div class="dash-card-icon">📜</div>
+        <div class="dash-card-title">Riwayat Nota</div>
+        <div class="dash-card-desc">Lihat & kelola semua nota</div>
+        <div class="dash-card-stats" id="historyCount">0 nota</div>
+      </div>
+
+      <div class="dash-card" onclick="exportToExcel()">
+        <div class="dash-card-icon">📊</div>
+        <div class="dash-card-title">Export Excel</div>
+        <div class="dash-card-desc">Download laporan + grafik</div>
+        <div class="dash-card-stats">Klik untuk export</div>
+      </div>
+
+      <div class="dash-card" onclick="shareToWhatsApp()">
+        <div class="dash-card-icon">📱</div>
+        <div class="dash-card-title">Kirim via WA</div>
+        <div class="dash-card-desc">Share nota ke WhatsApp</div>
+        <div class="dash-card-stats">Klik untuk kirim</div>
+      </div>
+
+      <div class="dash-card" onclick="openRevenuePrediction()">
+        <div class="dash-card-icon">📈</div>
+        <div class="dash-card-title">Prediksi Pendapatan</div>
+        <div class="dash-card-desc">AI prediksi bulan depan</div>
+        <div class="dash-card-stats" id="predictionPreview">Belum ada data</div>
+      </div>
+    </div>
+
+    <!-- AI CHAT ASSISTANT (SUPERIOR) -->
+    <div class="ai-chat-section">
+      <div class="chat-header">
+        <span class="chat-icon">🧠</span>
+        <span>AI Business Assistant (Gemini 1.5 Pro)</span>
+        <span class="chat-badge">SUPERIOR AI</span>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message ai">
+          👋 Halo! Saya asisten AI canggih untuk bisnis Anda. Tanya apa saja tentang strategi harga, analisis penjualan, atau minta saran bisnis!
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Tanya AI... contoh: 'Bagaimana cara meningkatkan penjualan?' atau 'Analisis penjualan saya'" />
+        <button id="chatSendBtn" onclick="sendChatMessage()">Kirim</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PRICING -->
   <div class="pricing-grid">
     <div class="pricing-card">
@@ -570,7 +644,7 @@
     </div>
   </div>
 
-  <!-- LOGO UPLOAD (Premium Feature) -->
+  <!-- LOGO UPLOAD (Premium Feature) - backup -->
   <div class="logo-upload premium-feature" id="logoUploadContainer" style="text-align:center; margin: 1rem 0; display: none;">
     <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px;">
       <h4 style="color: var(--gold);">🖼️ Custom Logo</h4>
@@ -582,7 +656,7 @@
     </div>
   </div>
 
-  <!-- RIWAYAT NOTA (Premium Feature) -->
+  <!-- RIWAYAT NOTA (Premium Feature) - backup -->
   <div class="invoice-history premium-feature" id="invoiceHistoryContainer" style="margin-top: 1rem; display: none;">
     <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px;">
       <h4 style="color: var(--gold);">📜 Riwayat Nota</h4>
