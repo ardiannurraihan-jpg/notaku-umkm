@@ -31,6 +31,13 @@
   }
   </script>
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
+
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -498,23 +505,37 @@
     </div>
   </div>
 
-  <!-- PRICING -->
+  <!-- PRICING - HARGA BARU LEBIH TERJANGKAU -->
   <div class="pricing-grid">
     <div class="pricing-card">
       <div class="pc-badge">BULANAN</div>
-      <div class="pc-price">Rp 49.000<span>/bulan</span></div>
+      <div class="pc-price">Rp 29.000<span>/bulan</span></div>
       <ul class="pc-features">
         <li>✓ 8 Template Eksklusif</li>
         <li>✓ Tanpa Watermark</li>
         <li>✓ Prioritas Support</li>
         <li>✓ Update Template Gratis</li>
       </ul>
-      <button class="pc-btn" onclick="showPaymentInfo('bulanan', 49000)">Pilih Bulanan</button>
+      <button class="pc-btn" onclick="showPaymentInfo('bulanan', 29000)">Pilih Bulanan</button>
     </div>
+
+    <div class="pricing-card">
+      <div class="pc-badge">3 BULAN</div>
+      <div class="pc-price">Rp 69.000<span>/3 bulan</span></div>
+      <div class="pc-per">≈ Rp 23.000/bulan</div>
+      <ul class="pc-features">
+        <li>✓ 8 Template Eksklusif</li>
+        <li>✓ Tanpa Watermark</li>
+        <li>✓ Prioritas Support</li>
+        <li>✓ Update Template Gratis</li>
+      </ul>
+      <button class="pc-btn" onclick="showPaymentInfo('3bulan', 69000)">Pilih 3 Bulan</button>
+    </div>
+
     <div class="pricing-card pricing-featured">
-      <div class="pc-badge featured-badge">TERPOPULER • HEMAT 15%</div>
-      <div class="pc-price">Rp 499.000<span>/tahun</span></div>
-      <div class="pc-per">≈ Rp 41.583/bulan</div>
+      <div class="pc-badge featured-badge">TERPOPULER • HEMAT 53%</div>
+      <div class="pc-price">Rp 199.000<span>/tahun</span></div>
+      <div class="pc-per">≈ Rp 16.583/bulan</div>
       <ul class="pc-features">
         <li>✓ 8 Template Eksklusif</li>
         <li>✓ Tanpa Watermark</li>
@@ -522,7 +543,7 @@
         <li>✓ Update Template Gratis</li>
         <li>✓ Template Baru Eksklusif</li>
       </ul>
-      <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 499000)">Pilih Tahunan</button>
+      <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 199000)">Pilih Tahunan</button>
     </div>
   </div>
 
@@ -657,14 +678,20 @@
     <div class="premium-plans">
       <div class="plan">
         <h4>Bulanan</h4>
-        <p class="price">Rp 49.000</p>
-        <button onclick="showPaymentInfo('bulanan', 49000); closePremiumModal();">Pilih</button>
+        <p class="price">Rp 29.000</p>
+        <button onclick="showPaymentInfo('bulanan', 29000); closePremiumModal();">Pilih</button>
       </div>
       <div class="plan">
-        <div class="save-badge">Hemat 15%</div>
+        <div class="save-badge">Hemat 53%</div>
         <h4>Tahunan</h4>
-        <p class="price">Rp 499.000</p>
-        <button onclick="showPaymentInfo('tahunan', 499000); closePremiumModal();">Pilih</button>
+        <p class="price">Rp 199.000</p>
+        <button onclick="showPaymentInfo('tahunan', 199000); closePremiumModal();">Pilih</button>
+      </div>
+      <div class="plan">
+        <div class="save-badge">3 Bulan</div>
+        <h4>3 BULAN</h4>
+        <p class="price">Rp 69.000</p>
+        <button onclick="showPaymentInfo('3bulan', 69000); closePremiumModal();">Pilih</button>
       </div>
     </div>
     <p class="premium-note">*BRI 3593 0100 9186 508 a.n. Ardian Nurraihan</p>
