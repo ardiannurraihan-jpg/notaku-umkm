@@ -393,10 +393,14 @@ function checkPremiumStatus() {
   const watermark = document.getElementById('watermark');
   const statusDiv = document.getElementById('premiumStatus');
   const aiContainer = document.getElementById('aiSmartContainer');
+  const logoContainer = document.getElementById('logoUploadContainer');
+  const historyContainer = document.getElementById('invoiceHistoryContainer');
   
   if (isPremium && !isExpired) {
     if (watermark) watermark.style.display = 'none';
-    if (aiButton) aiButton.style.display = 'flex';
+    if (aiContainer) aiContainer.style.display = 'block';
+    if (logoContainer) logoContainer.style.display = 'block';
+    if (historyContainer) historyContainer.style.display = 'block';
     if (statusDiv) {
       const days = window.PremiumAPI.getRemainingDays();
       const until = window.PremiumAPI.getUntilFormatted();
@@ -406,7 +410,9 @@ function checkPremiumStatus() {
     }
   } else {
     if (watermark) watermark.style.display = 'block';
-    if (aiButton) aiButton.style.display = 'none';
+    if (aiContainer) aiContainer.style.display = 'none';
+    if (logoContainer) logoContainer.style.display = 'none';
+    if (historyContainer) historyContainer.style.display = 'none';
     if (statusDiv) {
       if (isPremium && isExpired) {
         statusDiv.innerHTML = '⚠️ Premium sudah kadaluarsa. Perpanjang untuk akses fitur eksklusif!';
