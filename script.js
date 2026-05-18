@@ -1,6 +1,6 @@
 // ============================================
 //   NOTAKU — MAIN SCRIPT
-//   Supports 8 premium templates
+//   Supports 11 templates (8 premium)
 // ============================================
 
 // ── STATE ────────────────────────────────────
@@ -65,7 +65,6 @@ function loadLastInvoice() {
 
 // ── LOAD DATA ────────────────────────────────
 function loadData() {
-  // Produk tersimpan
   const saved = localStorage.getItem('notaku_products');
   if (saved) {
     try {
@@ -75,7 +74,6 @@ function loadData() {
     }
   }
 
-  // Statistik
   const stats = localStorage.getItem('notaku_stats');
   if (stats) {
     try {
@@ -102,7 +100,6 @@ function showPremiumTemplates() {
     premiumGroup.style.display = 'none';
     if (premiumNote) premiumNote.style.display = 'none';
 
-    // Reset ke classic kalau sedang pakai template premium
     if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(currentTemplate)) {
       switchTemplate('classic');
     }
@@ -160,7 +157,6 @@ function activatePremium() {
     showToast('✅ Premium berhasil diaktifkan! 8 template eksklusif siap digunakan.', 'success');
     if (input) input.value = '';
     checkPremiumStatus();
-    // Scroll ke template selector
     setTimeout(() => {
       const el = document.querySelector('.template-selector');
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -339,7 +335,7 @@ function resetStats() {
 // ── EXPORT CSV ───────────────────────────────
 function exportStats() {
   if (transactionHistory.length === 0) {
-    showToast('⚠️ Belum ada数据 transaksi untuk diexport.', 'warn');
+    showToast('⚠️ Belum ada data transaksi untuk diexport.', 'warn');
     return;
   }
 
@@ -360,9 +356,169 @@ function exportStats() {
   showToast('✅ Data statistik sudah diexport ke CSV!', 'success');
 }
 
+// ── BACKUP & RESTORE ─────────────────────────
+function backupData() {
+  const backup = {
+    products: localStorage.getItem('notaku_products') || '[]',
+    stats: localStorage.getItem('notaku_stats') || '[]',
+    lastInvoice: localStorage.getItem('notaku_last_invoice') || '{}',
+    darkMode: localStorage.getItem('notaku_dark_mode') || 'false',
+    version: '1.0.0',
+    date: new Date().toISOString()
+  };
+
+  const dataStr = JSON.stringify(backup, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `notaku-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showToast('💾 Data berhasil di-backup!', 'success');
+}
+
+function restoreData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const backup = JSON.parse(event.target.result);
+        if (backup.products) localStorage.setItem('notaku_products', backup.products);
+        if (backup.stats) localStorage.setItem('notaku_stats', backup.stats);
+        if (backup.lastInvoice) localStorage.setItem('notaku_last_invoice', backup.lastInvoice);
+        if (backup.darkMode) localStorage.setItem('notaku_dark_mode', backup.darkMode);
+
+        loadData();
+        loadLastInvoice();
+        if (backup.darkMode === 'true') document.body.classList.add('dark-mode');
+        
+        showToast('🔄 Data berhasil direstore!', 'success');
+        setTimeout(() => location.reload(), 1500);
+      } catch (err) {
+        showToast('❌ File backup tidak valid!', 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// ── QUICK ADD SAMPLE PRODUCTS ─────────────────
+function quickAddSample() {
+  const samples = [
+    { name: 'Batik Tulis Semarang', price: 185000 },
+    { name: 'Kain Lurik Premium', price: 95000 },
+    { name: 'Tas Anyaman Rotan', price: 120000 },
+    { name: 'Kerajinan Kayu Ukir', price: 250000 }
+  ];
+  
+  samples.forEach(sample => {
+    addItem(sample.name, 1, sample.price);
+  });
+  
+  showToast('📦 Contoh produk ditambahkan!', 'success');
+}
+
+// ── BULK IMPORT ──────────────────────────────
+function bulkImportProducts() {
+  document.getElementById('bulkImportModal').style.display = 'block';
+}
+
+function closeBulkImportModal() {
+  document.getElementById('bulkImportModal').style.display = 'none';
+}
+
+function processBulkImport() {
+  const data = document.getElementById('bulkImportData').value;
+  const lines = data.split('\n');
+  let count = 0;
+
+  lines.forEach(line => {
+    line = line.trim();
+    if (!line) return;
+    
+    const parts = line.split('|');
+    if (parts.length >= 2) {
+      const name = parts[0].trim();
+      const price = parseInt(parts[1].trim());
+      if (name && !isNaN(price) && price > 0) {
+        const products = JSON.parse(localStorage.getItem('notaku_products') || '[]');
+        if (!products.find(p => p.name.toLowerCase() === name.toLowerCase())) {
+          products.push({ name, price });
+          saveProducts(products);
+          count++;
+        }
+      }
+    }
+  });
+
+  displaySavedProducts(JSON.parse(localStorage.getItem('notaku_products') || '[]'));
+  showToast(`✅ ${count} produk berhasil diimport!`, 'success');
+  closeBulkImportModal();
+  document.getElementById('bulkImportData').value = '';
+}
+
+// ── SHARE INVOICE ────────────────────────────
+async function shareInvoice() {
+  const invoice = document.getElementById('invoicePreview');
+  if (!invoice || invoice.style.display === 'none') {
+    showToast('⚠️ Generate nota terlebih dahulu!', 'warn');
+    return;
+  }
+
+  try {
+    const canvas = await html2canvas(invoice, { scale: 2 });
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    const file = new File([blob], 'nota.png', { type: 'image/png' });
+    
+    if (navigator.share) {
+      await navigator.share({
+        title: 'Nota dari NotaKu',
+        text: 'Berikut nota dari toko kami',
+        files: [file]
+      });
+      showToast('✅ Nota berhasil dibagikan!', 'success');
+    } else {
+      showToast('📱 Share tidak didukung, gunakan screenshot', 'info');
+    }
+  } catch (err) {
+    console.log('Share cancelled or failed');
+  }
+}
+
+// ── CLEAR ALL DATA ───────────────────────────
+function clearAllData() {
+  if (confirm('Reset semua form dan hapus data? Tindakan ini tidak dapat dibatalkan!')) {
+    localStorage.removeItem('notaku_last_invoice');
+    document.getElementById('storeName').value = '';
+    document.getElementById('storeAddress').value = '';
+    document.getElementById('storePhone').value = '';
+    document.getElementById('buyerName').value = '';
+    document.getElementById('buyerPhone').value = '';
+    document.getElementById('discount').value = '0';
+    document.getElementById('tax').value = '0';
+    document.getElementById('notes').value = '';
+    
+    const itemsContainer = document.getElementById('itemsList');
+    if (itemsContainer) {
+      itemsContainer.innerHTML = '';
+      itemCount = 0;
+      addItem();
+      addItem();
+    }
+    
+    showToast('🗑️ Semua data telah direset!', 'warn');
+  }
+}
+
 // ── INIT ─────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  // Set tanggal & nomor nota otomatis
   const today = new Date().toISOString().split('T')[0];
   const dateEl = document.getElementById('invoiceDate');
   if (dateEl) dateEl.value = today;
@@ -373,27 +529,20 @@ window.addEventListener('DOMContentLoaded', () => {
   const numEl = document.getElementById('invoiceNumber');
   if (numEl) numEl.value = `INV/${year}/${month}/${num}`;
 
-  // Tambahkan 2 baris produk default
   addItem();
   addItem();
 
-  // Load data tersimpan
   loadData();
   loadLastInvoice();
-
-  // Cek status premium
   checkPremiumStatus();
 
-  // Template selector — event delegation
   document.querySelectorAll('.template-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tpl = btn.dataset.template;
 
-      // Cek apakah template premium & user tidak premium
       if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(tpl)) {
         if (!window.PremiumAPI.isPremium() || window.PremiumAPI.isExpired()) {
           showToast('👑 Template ini eksklusif untuk member Premium. Upgrade sekarang!', 'warn');
-          // Scroll ke section premium
           const premSec = document.getElementById('premium');
           if (premSec) premSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
           return;
@@ -404,7 +553,6 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Dark Mode Toggle
   const toggleBtn = document.getElementById('darkModeToggle');
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
@@ -420,6 +568,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// ── ITEM MANAGEMENT ──────────────────────────
 function addItem(name = '', qty = 1, price = 0) {
   itemCount++;
   const id   = itemCount;
@@ -429,22 +578,18 @@ function addItem(name = '', qty = 1, price = 0) {
   const row = document.createElement('div');
   row.className = 'item-row';
   row.id = `item-${id}`;
-row.innerHTML = `
-  <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${escapeHtml(name)}" enterkeyhint="next" />
-  <input type="text"   placeholder="Qty"                class="item-qty"   inputmode="numeric" pattern="[0-9]*" value="${qty}" enterkeyhint="next" />
-  <input type="text"   placeholder="Harga (Rp)"         class="item-price" inputmode="numeric" pattern="[0-9]*" value="${price}" enterkeyhint="done" />
-  <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
-`;
+  row.innerHTML = `
+    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${escapeHtml(name)}" enterkeyhint="next" />
+    <input type="text"   placeholder="Qty"                class="item-qty"   inputmode="numeric" pattern="[0-9]*" value="${qty}" enterkeyhint="next" />
+    <input type="text"   placeholder="Harga (Rp)"         class="item-price" inputmode="numeric" pattern="[0-9]*" value="${price}" enterkeyhint="done" />
+    <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
+  `;
   list.appendChild(row);
 }
 
 function removeItem(id) {
   const row = document.getElementById(`item-${id}`);
   if (row) row.remove();
-}
-
-function updateSubtotal(id) {
-  // Dipanggil saat input berubah — kalkulasi terjadi di generateInvoice
 }
 
 // ── SAVED PRODUCTS ────────────────────────────
@@ -536,7 +681,7 @@ function addSavedProductToItems(name, price) {
   showToast(`✅ "${name}" ditambahkan ke nota.`, 'success');
 }
 
-// ── HELPER ESCAPE HTML ───────────────────────
+// ── HELPER ────────────────────────────────────
 function escapeHtml(str) {
   if (!str) return '';
   return str.replace(/[&<>]/g, function(m) {
@@ -547,7 +692,6 @@ function escapeHtml(str) {
   });
 }
 
-// ── FORMAT HELPERS ────────────────────────────
 function formatRupiah(num) {
   return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
 }
@@ -559,7 +703,6 @@ function formatDate(str) {
   });
 }
 
-// ── AUTO INCREMENT INVOICE NUMBER ─────────────
 function incrementInvoiceNumber() {
   const invoiceField = document.getElementById('invoiceNumber');
   if (!invoiceField) return;
@@ -588,8 +731,8 @@ function generateInvoice() {
     const name  = row.querySelector('.item-name')?.value.trim();
     const qty   = parseFloat(row.querySelector('.item-qty')?.value)   || 0;
     const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
-    if (name || price > 0) {
-      items.push({ name: name || '-', qty, price, subtotal: qty * price });
+    if (name && price > 0 && qty > 0) {
+      items.push({ name: name, qty, price, subtotal: qty * price });
     }
   });
 
@@ -615,7 +758,6 @@ function generateInvoice() {
   const taxAmt   = Math.round(subtotal * taxPct / 100);
   const total    = Math.max(0, subtotal - discount + taxAmt);
 
-  // Google Analytics
   if (typeof gtag === 'function') {
     gtag('event', 'generate_invoice', {
       event_category: 'engagement',
@@ -624,11 +766,9 @@ function generateInvoice() {
     });
   }
 
-  // Simpan ke statistik
   saveTransaction(total);
   saveCurrentInvoice();
 
-  // ── Isi preview ────────────────────────────
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
   set('inv-storeName',   storeName);
@@ -671,7 +811,6 @@ function generateInvoice() {
   if (notesSection) notesSection.style.display = notes ? 'block' : 'none';
   set('inv-notes', notes);
 
-  // ── Tampilkan preview ──────────────────────
   const placeholder = document.getElementById('previewPlaceholder');
   const preview     = document.getElementById('invoicePreview');
   const actions     = document.getElementById('previewActions');
@@ -680,13 +819,10 @@ function generateInvoice() {
   if (preview)     preview.style.display     = 'block';
   if (actions)     actions.style.display     = 'flex';
 
-  // Terapkan template aktif
   if (preview) preview.className = `invoice-template template-${currentTemplate}`;
 
-  // Auto increment nomor invoice
   incrementInvoiceNumber();
 
-  // Scroll ke preview
   if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   showToast('✅ Nota berhasil dibuat!', 'success');
@@ -790,7 +926,6 @@ function showPaymentInfo(paket, nominal) {
   paymentDiv.style.display = 'block';
   paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-  // Optional: tampilkan toast konfirmasi
   showToast(`✅ Silakan transfer Rp ${nominal.toLocaleString('id-ID')}`, 'success');
 
   if (typeof gtag === 'function') {
@@ -823,7 +958,7 @@ function copyPaymentInfo() {
   }
 }
 
-// ── STYLE TAMBAHAN ───────────────────────────
+// ── DYNAMIC STYLES ───────────────────────────
 (function injectDynamicStyles() {
   const style = document.createElement('style');
   style.textContent = `
@@ -845,4 +980,4 @@ function copyPaymentInfo() {
     .sp-del:hover { background: rgba(192,67,26,0.1); color: var(--rust); }
   `;
   document.head.appendChild(style);
-})(); 
+})();
