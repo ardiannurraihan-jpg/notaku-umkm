@@ -514,6 +514,72 @@
     <button onclick="saveStock()">Simpan Stok</button>
   </div>
 </div>
+
+<!-- LAPORAN LABA/RUGI -->
+<div class="stats-section" style="margin-top: 2rem;">
+  <div class="section-label">/ Laporan Laba/Rugi</div>
+  <div class="glass-panel stats-container">
+    <div class="stats-header">
+      <h2 class="panel-title">📊 Laporan Keuangan</h2>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <select id="reportPeriod" onchange="updateProfitReport()" style="padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border); background: var(--paper);">
+          <option value="day">Hari Ini</option>
+          <option value="week">Minggu Ini</option>
+          <option value="month" selected>Bulan Ini</option>
+          <option value="all">Semua Waktu</option>
+        </select>
+        <button class="reset-stats-btn" onclick="showHppModal()" style="background: #6b3fa0; border-color: #6b3fa0; color: white;">💰 Atur Harga Beli</button>
+        <button class="reset-stats-btn" onclick="exportProfitReport()" style="background: #2a7a4b; border-color: #2a7a4b;">📊 Export Laporan</button>
+      </div>
+    </div>
+    
+    <!-- Ringkasan Laba/Rugi -->
+    <div class="stats-grid" style="margin-bottom: 1.5rem;">
+      <div class="stat-card">
+        <div class="stat-icon">💵</div>
+        <div class="stat-label">Total Pendapatan</div>
+        <div class="stat-value" id="reportRevenue" style="color: #2a7a4b;">Rp 0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-label">Total HPP (Modal)</div>
+        <div class="stat-value" id="reportHpp" style="color: #c0431a;">Rp 0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">LABA BERSIH</div>
+        <div class="stat-value" id="reportProfit" style="color: #c9952a; font-size: 1.8rem;">Rp 0</div>
+      </div>
+    </div>
+    
+    <!-- Margin Keuntungan -->
+    <div style="background: var(--cream); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
+      <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted);">MARGIN KEUNTUNGAN</span>
+      <div style="font-size: 2rem; font-weight: 800; color: var(--gold);" id="profitMargin">0%</div>
+    </div>
+    
+    <!-- Tabel Detail Transaksi -->
+    <div style="overflow-x: auto;">
+      <table id="profitTable" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+        <thead>
+          <tr style="background: var(--cream); border-bottom: 2px solid var(--gold);">
+            <th style="padding: 0.8rem; text-align: left;">Tanggal</th>
+            <th style="padding: 0.8rem; text-align: left;">Nota</th>
+            <th style="padding: 0.8rem; text-align: center;">Total</th>
+            <th style="padding: 0.8rem; text-align: center;">HPP</th>
+            <th style="padding: 0.8rem; text-align: center;">Laba</th>
+            <th style="padding: 0.8rem; text-align: center;">Margin</th>
+          </tr>
+        </thead>
+        <tbody id="profitTableBody">
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 2rem; color: var(--muted);">Generate nota terlebih dahulu untuk melihat laporan</td>
+          </tr>
+        </tbody>
+       </table>
+    </div>
+  </div>
+</div>
   
 <!-- PREMIUM SECTION -->
 <section id="premium" class="premium-section">
@@ -808,6 +874,21 @@
     <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 0.8rem;">Format: nama produk|harga (satu produk per baris)</p>
     <textarea id="bulkImportData" rows="6" placeholder="Contoh:&#10;Batik Tulis|185000&#10;Kain Lurik|95000&#10;Tas Rotan|120000" style="width:100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 8px; font-family: monospace;"></textarea>
     <button onclick="processBulkImport()" style="margin-top: 1rem;">Import Produk</button>
+  </div>
+</div>
+
+  <!-- Modal Input Harga Beli Produk -->
+<div id="hppModal" class="modal">
+  <div class="modal-content">
+    <button class="close" onclick="closeHppModal()">✕</button>
+    <h3>💰 Atur Harga Beli (Modal)</h3>
+    <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem;">Harga beli digunakan untuk menghitung keuntungan (Laba/Rugi)</p>
+    
+    <div id="hppProductList" style="max-height: 400px; overflow-y: auto;">
+      <!-- Daftar produk akan muncul di sini -->
+    </div>
+    
+    <button onclick="saveAllHpp()" style="margin-top: 1rem;">💾 Simpan Semua Harga Beli</button>
   </div>
 </div>
 
