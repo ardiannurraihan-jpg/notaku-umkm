@@ -1097,10 +1097,10 @@ textarea {
 .prem-title span { -webkit-text-stroke: 1.5px rgba(250,248,243,0.25); color: transparent; }
 .prem-sub { font-size: 1rem; color: rgba(250,248,243,0.4); line-height: 1.7; }
 
-/* TEMPLATE SHOWCASE */
+/* TEMPLATE SHOWCASE - FIXED VERSION */
 .template-showcase {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
   max-width: 1200px;
   margin: 0 auto 5rem;
@@ -1109,37 +1109,135 @@ textarea {
 .ts-card {
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.07);
   transition: transform 0.3s, box-shadow 0.3s;
   position: relative;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
-.ts-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+.ts-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
 
 .ts-tag {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   letter-spacing: 0.05em;
-  color: rgba(250,248,243,0.5);
   padding: 0.8rem 1rem;
-  background: rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-weight: 600;
 }
-.new-tag { color: rgba(250,248,243,0.5); }
-.new-badge { background: var(--rust); color: #fff; font-size: 0.5rem; padding: 0.15rem 0.4rem; border-radius: 999px; }
+.new-tag { background: linear-gradient(135deg, #e8527a, #f08aaa); color: #fff; }
+.new-badge { background: #c0431a; color: #fff; font-size: 0.5rem; padding: 0.15rem 0.5rem; border-radius: 999px; margin-left: 0.5rem; }
 
 .ts-preview {
   padding: 1.2rem;
   font-family: var(--font-body);
+  font-size: 0.8rem;
+  min-height: 220px;
+}
+
+.ts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.6rem;
+}
+.ts-sname { font-weight: 700; font-size: 0.85rem; }
+.ts-badge { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.1em; padding: 0.2rem 0.5rem; border: 1px solid currentColor; border-radius: 4px; }
+
+.ts-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
   font-size: 0.75rem;
 }
-.ts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding-bottom: 0.6rem; }
-.ts-sname { font-weight: 700; font-size: 0.8rem; }
-.ts-badge { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.1em; padding: 0.15rem 0.4rem; border: 1px solid currentColor; border-radius: 2px; }
-.ts-item-row { display: flex; justify-content: space-between; padding: 0.25rem 0; opacity: 0.7; }
-.ts-total { display: flex; justify-content: space-between; font-weight: 700; margin-top: 0.5rem; padding-top: 0.5rem; font-size: 0.78rem; }
-.ts-stamp { display: inline-block; font-size: 0.6rem; font-weight: 700; border: 1.5px solid currentColor; padding: 0.15rem 0.5rem; border-radius: 3px; transform: rotate(-6deg); margin-top: 0.5rem; opacity: 0.85; }
+.ts-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  font-size: 0.8rem;
+}
+.ts-stamp {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border: 1.5px solid currentColor;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  transform: rotate(-4deg);
+  margin-top: 0.6rem;
+  opacity: 0.9;
+}
+
+/* LUXURY GOLD */
+.ts-luxury { background: linear-gradient(135deg, #2d2210, #1a1208); }
+.ts-luxury .ts-tag { background: #1a1208; color: var(--gold); border-bottom: 1px solid var(--gold); }
+.ts-luxury .ts-preview { background: #fffbf0; color: #1a1208; }
+.ts-luxury .ts-header { border-bottom: 1px solid var(--gold); }
+.ts-luxury .gold-grad { background: linear-gradient(135deg, #b8821e, #e8b84b); border-radius: 8px; padding: 0.5rem 0.8rem; margin-bottom: 0.8rem; }
+.ts-luxury .ts-sname { color: #1a1208; }
+.ts-luxury .ts-badge { color: #1a1208; border-color: #1a1208; }
+.ts-luxury .ts-item-row { color: #4a3a20; border-bottom: 1px dashed #e0d4bc; }
+.ts-luxury .gold-text { color: #b8821e; border-top: 1px solid var(--gold); }
+.ts-luxury .gold-stamp { color: #b8821e; border-color: #b8821e; background: rgba(184,130,30,0.1); }
+
+/* DARK EXECUTIVE */
+.ts-dark { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+.ts-dark .ts-tag { background: #0f0f1a; color: var(--gold); border-bottom: 1px solid #2a2a4a; }
+.ts-dark .ts-preview { background: #0a0a0a; color: #e0e0e0; }
+.ts-dark .dark-header { background: #0a0a0a; border-bottom: 1px solid var(--gold); padding: 0.5rem 0.8rem; margin-bottom: 0.8rem; border-radius: 8px; }
+.ts-dark .gold-text-sm { color: var(--gold); font-size: 0.75rem; letter-spacing: 2px; }
+.ts-dark .gold-badge { color: var(--gold); border-color: var(--gold); }
+.ts-dark .dark-row { color: #888; border-bottom: 1px solid #222; }
+.ts-dark .dark-total { color: var(--gold); border-top: 1px solid #333; }
+.ts-dark .dark-stamp { color: var(--gold); border-color: var(--gold); background: rgba(201,149,42,0.1); }
+
+/* NEON CYBER */
+.ts-neon { background: linear-gradient(135deg, #0a0e1c, #0d1428); }
+.ts-neon .ts-tag { background: #06080f; color: #00d4ff; border-bottom: 1px solid #00d4ff; }
+.ts-neon .ts-preview { background: #06080f; color: #c8e8ff; }
+.ts-neon .neon-header { background: rgba(0,212,255,0.08); border-bottom: 1px solid rgba(0,212,255,0.3); padding: 0.5rem 0.8rem; margin-bottom: 0.8rem; border-radius: 8px; }
+.ts-neon .neon-name { color: #00d4ff; letter-spacing: 2px; font-size: 0.7rem; text-shadow: 0 0 8px rgba(0,212,255,0.4); }
+.ts-neon .neon-badge { color: #7b2fff; border-color: #7b2fff; text-shadow: 0 0 6px rgba(123,47,255,0.4); }
+.ts-neon .neon-row { color: #6090b0; border-bottom: 1px solid rgba(0,212,255,0.1); }
+.ts-neon .neon-total { color: #00d4ff; border-top: 1px solid rgba(0,212,255,0.2); text-shadow: 0 0 4px rgba(0,212,255,0.3); }
+.ts-neon .neon-stamp { color: #00d4ff; border-color: #00d4ff; background: rgba(0,212,255,0.1); }
+
+/* SAKURA SOFT */
+.ts-sakura { background: linear-gradient(135deg, #3a1028, #1e0818); }
+.ts-sakura .ts-tag { background: #2a0a1a; color: #e8527a; border-bottom: 1px solid #e8527a; }
+.ts-sakura .ts-preview { background: linear-gradient(160deg, #fff0f6, #fff8fb); color: #4a2a3a; }
+.ts-sakura .sakura-header { background: linear-gradient(135deg, #e8527a, #f08aaa); border-radius: 12px; padding: 0.5rem 0.8rem; margin-bottom: 0.8rem; }
+.ts-sakura .sakura-name { color: #fff; font-style: italic; }
+.ts-sakura .sakura-badge { color: rgba(255,255,255,0.9); border-color: rgba(255,255,255,0.5); }
+.ts-sakura .sakura-row { color: #c06080; border-bottom: 1px solid #ffe0ec; }
+.ts-sakura .sakura-total { color: #e8527a; border-top: 1px solid #ffe0ec; }
+.ts-sakura .sakura-stamp { color: #e8527a; border-color: #e8527a; background: rgba(232,82,122,0.1); }
+
+/* ROYAL MARBLE */
+.ts-royal { background: linear-gradient(135deg, #1a0e30, #0e0820); }
+.ts-royal .ts-tag { background: #140a28; color: #8b6bc8; border-bottom: 1px solid #6b3fa0; }
+.ts-royal .ts-preview { background: linear-gradient(160deg, #f8f5ff, #f2eefc); color: #2a1a4a; }
+.ts-royal .royal-header { background: linear-gradient(135deg, #3a1f6e, #6b3fa0); border-radius: 12px; padding: 0.5rem 0.8rem; margin-bottom: 0.8rem; }
+.ts-royal .royal-name { color: #dcc8ff; }
+.ts-royal .royal-badge { color: rgba(220,200,255,0.8); border-color: rgba(220,200,255,0.5); }
+.ts-royal .royal-row { color: #6a50a0; border-bottom: 1px solid #e8d8ff; }
+.ts-royal .royal-total { color: #6b3fa0; border-top: 1px solid #e8d8ff; }
+.ts-royal .royal-stamp { color: #6b3fa0; border-color: #6b3fa0; background: rgba(107,63,160,0.1); }
+
+/* NATURE FRESH */
+.ts-nature { background: linear-gradient(135deg, #0e2018, #0a1a10); }
+.ts-nature .ts-tag { background: #0a1a10; color: #3a9a5b; border-bottom: 1px solid #2a7a4b; }
+.ts-nature .ts-preview { background: linear-gradient(160deg, #e8f5e8, #f0f8f0); color: #1a3a2a; }
+.ts-nature .nature-header { background: linear-gradient(135deg, #2a7a4b, #3a9a5b); border-radius: 12px; padding: 0.5rem 0.8rem; margin-bottom: 0.8rem; }
+.ts-nature .nature-name { color: #fff; }
+.ts-nature .nature-badge { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.5); }
+.ts-nature .nature-row { color: #4a7a60; border-bottom: 1px solid #c8e0c8; }
+.ts-nature .nature-total { color: #2a7a4b; border-top: 1px solid #c8e0c8; }
+.ts-nature .nature-stamp { color: #2a7a4b; border-color: #2a7a4b; background: rgba(42,122,75,0.1); }
 
 /* PRICING */
 .pricing-grid {
