@@ -536,6 +536,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadLastInvoice();
   checkPremiumStatus();
   loadStockData();
+  loadHppData();
 
   document.querySelectorAll('.template-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -566,6 +567,11 @@ window.addEventListener('DOMContentLoaded', () => {
       document.body.classList.add('dark-mode');
       toggleBtn.innerHTML = '☀️ Terang';
     }
+    // Update laporan laba/rugi
+if (typeof updateProfitReport === 'function') {
+  setTimeout(updateProfitReport, 100);
+}
+    
   }
 });
 
