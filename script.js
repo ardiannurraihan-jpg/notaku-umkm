@@ -980,4 +980,124 @@ function copyPaymentInfo() {
     .sp-del:hover { background: rgba(192,67,26,0.1); color: var(--rust); }
   `;
   document.head.appendChild(style);
+  // ============================================
+//   FITUR KIRIM NOTA KE WHATSAPP
+// ============================================
+
+async function sendToWhatsApp() {
+  const invoice = document.getElementById('invoicePreview');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
+  
+  // Cek apakah nota sudah digenerate
+  if (!invoice || invoice.style.display === 'none') {
+    showToast('⚠️ Generate nota terlebih dahulu!', 'warn');
+    return;
+  }
+  
+  // Ambil data dari nota
+  const storeName = document.getElementById('inv-storeName')?.textContent || 'Toko Kami';
+  const buyerName = document.getElementById('inv-buyerName')?.textContent || 'Pelanggan';
+  const total = document.getElementById('inv-total')?.textContent || 'Rp 0';
+  const invoiceNumber = document.getElementById('inv-number')?.textContent || '';
+  const buyerPhone = document.getElementById('buyerPhone')?.value || '';
+  
+  showToast('⏳ Menyiapkan gambar nota...', 'info');
+  
+  try {
+    // Simpan style asli untuk sementara
+    const originalWidth = invoice.style.width;
+    const originalMaxWidth = invoice.style.maxWidth;
+    const originalMargin = invoice.style.margin;
+    
+    // Set ukuran tetap untuk capture
+    invoice.style.width = '500px';
+    invoice.style.maxWidth = '500px';
+    invoice.style.margin = '0';
+    
+    await new Promise(r => setTimeout(r, 200));
+    
+    // Capture nota jadi gambar
+    const canvas = await html2canvas(invoice, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: 500
+    });
+    
+    // Kembalikan style asli
+    invoice.style.width = originalWidth;
+    invoice.style.maxWidth = originalMaxWidth;
+    invoice.style.margin = originalMargin;
+    
+    // Konversi ke file
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    const file = new File([blob], 'nota.png', { type: 'image/png' });
+    
+    // Ambil nomor HP pembeli
+    let phoneNumber = buyerPhone.replace(/\D/g, '');
+    
+    // Jika tidak ada nomor, minta input
+    if (!phoneNumber) {
+      phoneNumber = prompt('Masukkan nomor WhatsApp pelanggan:\nContoh: 628123456789', '');
+      if (!phoneNumber) {
+        showToast('❌ Kirim WA dibatalkan', 'warn');
+        return;
+      }
+      phoneNumber = phoneNumber.replace(/\D/g, '');
+    }
+    
+    // Format nomor (awalan 62, tanpa 0 di depan)
+    if (phoneNumber.startsWith('0')) {
+      phoneNumber = '62' + phoneNumber.substring(1);
+    }
+    if (!phoneNumber.startsWith('62')) {
+      phoneNumber = '62' + phoneNumber;
+    }
+    
+    // Buat pesan
+    const message = `*NOTA DARI ${storeName.toUpperCase()}*%0A%0A` +
+      `Kepada Yth. ${buyerName}%0A` +
+      `No. Nota: ${invoiceNumber}%0A` +
+      `Total: ${total}%0A%0A` +
+      `Terima kasih atas pembeliannya!%0A` +
+      `Nota ini dibuat dengan NotaKu.id%0A%0A` +
+      `_Nota digital, lampiran terlampir_`;
+    
+    // Cek apakah pakai HP atau desktop
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      // Di HP: pakai Web Share API
+      await navigator.share({
+        title: `Nota dari ${storeName}`,
+        text: `Halo ${buyerName}, berikut nota pembelian Anda. Total: ${total}`,
+        files: [file]
+      });
+      showToast('✅ Nota siap dibagikan ke WhatsApp!', 'success');
+    } else {
+      // Di Desktop: buka WhatsApp Web
+      const waUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+      window.open(waUrl, '_blank');
+      showToast('✅ Buka WhatsApp Web, kirim gambar nota manual', 'success');
+      
+      // Download gambar juga sebagai backup
+      const link = document.createElement('a');
+      link.download = `nota-${invoiceNumber.replace(/\//g, '-')}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+    
+    // Catat event ke Google Analytics
+    if (typeof gtag === 'function') {
+      gtag('event', 'send_whatsapp', {
+        event_category: 'engagement',
+        event_label: storeName
+      });
+    }
+    
+  } catch (err) {
+    console.error('WA Error:', err);
+    showToast('❌ Gagal kirim ke WA. Coba download PDF dulu.', 'error');
+  }
+}
 })();
