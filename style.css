@@ -784,6 +784,12 @@ textarea {
   cursor: pointer;
   transition: all 0.2s;
 }
+
+.export-btn {
+  background: #2a7a4b !important;
+  border-color: #2a7a4b !important;
+  color: white !important;
+}
 .action-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
 .action-btn.secondary {
   background: transparent;
