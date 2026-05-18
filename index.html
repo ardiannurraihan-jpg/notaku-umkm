@@ -321,15 +321,15 @@
           <div class="panel-step">02</div>
         </div>
         <div class="preview-actions" id="previewActions" style="display:none">
-  <button class="action-btn" onclick="downloadPDF()">PDF</button>
-  <button class="action-btn secondary" onclick="printInvoice()">Print</button>
-  <button class="action-btn whatsapp-btn" onclick="sendToWhatsApp()" style="background: #25D366; color: white; border: none;">
-    📱 WA ke Pelanggan
-  </button>
-  <button class="action-btn secondary" onclick="shareInvoice()" style="background: #128C7E; color: white; border: none;">
-    📤 Share
-  </button>
-</div>
+          <button class="action-btn" onclick="downloadPDF()">PDF</button>
+          <button class="action-btn secondary" onclick="printInvoice()">Print</button>
+          <button class="action-btn whatsapp-btn" onclick="sendToWhatsApp()" style="background: #25D366; color: white; border: none;">
+            📱 WA ke Pelanggan
+          </button>
+          <button class="action-btn secondary" onclick="shareInvoice()" style="background: #128C7E; color: white; border: none;">
+            📤 Share
+          </button>
+        </div>
       </div>
 
       <div class="preview-placeholder" id="previewPlaceholder">
@@ -522,7 +522,7 @@
     </div>
   </div>
 
-  <!-- PRICING -->
+  <!-- PRICING - DIPERBAIKI (nominal sesuai harga baru) -->
   <div class="pricing-grid">
     <div class="pricing-card">
       <div class="pc-badge">BULANAN</div>
@@ -533,7 +533,7 @@
         <li>✓ Prioritas Support</li>
         <li>✓ Update Template Gratis</li>
       </ul>
-      <button class="pc-btn" onclick="showPaymentInfo('bulanan', 29000)">Pilih Bulanan</button>
+      <button class="pc-btn" onclick="showPaymentInfo('bulanan', 10000)">Pilih Bulanan</button>
     </div>
 
     <div class="pricing-card">
@@ -546,11 +546,11 @@
         <li>✓ Prioritas Support</li>
         <li>✓ Update Template Gratis</li>
       </ul>
-      <button class="pc-btn" onclick="showPaymentInfo('3bulan', 69000)">Pilih 3 Bulan</button>
+      <button class="pc-btn" onclick="showPaymentInfo('3bulan', 25000)">Pilih 3 Bulan</button>
     </div>
 
     <div class="pricing-card pricing-featured">
-      <div class="pc-badge featured-badge">TERPOPULER • HEMAT 53%</div>
+      <div class="pc-badge featured-badge">TERPOPULER • HEMAT 83%</div>
       <div class="pc-price">Rp 60.000<span>/tahun</span></div>
       <div class="pc-per">≈ Rp 5.000/bulan</div>
       <ul class="pc-features">
@@ -560,7 +560,7 @@
         <li>✓ Update Template Gratis</li>
         <li>✓ Template Baru Eksklusif</li>
       </ul>
-      <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 199000)">Pilih Tahunan</button>
+      <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 60000)">Pilih Tahunan</button>
     </div>
   </div>
 
@@ -695,20 +695,20 @@
     <div class="premium-plans">
       <div class="plan">
         <h4>Bulanan</h4>
-        <p class="price">Rp 29.000</p>
-        <button onclick="showPaymentInfo('bulanan', 29000); closePremiumModal();">Pilih</button>
+        <p class="price">Rp 10.000</p>
+        <button onclick="showPaymentInfo('bulanan', 10000); closePremiumModal();">Pilih</button>
       </div>
       <div class="plan">
-        <div class="save-badge">Hemat 53%</div>
+        <div class="save-badge">Hemat 83%</div>
         <h4>Tahunan</h4>
-        <p class="price">Rp 199.000</p>
-        <button onclick="showPaymentInfo('tahunan', 199000); closePremiumModal();">Pilih</button>
+        <p class="price">Rp 60.000</p>
+        <button onclick="showPaymentInfo('tahunan', 60000); closePremiumModal();">Pilih</button>
       </div>
       <div class="plan">
-        <div class="save-badge">3 Bulan</div>
+        <div class="save-badge">Hemat 58%</div>
         <h4>3 BULAN</h4>
-        <p class="price">Rp 69.000</p>
-        <button onclick="showPaymentInfo('3bulan', 69000); closePremiumModal();">Pilih</button>
+        <p class="price">Rp 25.000</p>
+        <button onclick="showPaymentInfo('3bulan', 25000); closePremiumModal();">Pilih</button>
       </div>
     </div>
     <p class="premium-note">*BRI 3593 0100 9186 508 a.n. Ardian Nurraihan</p>
