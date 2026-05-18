@@ -22,6 +22,7 @@ function saveCurrentInvoice() {
     discount: document.getElementById('discount')?.value || '0',
     tax: document.getElementById('tax')?.value || '0',
     notes: document.getElementById('notes')?.value || '',
+    template: currentTemplate,
     items: []
   };
 
@@ -51,6 +52,7 @@ function loadLastInvoice() {
     document.getElementById('discount') && (document.getElementById('discount').value = data.discount);
     document.getElementById('tax') && (document.getElementById('tax').value = data.tax);
     document.getElementById('notes') && (document.getElementById('notes').value = data.notes);
+    if (data.template) switchTemplate(data.template);
 
     const itemsContainer = document.getElementById('itemsList');
     if (itemsContainer && data.items && data.items.length) {
@@ -339,7 +341,7 @@ function resetStats() {
 // ── EXPORT CSV ───────────────────────────────
 function exportStats() {
   if (transactionHistory.length === 0) {
-    showToast('⚠️ Belum ada数据 transaksi untuk diexport.', 'warn');
+    showToast('⚠️ Belum ada data transaksi untuk diexport.', 'warn');
     return;
   }
 
@@ -360,66 +362,7 @@ function exportStats() {
   showToast('✅ Data statistik sudah diexport ke CSV!', 'success');
 }
 
-// ── INIT ─────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  // Set tanggal & nomor nota otomatis
-  const today = new Date().toISOString().split('T')[0];
-  const dateEl = document.getElementById('invoiceDate');
-  if (dateEl) dateEl.value = today;
-
-  const num   = String(Math.floor(Math.random() * 9000) + 1000);
-  const month = String(new Date().getMonth() + 1).padStart(2, '0');
-  const year  = new Date().getFullYear();
-  const numEl = document.getElementById('invoiceNumber');
-  if (numEl) numEl.value = `INV/${year}/${month}/${num}`;
-
-  // Tambahkan 2 baris produk default
-  addItem();
-  addItem();
-
-  // Load data tersimpan
-  loadData();
-  loadLastInvoice();
-
-  // Cek status premium
-  checkPremiumStatus();
-
-  // Template selector — event delegation
-  document.querySelectorAll('.template-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tpl = btn.dataset.template;
-
-      // Cek apakah template premium & user tidak premium
-      if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(tpl)) {
-        if (!window.PremiumAPI.isPremium() || window.PremiumAPI.isExpired()) {
-          showToast('👑 Template ini eksklusif untuk member Premium. Upgrade sekarang!', 'warn');
-          // Scroll ke section premium
-          const premSec = document.getElementById('premium');
-          if (premSec) premSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          return;
-        }
-      }
-
-      switchTemplate(tpl);
-    });
-  });
-
-  // Dark Mode Toggle
-  const toggleBtn = document.getElementById('darkModeToggle');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      toggleBtn.innerHTML = isDark ? '☀️ Terang' : '🌙 Mode';
-      localStorage.setItem('notaku_dark_mode', isDark);
-    });
-    if (localStorage.getItem('notaku_dark_mode') === 'true') {
-      document.body.classList.add('dark-mode');
-      toggleBtn.innerHTML = '☀️ Terang';
-    }
-  }
-});
-
+// ── ADD ITEM ─────────────────────────────────
 function addItem(name = '', qty = 1, price = 0) {
   itemCount++;
   const id   = itemCount;
@@ -429,12 +372,12 @@ function addItem(name = '', qty = 1, price = 0) {
   const row = document.createElement('div');
   row.className = 'item-row';
   row.id = `item-${id}`;
-row.innerHTML = `
-  <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${escapeHtml(name)}" enterkeyhint="next" />
-  <input type="text"   placeholder="Qty"                class="item-qty"   inputmode="numeric" pattern="[0-9]*" value="${qty}" enterkeyhint="next" />
-  <input type="text"   placeholder="Harga (Rp)"         class="item-price" inputmode="numeric" pattern="[0-9]*" value="${price}" enterkeyhint="done" />
-  <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
-`;
+  row.innerHTML = `
+    <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${escapeHtml(name)}" />
+    <input type="number" placeholder="Qty"                class="item-qty"   min="1" value="${qty}" />
+    <input type="number" placeholder="Harga (Rp)"         class="item-price" min="0" value="${price}" />
+    <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
+  `;
   list.appendChild(row);
 }
 
@@ -646,7 +589,7 @@ function generateInvoice() {
     items.forEach(item => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${escapeHtml(item.name)}</td>
+        <tr>${escapeHtml(item.name)}</td>
         <td style="text-align:center">${item.qty}</td>
         <td>${formatRupiah(item.price)}</td>
         <td style="text-align:right;font-weight:600">${formatRupiah(item.subtotal)}</td>
@@ -790,7 +733,6 @@ function showPaymentInfo(paket, nominal) {
   paymentDiv.style.display = 'block';
   paymentDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-  // Optional: tampilkan toast konfirmasi
   showToast(`✅ Silakan transfer Rp ${nominal.toLocaleString('id-ID')}`, 'success');
 
   if (typeof gtag === 'function') {
@@ -823,6 +765,66 @@ function copyPaymentInfo() {
   }
 }
 
+// ── INIT ─────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Set tanggal & nomor nota otomatis
+  const today = new Date().toISOString().split('T')[0];
+  const dateEl = document.getElementById('invoiceDate');
+  if (dateEl) dateEl.value = today;
+
+  const num   = String(Math.floor(Math.random() * 9000) + 1000);
+  const month = String(new Date().getMonth() + 1).padStart(2, '0');
+  const year  = new Date().getFullYear();
+  const numEl = document.getElementById('invoiceNumber');
+  if (numEl) numEl.value = `INV/${year}/${month}/${num}`;
+
+  // Tambahkan 2 baris produk default
+  addItem();
+  addItem();
+
+  // Load data tersimpan
+  loadData();
+  loadLastInvoice();
+
+  // Cek status premium
+  checkPremiumStatus();
+
+  // Template selector — event delegation
+  document.querySelectorAll('.template-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tpl = btn.dataset.template;
+
+      // Cek apakah template premium & user tidak premium
+      if (window.PremiumAPI && window.PremiumAPI.isTemplatePremium(tpl)) {
+        if (!window.PremiumAPI.isPremium() || window.PremiumAPI.isExpired()) {
+          showToast('👑 Template ini eksklusif untuk member Premium. Upgrade sekarang!', 'warn');
+          // Scroll ke section premium
+          const premSec = document.getElementById('premium');
+          if (premSec) premSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+      }
+
+      switchTemplate(tpl);
+    });
+  });
+
+  // Dark Mode Toggle
+  const toggleBtn = document.getElementById('darkModeToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      toggleBtn.innerHTML = isDark ? '☀️ Terang' : '🌙 Mode';
+      localStorage.setItem('notaku_dark_mode', isDark);
+    });
+    if (localStorage.getItem('notaku_dark_mode') === 'true') {
+      document.body.classList.add('dark-mode');
+      toggleBtn.innerHTML = '☀️ Terang';
+    }
+  }
+});
+
 // ── STYLE TAMBAHAN ───────────────────────────
 (function injectDynamicStyles() {
   const style = document.createElement('style');
@@ -833,6 +835,16 @@ function copyPaymentInfo() {
       flex-direction: column;
       gap: 0.1rem;
       padding: 0.4rem 1.8rem 0.4rem 0.7rem;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .saved-product:hover {
+      background: var(--gold-pale);
+      transform: translateY(-1px);
+      border-color: var(--gold);
     }
     .sp-name  { font-size: 0.78rem; font-weight: 600; color: var(--ink); }
     .sp-price { font-family: var(--font-mono, monospace); font-size: 0.65rem; color: var(--muted); }
