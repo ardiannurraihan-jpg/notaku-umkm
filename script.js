@@ -767,6 +767,10 @@ function generateInvoice() {
   }
 
   saveTransaction(total);
+  // Update stok setelah membuat nota
+if (typeof updateStockAfterSale === 'function') {
+  updateStockAfterSale(items);
+}
   saveCurrentInvoice();
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -1100,4 +1104,212 @@ async function sendToWhatsApp() {
     console.error('WA Error:', err);
     showToast('❌ Gagal kirim ke WA. Coba download PDF dulu.', 'error');
   }
+}
+// ============================================
+//   FITUR MANAJEMEN STOK
+// ============================================
+
+let stockData = [];
+
+function loadStockData() {
+  const saved = localStorage.getItem('notaku_stock');
+  if (saved) {
+    try {
+      stockData = JSON.parse(saved);
+      updateStockDisplay();
+    } catch (e) {
+      stockData = [];
+    }
+  } else {
+    // Data contoh
+    stockData = [
+      { name: 'Batik Tulis Semarang', stock: 15, minStock: 5 },
+      { name: 'Kain Lurik Premium', stock: 8, minStock: 5 },
+      { name: 'Tas Anyaman Rotan', stock: 3, minStock: 5 },
+      { name: 'Kerajinan Kayu Ukir', stock: 12, minStock: 5 }
+    ];
+    saveStockData();
+  }
+  updateStockDisplay();
+}
+
+function saveStockData() {
+  localStorage.setItem('notaku_stock', JSON.stringify(stockData));
+  updateStockDisplay();
+}
+
+function updateStockDisplay() {
+  const tbody = document.getElementById('stockTableBody');
+  const totalProductsEl = document.getElementById('totalProducts');
+  const lowStockCountEl = document.getElementById('lowStockCount');
+  const safeStockCountEl = document.getElementById('safeStockCount');
+  
+  if (!tbody) return;
+  
+  if (stockData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--muted);">Belum ada data stok. Klik "Tambah Stok" untuk mulai.</td></tr>';
+    if (totalProductsEl) totalProductsEl.textContent = '0';
+    if (lowStockCountEl) lowStockCountEl.textContent = '0';
+    if (safeStockCountEl) safeStockCountEl.textContent = '0';
+    return;
+  }
+  
+  let lowStock = 0;
+  let safeStock = 0;
+  
+  tbody.innerHTML = stockData.map((item, index) => {
+    const isLow = item.stock <= item.minStock;
+    if (isLow) lowStock++;
+    else safeStock++;
+    
+    const status = isLow 
+      ? '<span style="background: #c0431a; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem;">⚠️ Stok Menipis</span>'
+      : '<span style="background: #2a7a4b; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem;">✅ Aman</span>';
+    
+    return `
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.8rem;">${escapeHtml(item.name)}</td>
+        <td style="padding: 0.8rem; text-align: center; font-weight: 600; ${isLow ? 'color: #c0431a;' : ''}">${item.stock}</td>
+        <td style="padding: 0.8rem; text-align: center;">${item.minStock}</td>
+        <td style="padding: 0.8rem; text-align: center;">${status}</td>
+        <td style="padding: 0.8rem; text-align: center;">
+          <button onclick="editStock(${index})" style="background: none; border: none; color: var(--gold); cursor: pointer; margin-right: 0.5rem;">✏️ Edit</button>
+          <button onclick="deleteStock(${index})" style="background: none; border: none; color: var(--rust); cursor: pointer;">🗑️</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  
+  if (totalProductsEl) totalProductsEl.textContent = stockData.length;
+  if (lowStockCountEl) lowStockCountEl.textContent = lowStock;
+  if (safeStockCountEl) safeStockCountEl.textContent = safeStock;
+}
+
+function showAddStockModal() {
+  // Isi dropdown dengan produk dari saved products
+  const select = document.getElementById('stockProductSelect');
+  if (select) {
+    const savedProducts = JSON.parse(localStorage.getItem('notaku_products') || '[]');
+    select.innerHTML = '<option value="">Pilih produk dari daftar favorit...</option>';
+    savedProducts.forEach(product => {
+      select.innerHTML += `<option value="${escapeHtml(product.name)}|${product.price}">${escapeHtml(product.name)}</option>`;
+    });
+  }
+  
+  document.getElementById('stockProductName').value = '';
+  document.getElementById('stockQuantity').value = '0';
+  document.getElementById('stockMin').value = '5';
+  document.getElementById('stockModalTitle').textContent = '📦 Tambah Stok Produk';
+  document.getElementById('stockModal').style.display = 'block';
+}
+
+function closeStockModal() {
+  document.getElementById('stockModal').style.display = 'none';
+}
+
+function editStock(index) {
+  const item = stockData[index];
+  document.getElementById('stockProductName').value = item.name;
+  document.getElementById('stockQuantity').value = item.stock;
+  document.getElementById('stockMin').value = item.minStock;
+  document.getElementById('stockModalTitle').textContent = '✏️ Edit Stok Produk';
+  document.getElementById('stockModal').dataset.editIndex = index;
+  document.getElementById('stockModal').style.display = 'block';
+}
+
+function deleteStock(index) {
+  if (confirm(`Hapus stok untuk "${stockData[index].name}"?`)) {
+    stockData.splice(index, 1);
+    saveStockData();
+    showToast(`✅ Stok dihapus!`, 'success');
+  }
+}
+
+function saveStock() {
+  const nameInput = document.getElementById('stockProductName').value.trim();
+  const select = document.getElementById('stockProductSelect');
+  const quantity = parseInt(document.getElementById('stockQuantity').value) || 0;
+  const minStock = parseInt(document.getElementById('stockMin').value) || 5;
+  const editIndex = document.getElementById('stockModal').dataset.editIndex;
+  
+  let productName = nameInput;
+  
+  // Jika pilih dari dropdown
+  if (select && select.value && !nameInput) {
+    const selectedValue = select.value;
+    productName = selectedValue.split('|')[0];
+  }
+  
+  if (!productName) {
+    showToast('⚠️ Masukkan nama produk!', 'warn');
+    return;
+  }
+  
+  if (editIndex !== undefined) {
+    // Edit existing
+    stockData[editIndex] = { name: productName, stock: quantity, minStock: minStock };
+    showToast(`✅ Stok "${productName}" diperbarui!`, 'success');
+    delete document.getElementById('stockModal').dataset.editIndex;
+  } else {
+    // Cek duplikat
+    const existing = stockData.find(s => s.name.toLowerCase() === productName.toLowerCase());
+    if (existing) {
+      showToast('⚠️ Produk sudah ada! Gunakan edit untuk mengubah.', 'warn');
+      return;
+    }
+    stockData.push({ name: productName, stock: quantity, minStock: minStock });
+    showToast(`✅ Stok "${productName}" ditambahkan!`, 'success');
+  }
+  
+  saveStockData();
+  closeStockModal();
+  
+  // Reset form
+  document.getElementById('stockProductName').value = '';
+  if (select) select.value = '';
+}
+
+function updateStockAfterSale(items) {
+  // Kurangi stok setelah membuat nota
+  let updated = false;
+  
+  items.forEach(item => {
+    const stockItem = stockData.find(s => s.name.toLowerCase() === item.name.toLowerCase());
+    if (stockItem) {
+      const newStock = stockItem.stock - item.qty;
+      stockItem.stock = Math.max(0, newStock);
+      updated = true;
+      
+      if (newStock <= stockItem.minStock) {
+        showToast(`⚠️ Stok "${item.name}" tersisa ${newStock} (min ${stockItem.minStock})!`, 'warn');
+      }
+    }
+  });
+  
+  if (updated) {
+    saveStockData();
+  }
+}
+
+function exportStockData() {
+  if (stockData.length === 0) {
+    showToast('⚠️ Belum ada data stok untuk diexport.', 'warn');
+    return;
+  }
+  
+  let csv = 'Produk,Stok,Min Stok,Status\n';
+  stockData.forEach(item => {
+    const status = item.stock <= item.minStock ? 'Menipis' : 'Aman';
+    csv += `"${item.name}",${item.stock},${item.minStock},${status}\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `notaku-stok-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showToast('✅ Data stok berhasil diexport!', 'success');
 }
