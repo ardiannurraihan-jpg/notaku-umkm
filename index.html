@@ -1,713 +1,1233 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="google-site-verification" content="NPWAmD-kQ5WiV9OONu_M0jhEtTyo45FPkeGdoX1q__U" />
- <meta name="description" content="Buat nota profesional gratis untuk UMKM Indonesia. Download PDF, pilih template eksklusif, simpan produk favorit, dan pantau penjualan. Tanpa ribet, langsung jadi!" />
-  <meta name="keywords" content="nota umkm, generator nota, buat nota online, nota gratis, invoice generator, nota penjualan" />
-  <meta name="author" content="NotaKu" />
-  <title>NotaKu — Generator Nota UMKM Profesional</title>
+/* ============================================
+   NOTAKU — REDESIGNED DESIGN SYSTEM v2.0
+   Fonts: Instrument Serif + DM Sans + JetBrains Mono
+   ============================================ */
 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BW47VZ45RG"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-BW47VZ45RG');
-  </script>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "NotaKu",
-    "description": "Generator nota gratis untuk UMKM Indonesia.",
-    "url": "https://notaku-umkm.vercel.app",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "All",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" },
-    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "ratingCount": "50" }
-  }
-  </script>
+:root {
+  /* Core Palette */
+  --ink:        #0c0a07;
+  --ink-2:      #1c1710;
+  --ink-3:      #2e2618;
+  --paper:      #faf7f2;
+  --cream:      #f0ead8;
+  --cream-2:    #e8dfc8;
+  --gold:       #c8911e;
+  --gold-light: #e0a83a;
+  --gold-pale:  #faefd8;
+  --gold-subtle:#f5e8c4;
+  --rust:       #b83a18;
+  --green:      #1e6e3a;
+  --muted:      #7a6e5c;
+  --muted-2:    #a0917e;
+  --border:     #e4d9c4;
+  --border-2:   #d4c8b0;
+  --shadow-sm:  rgba(12,10,7,0.06);
+  --shadow-md:  rgba(12,10,7,0.12);
+  --shadow-lg:  rgba(12,10,7,0.20);
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
 
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-</head>
-<body>
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-2xl: 36px;
+}
 
-<!-- CURSOR GLOW -->
-<div class="cursor-glow" id="cursorGlow"></div>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
 
-<!-- NOISE OVERLAY -->
-<div class="noise-overlay"></div>
+input, textarea, button, select { font-family: var(--font-body); font-size: 16px; }
 
-<!-- HERO -->
-<header class="hero">
-  <div class="hero-grid-lines"></div>
-  <div class="hero-radial"></div>
+body {
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
-  <nav class="navbar">
-    <div class="logo">
-      <span class="logo-n">N</span>ota<span class="logo-ku">Ku</span>
-      <span class="logo-dot">●</span>
-    </div>
-    <div class="nav-right">
-      <div class="nav-tag">
-        <span class="tag-dot"></span>
-        UMKM Indonesia 🇮🇩
-      </div>
-      <a href="#premium" class="nav-premium-btn">✦ Premium</a>
-      <button id="darkModeToggle" class="nav-premium-btn dark-toggle" style="background: transparent; border: 1px solid rgba(201,149,42,0.4);">🌙 Mode</button>
-    </div>
-  </nav>
+/* ─────────────────────────────────────
+   CURSOR GLOW
+───────────────────────────────────── */
+.cursor-glow {
+  position: fixed;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,145,30,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  transition: left 0.1s linear, top 0.1s linear;
+}
 
-  <div class="hero-body">
-    <div class="hero-content">
-      <div class="hero-eyebrow">
-        <span class="eyebrow-line"></span>
-        <span>Generator Nota #1 Indonesia</span>
-        <span class="eyebrow-pill">Gratis Selamanya</span>
-      </div>
-      <h1 class="hero-title">
-        Nota<br/>
-        <em>Profesional</em><br/>
-        <span class="title-accent">Dalam Detik</span>
-      </h1>
-      <p class="hero-sub">Simpan produk favorit, pilih template mewah,<br/>cetak massal & pantau penjualan — semua gratis.</p>
-      <div class="hero-ctas">
-        <a href="#app" class="cta-primary">
-          <span>Buat Nota Sekarang</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-        </a>
-        <a href="#premium" class="cta-ghost">Lihat Premium →</a>
-      </div>
-      <div class="hero-stats">
-        <div class="h-stat"><span class="h-stat-num">50+</span><span class="h-stat-lab">UMKM Aktif</span></div>
-        <div class="h-stat-div"></div>
-        <div class="h-stat"><span class="h-stat-num">8</span><span class="h-stat-lab">Template</span></div>
-        <div class="h-stat-div"></div>
-        <div class="h-stat"><span class="h-stat-num">100%</span><span class="h-stat-lab">Gratis</span></div>
-      </div>
-    </div>
+/* ─────────────────────────────────────
+   NOISE OVERLAY
+───────────────────────────────────── */
+.noise-overlay {
+  position: fixed; inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9998;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
 
-    <div class="hero-visual">
-      <div class="nota-mockup">
-        <div class="nota-mockup-header">
-          <div class="nm-store">
-            <div class="nm-name">Toko Berkah Jaya</div>
-            <div class="nm-sub">Jl. Pahlawan No. 12, Semarang</div>
-          </div>
-          <div class="nm-badge">NOTA</div>
-        </div>
-        <div class="nota-mockup-divider"></div>
-        <div class="nm-items">
-          <div class="nm-item"><span>Batik Tulis Semarang</span><span>Rp 185.000</span></div>
-          <div class="nm-item"><span>Kain Lurik Premium</span><span>Rp 95.000</span></div>
-          <div class="nm-item"><span>Tas Anyaman Rotan</span><span>Rp 120.000</span></div>
-        </div>
-        <div class="nota-mockup-divider"></div>
-        <div class="nm-total">
-          <span>TOTAL</span>
-          <span class="nm-total-val">Rp 400.000</span>
-        </div>
-        <div class="nm-stamp">LUNAS ✓</div>
-        <div class="nm-powered">NotaKu.id</div>
-      </div>
+/* ─────────────────────────────────────
+   SECTION LABEL
+───────────────────────────────────── */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 20px; height: 1px;
+  background: var(--gold);
+}
+.section-label.light { color: rgba(250,247,242,0.4); }
+.section-label.light::before { background: rgba(200,145,30,0.5); }
 
-      <div class="floating-badge fb1">
-        <span>⬇ PDF Ready</span>
-      </div>
-      <div class="floating-badge fb2">
-        <span>✓ Terkirim</span>
-      </div>
-      <div class="floating-badge fb3">
-        <span>📊 Statistik</span>
-      </div>
-    </div>
-  </div>
+/* ─────────────────────────────────────
+   HERO
+───────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  background: var(--ink);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  <!-- scroll indicator -->
-  <div class="scroll-ind">
-    <div class="scroll-line"></div>
-    <span>Scroll</span>
-  </div>
-</header>
+.hero-grid-lines {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(200,145,30,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,145,30,0.04) 1px, transparent 1px);
+  background-size: 72px 72px;
+  pointer-events: none;
+}
 
-<!-- FEATURES MARQUEE -->
-<div class="marquee-strip">
-  <div class="marquee-track">
-    <span>✦ Buat Nota Gratis</span>
-    <span>✦ Download PDF</span>
-    <span>✦ 8 Template Eksklusif</span>
-    <span>✦ Statistik Penjualan</span>
-    <span>✦ Simpan Produk Favorit</span>
-    <span>✦ Tanpa Daftar</span>
-    <span>✦ 100% Privasi</span>
-    <span>✦ Buat Nota Gratis</span>
-    <span>✦ Download PDF</span>
-    <span>✦ 8 Template Eksklusif</span>
-    <span>✦ Statistik Penjualan</span>
-    <span>✦ Simpan Produk Favorit</span>
-    <span>✦ Tanpa Daftar</span>
-    <span>✦ 100% Privasi</span>
-  </div>
-</div>
+.hero-radial {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 65% 55% at 72% 50%, rgba(60,35,8,0.95) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 40% at 5% 95%, rgba(200,145,30,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 25% 30% at 95% 5%, rgba(200,145,30,0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
 
-<!-- APP SECTION -->
-<main id="app" class="app-section">
-  <div class="section-label">/ Buat Nota</div>
+/* NAVBAR */
+.navbar {
+  position: relative; z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 5rem;
+  border-bottom: 1px solid rgba(200,145,30,0.08);
+}
 
-  <div class="app-container">
+.logo {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  color: var(--paper);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.05em;
+  text-decoration: none;
+}
+.logo-n  { color: var(--gold); }
+.logo-ku { color: var(--gold); }
+.logo-dot {
+  font-size: 0.4em;
+  color: var(--gold);
+  margin-left: 0.3em;
+  opacity: 0.7;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 0.7; } 50% { opacity: 0.2; } }
 
-    <!-- FORM PANEL -->
-    <div class="form-panel glass-panel">
-      <div class="panel-head">
-        <h2 class="panel-title">Isi Data Nota</h2>
-        <div class="panel-step">01</div>
-      </div>
+.nav-right { display: flex; align-items: center; gap: 0.8rem; }
 
-      <div class="form-group">
-        <label class="group-label">🏪 Info Toko / Usaha</label>
-        <div class="input-stack">
-          <div class="input-wrap">
-            <input type="text" id="storeName" placeholder="Nama Toko / Usaha Anda" />
-            <div class="input-line"></div>
-          </div>
-          <div class="input-wrap">
-            <input type="text" id="storeAddress" placeholder="Alamat (opsional)" />
-            <div class="input-line"></div>
-          </div>
-          <div class="input-wrap">
-            <input type="text" id="storePhone" placeholder="No. HP / WA (opsional)" />
-            <div class="input-line"></div>
-          </div>
-        </div>
-      </div>
+.nav-tag {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-mono); font-size: 0.65rem;
+  color: rgba(250,247,242,0.45);
+  border: 1px solid rgba(200,145,30,0.2);
+  padding: 0.38rem 0.9rem;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+}
+.tag-dot {
+  width: 5px; height: 5px;
+  background: var(--gold); border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
 
-      <div class="form-group">
-        <label class="group-label">👤 Info Pembeli</label>
-        <div class="input-stack">
-          <div class="input-wrap">
-            <input type="text" id="buyerName" placeholder="Nama Pembeli" />
-            <div class="input-line"></div>
-          </div>
-          <div class="input-wrap">
-            <input type="text" id="buyerPhone" placeholder="No. HP Pembeli (opsional)" />
-            <div class="input-line"></div>
-          </div>
-        </div>
-      </div>
+.nav-premium-btn {
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 600;
+  color: var(--ink); background: var(--gold);
+  padding: 0.42rem 1.1rem; border-radius: 999px;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+}
+.nav-premium-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+.dark-toggle {
+  background: transparent !important;
+  color: rgba(250,247,242,0.5) !important;
+  border: 1px solid rgba(200,145,30,0.25) !important;
+}
+.dark-toggle:hover { color: var(--gold) !important; background: rgba(200,145,30,0.08) !important; }
 
-      <div class="form-group">
-        <label class="group-label">📋 Detail Nota</label>
-        <div class="input-row">
-          <div class="input-wrap">
-            <input type="text" id="invoiceNumber" placeholder="No. Nota (otomatis)" />
-            <div class="input-line"></div>
-          </div>
-          <div class="input-wrap">
-            <input type="date" id="invoiceDate" />
-            <div class="input-line"></div>
-          </div>
-        </div>
-      </div>
+/* HERO BODY */
+.hero-body {
+  flex: 1;
+  display: flex; align-items: center;
+  padding: 4rem 5rem 5rem;
+  gap: 5rem;
+  position: relative; z-index: 5;
+}
+.hero-content { flex: 1; max-width: 540px; }
 
-      <!-- Template Selector -->
-      <div class="form-group">
-        <label class="group-label">🎨 Pilih Template</label>
-        <div class="template-selector">
-          <div class="template-group-label-ui">📋 GRATIS</div>
-          <div class="template-buttons">
-            <button class="template-btn active" data-template="classic">
-              <span class="tb-icon">◈</span> Classic
-            </button>
-            <button class="template-btn" data-template="modern">
-              <span class="tb-icon">◆</span> Modern
-            </button>
-            <button class="template-btn" data-template="minimal">
-              <span class="tb-icon">◻</span> Minimal
-            </button>
-          </div>
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 0.7rem;
+  margin-bottom: 2rem;
+  font-family: var(--font-mono); font-size: 0.65rem;
+  color: rgba(250,247,242,0.4);
+  letter-spacing: 0.12em;
+}
+.eyebrow-line { display: block; width: 28px; height: 1px; background: var(--gold); }
+.eyebrow-pill {
+  background: rgba(200,145,30,0.12);
+  border: 1px solid rgba(200,145,30,0.28);
+  color: var(--gold);
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
 
-          <div id="premiumTemplateGroup" style="display:none">
-            <div class="template-group-label-ui premium-label">👑 PREMIUM EXCLUSIVE</div>
-            <div class="template-buttons">
-              <button class="template-btn premium-template" data-template="premium-luxury">💎 Luxury Gold</button>
-              <button class="template-btn premium-template" data-template="premium-elegant">🦢 Elegant Silk</button>
-              <button class="template-btn premium-template" data-template="premium-dark">🌙 Dark Executive</button>
-              <button class="template-btn premium-template" data-template="premium-art">🎨 Art Deco</button>
-              <button class="template-btn premium-template" data-template="premium-nature">🍃 Nature Fresh</button>
-              <button class="template-btn premium-template" data-template="premium-neon">⚡ Neon Cyber</button>
-              <button class="template-btn premium-template" data-template="premium-sakura">🌸 Sakura Soft</button>
-              <button class="template-btn premium-template" data-template="premium-royal">👑 Royal Marble</button>
-            </div>
-          </div>
-        </div>
-        <div id="premiumTemplateNote" style="font-size:0.7rem;color:var(--gold);margin-top:0.5rem;display:none;">
-          ⭐ 8 template eksklusif aktif sebagai member Premium!
-        </div>
-      </div>
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3.8rem, 7.5vw, 6.2rem);
+  font-weight: 400;
+  color: var(--paper);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.6rem;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+.title-accent {
+  -webkit-text-stroke: 1.5px rgba(250,247,242,0.25);
+  color: transparent; display: block;
+}
 
-      <div class="form-group">
-        <label class="group-label">🛍 Daftar Produk</label>
-        <div id="itemsList"></div>
-        <button class="add-item-btn" onclick="addItem()">
-          <span>+</span> Tambah Produk
-        </button>
-      </div>
+.hero-sub {
+  font-size: 1rem; line-height: 1.75;
+  color: rgba(250,247,242,0.45);
+  margin-bottom: 2.5rem;
+}
 
-      <div class="form-group">
-        <label class="group-label">⭐ Produk Favorit</label>
-        <div id="savedProducts" class="saved-products"></div>
-        <button class="add-item-btn small" onclick="showSaveProductModal()">💾 Simpan Produk</button>
-      </div>
+.hero-ctas {
+  display: flex; align-items: center; gap: 1.2rem;
+  margin-bottom: 3rem;
+}
+.cta-primary {
+  display: inline-flex; align-items: center; gap: 0.7rem;
+  background: var(--gold); color: var(--ink);
+  font-weight: 700; font-size: 0.9rem;
+  padding: 0.95rem 1.8rem;
+  border-radius: var(--r-lg);
+  text-decoration: none;
+  transition: all 0.25s;
+  box-shadow: 0 6px 24px rgba(200,145,30,0.3), 0 0 0 1px rgba(200,145,30,0.5);
+  letter-spacing: 0.01em;
+}
+.cta-primary:hover {
+  background: var(--gold-light); transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(200,145,30,0.45), 0 0 0 1px rgba(200,145,30,0.6);
+}
+.cta-ghost {
+  font-size: 0.88rem; color: rgba(250,247,242,0.45);
+  text-decoration: none; transition: color 0.2s;
+  letter-spacing: 0.02em;
+}
+.cta-ghost:hover { color: var(--gold); }
 
-      <div class="form-group">
-        <label class="group-label">💰 Diskon & Catatan</label>
-        <div class="input-row">
-          <div class="input-wrap">
-            <input type="number" id="discount" placeholder="Diskon (Rp)" min="0" value="0" />
-            <div class="input-line"></div>
-          </div>
-          <div class="input-wrap">
-            <input type="number" id="tax" placeholder="Pajak (%)" min="0" max="100" value="0" />
-            <div class="input-line"></div>
-          </div>
-        </div>
-        <div class="input-wrap">
-          <textarea id="notes" placeholder="Catatan tambahan (terima kasih, syarat pengembalian, dll)"></textarea>
-          <div class="input-line"></div>
-        </div>
-      </div>
+.hero-stats { display: flex; align-items: center; gap: 1.8rem; }
+.h-stat { text-align: left; }
+.h-stat-num {
+  font-family: var(--font-display);
+  font-size: 1.7rem; font-weight: 400;
+  color: var(--paper); display: block; line-height: 1;
+}
+.h-stat-lab {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  color: rgba(250,247,242,0.3);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-top: 0.3rem; display: block;
+}
+.h-stat-div { width: 1px; height: 32px; background: rgba(250,247,242,0.08); }
 
-      <button class="generate-btn" onclick="generateInvoice()">
-        <span class="gen-icon">✦</span>
-        <span>Generate Nota</span>
-        <span class="gen-arrow">→</span>
-      </button>
-    </div>
+/* NOTA MOCKUP */
+.hero-visual {
+  flex: 1; position: relative;
+  max-width: 380px;
+  display: flex; align-items: center; justify-content: center;
+}
 
-    <!-- PREVIEW PANEL -->
-    <div class="preview-panel glass-panel">
-      <div class="preview-header">
-        <div class="panel-head">
-          <h2 class="panel-title">Preview Nota</h2>
-          <div class="panel-step">02</div>
-        </div>
-        <div class="preview-actions" id="previewActions" style="display:none">
-          <button class="action-btn" onclick="downloadPDF()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            PDF
-          </button>
-          <button class="action-btn secondary" onclick="printInvoice()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Print
-          </button>
-        </div>
-      </div>
+.nota-mockup {
+  background: #fff;
+  border-radius: var(--r-xl);
+  padding: 2.2rem;
+  width: 100%;
+  box-shadow:
+    0 50px 100px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(200,145,30,0.15),
+    0 0 0 8px rgba(200,145,30,0.04);
+  animation: float-mockup 5s ease-in-out infinite;
+  position: relative;
+}
+@keyframes float-mockup {
+  0%,100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(-14px) rotate(-1.5deg); }
+}
 
-      <div class="preview-placeholder" id="previewPlaceholder">
-        <div class="placeholder-art">
-          <div class="pa-ring pa-ring-1"></div>
-          <div class="pa-ring pa-ring-2"></div>
-          <div class="pa-ring pa-ring-3"></div>
-          <div class="pa-icon">🧾</div>
-        </div>
-        <p>Isi form & klik <strong>Generate Nota</strong></p>
-        <span class="ph-sub">Preview akan muncul di sini</span>
-      </div>
+.nota-mockup-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; }
+.nm-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
+.nm-sub { font-family: var(--font-mono); font-size: 0.58rem; color: var(--muted); margin-top: 0.25rem; line-height: 1.5; }
+.nm-badge {
+  font-family: var(--font-mono); font-size: 0.52rem;
+  letter-spacing: 0.18em; color: var(--gold);
+  border: 1px solid var(--gold); padding: 0.22rem 0.55rem;
+  border-radius: 3px; opacity: 0.85;
+}
+.nota-mockup-divider { height: 1px; background: linear-gradient(90deg, var(--gold), rgba(200,145,30,0.1)); margin: 0.9rem 0; }
+.nm-items { margin-bottom: 0.6rem; }
+.nm-item {
+  display: flex; justify-content: space-between;
+  font-size: 0.78rem; color: var(--ink);
+  padding: 0.4rem 0; border-bottom: 1px solid #f4f0ea;
+  font-family: var(--font-body);
+}
+.nm-total {
+  display: flex; justify-content: space-between;
+  font-family: var(--font-display); font-weight: 400;
+  font-size: 1rem; color: var(--ink); padding-top: 0.6rem;
+}
+.nm-total-val { color: var(--gold); }
+.nm-stamp {
+  font-family: var(--font-body); font-size: 0.75rem; font-weight: 700;
+  color: var(--green); border: 2px solid var(--green);
+  display: inline-block; padding: 0.25rem 0.9rem;
+  border-radius: 3px; transform: rotate(-7deg);
+  margin-top: 1rem; opacity: 0.8; letter-spacing: 0.05em;
+}
+.nm-powered {
+  font-family: var(--font-mono); font-size: 0.52rem;
+  color: #d0c8b8; text-align: center;
+  margin-top: 1rem; padding-top: 0.6rem;
+  border-top: 1px solid #f0eae0;
+}
 
-      <div id="invoicePreview" class="invoice-template template-classic" style="display:none">
-        <div class="inv-header">
-          <div class="inv-store">
-            <div class="inv-store-name" id="inv-storeName"></div>
-            <div class="inv-store-sub" id="inv-storeAddress"></div>
-            <div class="inv-store-sub" id="inv-storePhone"></div>
-          </div>
-          <div class="inv-meta">
-            <div class="inv-label">NOTA</div>
-            <div class="inv-num" id="inv-number"></div>
-            <div class="inv-date" id="inv-date"></div>
-          </div>
-        </div>
-        <div class="inv-divider"></div>
-        <div class="inv-buyer">
-          <div class="inv-buyer-label">Kepada Yth.</div>
-          <div class="inv-buyer-name" id="inv-buyerName"></div>
-          <div class="inv-buyer-sub" id="inv-buyerPhone"></div>
-        </div>
-        <table class="inv-table">
-          <thead>
-            <tr><th>Produk / Jasa</th><th>Qty</th><th>Harga</th><th>Subtotal</th></tr>
-          </thead>
-          <tbody id="inv-items"></tbody>
-        </table>
-        <div class="inv-summary">
-          <div class="inv-summary-row"><span>Subtotal</span><span id="inv-subtotal"></span></div>
-          <div class="inv-summary-row discount" id="inv-discountRow" style="display:none"><span>Diskon</span><span id="inv-discount"></span></div>
-          <div class="inv-summary-row tax" id="inv-taxRow" style="display:none"><span>Pajak</span><span id="inv-tax"></span></div>
-          <div class="inv-summary-row total"><span>TOTAL</span><span id="inv-total"></span></div>
-        </div>
-        <div class="inv-notes" id="inv-notesSection" style="display:none">
-          <div class="inv-notes-label">Catatan:</div>
-          <div id="inv-notes"></div>
-        </div>
-        <div class="inv-footer">
-          <div class="inv-footer-left">
-            <div>Hormat kami,</div>
-            <div class="inv-sig-space"></div>
-            <div id="inv-sigName"></div>
-          </div>
-          <div class="inv-footer-right">
-            <div class="inv-stamp" id="inv-stamp">LUNAS</div>
-          </div>
-        </div>
-        <div class="inv-watermark" id="watermark">NotaKu.id</div>
-        <div class="inv-powered">Dibuat dengan <strong>NotaKu.id</strong> — Generator Nota Gratis untuk UMKM Indonesia</div>
-      </div>
-    </div>
-  </div>
+.floating-badge {
+  position: absolute;
+  background: rgba(12,10,7,0.85); backdrop-filter: blur(12px);
+  border: 1px solid rgba(200,145,30,0.25);
+  color: var(--paper);
+  font-family: var(--font-mono); font-size: 0.65rem;
+  padding: 0.48rem 0.9rem; border-radius: 999px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.fb1 { top: -12px; right: 0; animation: float-b 3.5s ease-in-out infinite; }
+.fb2 { bottom: 24px; left: -14px; animation: float-b 3.5s ease-in-out infinite 1.2s; }
+.fb3 { top: 38%; right: -18px; animation: float-b 3.5s ease-in-out infinite 0.6s; }
+@keyframes float-b { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 
-  <!-- STATISTIK -->
-  <div class="stats-section">
-    <div class="section-label">/ Statistik</div>
-    <div class="glass-panel stats-container">
-      <div class="stats-header">
-        <h2 class="panel-title">Statistik Penjualan</h2>
-        <div style="display: flex; gap: 0.5rem;">
-          <button class="reset-stats-btn export-btn" onclick="exportStats()" style="background: #2a7a4b; border-color: #2a7a4b;">📊 Export CSV</button>
-          <button class="reset-stats-btn" onclick="resetStats()">Reset</button>
-        </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">📋</div>
-          <div class="stat-label">Total Transaksi</div>
-          <div class="stat-value" id="totalTransactions">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">💰</div>
-          <div class="stat-label">Total Pendapatan</div>
-          <div class="stat-value" id="totalRevenue">Rp 0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📈</div>
-          <div class="stat-label">Rata-rata Transaksi</div>
-          <div class="stat-value" id="avgTransaction">Rp 0</div>
-        </div>
-      </div>
-      <canvas id="revenueChart" style="max-height:280px;margin-top:1.5rem;"></canvas>
-    </div>
-  </div>
-</main>
+.scroll-ind {
+  position: relative; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+  padding-bottom: 2.5rem;
+  font-family: var(--font-mono); font-size: 0.58rem;
+  color: rgba(250,247,242,0.25); letter-spacing: 0.12em; text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, rgba(200,145,30,0.5), transparent);
+  animation: scroll-pulse 2.5s ease-in-out infinite;
+}
+@keyframes scroll-pulse { 0%,100% { opacity: 1; height: 40px; } 50% { opacity: 0.3; height: 24px; } }
 
-<!-- PREMIUM SECTION -->
-<section id="premium" class="premium-section">
-  <div class="premium-bg-art"></div>
-  <div class="section-label light">/ Premium</div>
+/* ─────────────────────────────────────
+   MARQUEE STRIP
+───────────────────────────────────── */
+.marquee-strip {
+  background: var(--gold);
+  overflow: hidden; padding: 0.65rem 0;
+  position: relative; z-index: 5;
+}
+.marquee-track {
+  display: flex; gap: 3rem;
+  animation: marquee 28s linear infinite; width: max-content;
+}
+.marquee-track span {
+  font-family: var(--font-mono); font-size: 0.68rem;
+  font-weight: 500; color: var(--ink-2);
+  white-space: nowrap; letter-spacing: 0.06em;
+}
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-  <div class="premium-hero">
-    <div class="prem-eyebrow">✦ Upgrade Pengalaman Anda</div>
-    <h2 class="prem-title">Template<br/><em>Eksklusif</em> untuk<br/>Nota yang <span>Memukau</span></h2>
-    <p class="prem-sub">Hapus watermark & dapatkan 8 template premium yang dirancang khusus untuk tampilan nota paling profesional se-Indonesia.</p>
-  </div>
+/* ─────────────────────────────────────
+   APP SECTION
+───────────────────────────────────── */
+.app-section { padding: 6rem 5rem 4rem; background: var(--paper); }
 
-  <!-- TEMPLATE SHOWCASE -->
-  <div class="template-showcase">
-    <div class="ts-card ts-luxury">
-      <div class="ts-tag">💎 Luxury Gold</div>
-      <div class="ts-preview">
-        <div class="ts-header gold-grad">
-          <div class="ts-sname">Toko Anda</div>
-          <div class="ts-badge">NOTA</div>
-        </div>
-        <div class="ts-item-row"><span>Produk A</span><span>Rp 500.000</span></div>
-        <div class="ts-item-row"><span>Produk B</span><span>Rp 200.000</span></div>
-        <div class="ts-total gold-text">TOTAL: Rp 700.000</div>
-        <div class="ts-stamp gold-stamp">LUNAS</div>
-      </div>
-    </div>
-    <div class="ts-card ts-dark">
-      <div class="ts-tag">🌙 Dark Executive</div>
-      <div class="ts-preview dark-bg">
-        <div class="ts-header dark-header">
-          <div class="ts-sname gold-text-sm">TOKO ANDA</div>
-          <div class="ts-badge gold-badge">NOTA</div>
-        </div>
-        <div class="ts-item-row dark-row"><span>Produk A</span><span>Rp 500.000</span></div>
-        <div class="ts-item-row dark-row"><span>Produk B</span><span>Rp 200.000</span></div>
-        <div class="ts-total dark-total">TOTAL: Rp 700.000</div>
-        <div class="ts-stamp dark-stamp">LUNAS</div>
-      </div>
-    </div>
-    <div class="ts-card ts-neon">
-      <div class="ts-tag new-tag">⚡ Neon Cyber <span class="new-badge">BARU</span></div>
-      <div class="ts-preview neon-bg">
-        <div class="ts-header neon-header">
-          <div class="ts-sname neon-name">TOKO ANDA</div>
-          <div class="ts-badge neon-badge">NOTA</div>
-        </div>
-        <div class="ts-item-row neon-row"><span>Produk A</span><span>Rp 500.000</span></div>
-        <div class="ts-item-row neon-row"><span>Produk B</span><span>Rp 200.000</span></div>
-        <div class="ts-total neon-total">TOTAL: Rp 700.000</div>
-        <div class="ts-stamp neon-stamp">LUNAS</div>
-      </div>
-    </div>
-    <div class="ts-card ts-sakura">
-      <div class="ts-tag new-tag">🌸 Sakura Soft <span class="new-badge">BARU</span></div>
-      <div class="ts-preview sakura-bg">
-        <div class="ts-header sakura-header">
-          <div class="ts-sname sakura-name">Toko Anda</div>
-          <div class="ts-badge sakura-badge">NOTA</div>
-        </div>
-        <div class="ts-item-row sakura-row"><span>Produk A</span><span>Rp 500.000</span></div>
-        <div class="ts-item-row sakura-row"><span>Produk B</span><span>Rp 200.000</span></div>
-        <div class="ts-total sakura-total">TOTAL: Rp 700.000</div>
-        <div class="ts-stamp sakura-stamp">LUNAS</div>
-      </div>
-    </div>
-    <div class="ts-card ts-royal">
-      <div class="ts-tag new-tag">👑 Royal Marble <span class="new-badge">BARU</span></div>
-      <div class="ts-preview royal-bg">
-        <div class="ts-header royal-header">
-          <div class="ts-sname royal-name">Toko Anda</div>
-          <div class="ts-badge royal-badge">NOTA</div>
-        </div>
-        <div class="ts-item-row royal-row"><span>Produk A</span><span>Rp 500.000</span></div>
-        <div class="ts-item-row royal-row"><span>Produk B</span><span>Rp 200.000</span></div>
-        <div class="ts-total royal-total">TOTAL: Rp 700.000</div>
-        <div class="ts-stamp royal-stamp">LUNAS</div>
-      </div>
-    </div>
-    <div class="ts-card ts-nature">
-      <div class="ts-tag">🍃 Nature Fresh</div>
-      <div class="ts-preview nature-bg">
-        <div class="ts-header nature-header">
-          <div class="ts-sname nature-name">Toko Anda</div>
-          <div class="ts-badge nature-badge">NOTA</div>
-        </div>
-        <div class="ts-item-row nature-row"><span>Produk A</span><span>Rp 500.000</span></div>
-        <div class="ts-item-row nature-row"><span>Produk B</span><span>Rp 200.000</span></div>
-        <div class="ts-total nature-total">TOTAL: Rp 700.000</div>
-        <div class="ts-stamp nature-stamp">LUNAS</div>
-      </div>
-    </div>
-  </div>
+.app-container {
+  max-width: 1240px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem; align-items: start;
+}
 
-  <!-- PRICING - HARGA BARU LEBIH TERJANGKAU -->
-  <div class="pricing-grid">
-    <div class="pricing-card">
-      <div class="pc-badge">BULANAN</div>
-      <div class="pc-price">Rp 29.000<span>/bulan</span></div>
-      <ul class="pc-features">
-        <li>✓ 8 Template Eksklusif</li>
-        <li>✓ Tanpa Watermark</li>
-        <li>✓ Prioritas Support</li>
-        <li>✓ Update Template Gratis</li>
-      </ul>
-      <button class="pc-btn" onclick="showPaymentInfo('bulanan', 29000)">Pilih Bulanan</button>
-    </div>
+/* PANELS */
+.glass-panel {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 2.5rem;
+  box-shadow: 0 2px 24px var(--shadow-sm), 0 1px 0 #fff inset;
+}
 
-    <div class="pricing-card">
-      <div class="pc-badge">3 BULAN</div>
-      <div class="pc-price">Rp 69.000<span>/3 bulan</span></div>
-      <div class="pc-per">≈ Rp 23.000/bulan</div>
-      <ul class="pc-features">
-        <li>✓ 8 Template Eksklusif</li>
-        <li>✓ Tanpa Watermark</li>
-        <li>✓ Prioritas Support</li>
-        <li>✓ Update Template Gratis</li>
-      </ul>
-      <button class="pc-btn" onclick="showPaymentInfo('3bulan', 69000)">Pilih 3 Bulan</button>
-    </div>
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2.2rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-family: var(--font-display); font-size: 1.35rem;
+  font-weight: 400; color: var(--ink); letter-spacing: -0.02em;
+}
+.panel-step {
+  font-family: var(--font-mono); font-size: 1.8rem;
+  font-weight: 300; color: rgba(12,10,7,0.06); line-height: 1;
+}
 
-    <div class="pricing-card pricing-featured">
-      <div class="pc-badge featured-badge">TERPOPULER • HEMAT 53%</div>
-      <div class="pc-price">Rp 199.000<span>/tahun</span></div>
-      <div class="pc-per">≈ Rp 16.583/bulan</div>
-      <ul class="pc-features">
-        <li>✓ 8 Template Eksklusif</li>
-        <li>✓ Tanpa Watermark</li>
-        <li>✓ Prioritas Support</li>
-        <li>✓ Update Template Gratis</li>
-        <li>✓ Template Baru Eksklusif</li>
-      </ul>
-      <button class="pc-btn pc-btn-gold" onclick="showPaymentInfo('tahunan', 199000)">Pilih Tahunan</button>
-    </div>
-  </div>
+/* ─────────────────────────────────────
+   FORM
+───────────────────────────────────── */
+.form-group { margin-bottom: 2rem; }
 
-  <div id="paymentInfo" class="payment-info" style="display:none;">
-    <h4>💳 Transfer ke Rekening Berikut:</h4>
-    <p class="bank-account">BRI: 3593 0100 9186 508</p>
-    <p>a.n. <strong>Ardian Nurraihan</strong></p>
-    <p>Nominal: <strong id="paymentAmount">Rp 0</strong></p>
-    <p class="wa-confirm">📱 Kirim bukti ke WhatsApp:
-      <a href="https://wa.me/6282134858510?text=Halo%20Admin%2C%20saya%20sudah%20transfer%20untuk%20premium%20NotaKu">0821-3485-8510</a>
-    </p>
-    <button class="copy-btn" onclick="copyPaymentInfo()">📋 Copy No Rekening</button>
-  </div>
+.group-label {
+  display: block; font-family: var(--font-mono);
+  font-size: 0.62rem; letter-spacing: 0.14em;
+  color: var(--muted); text-transform: uppercase; margin-bottom: 1rem;
+}
 
-  <div class="premium-activation">
-    <h4>🔑 Punya kode premium?</h4>
-    <div class="activation-input">
-      <input type="text" id="premiumKey" placeholder="Masukkan kode premium…">
-      <button onclick="activatePremium()">Aktivasi</button>
-    </div>
-    <div id="premiumStatus" class="premium-status"></div>
-  </div>
+.input-stack { display: flex; flex-direction: column; gap: 0.9rem; }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
 
-  <div class="guarantee-row">
-    <div class="guarantee-box">
-      <div class="guarantee-icon">💰</div>
-      <div class="guarantee-text">
-        <strong>100% Garansi Uang Kembali</strong><br/>
-        Kode tidak dikirim dalam 24 jam? Uang kembali penuh.
-      </div>
-    </div>
-    <div class="guarantee-box">
-      <div class="guarantee-icon">⚡</div>
-      <div class="guarantee-text">
-        <strong>Aktivasi Cepat</strong><br/>
-        Biasanya kode dikirim dalam &lt;1 jam setelah transfer.
-      </div>
-    </div>
-    <div class="guarantee-box">
-      <div class="guarantee-icon">🔒</div>
-      <div class="guarantee-text">
-        <strong>Transaksi Aman</strong><br/>
-        Rekening BRI terverifikasi atas nama Ardian Nurraihan.
-      </div>
-    </div>
-  </div>
-</section>
+.input-wrap { position: relative; }
 
-<!-- TRUST SECTION -->
-<section class="trust-section">
-  <div class="section-label">/ Kepercayaan</div>
-  <h2 class="trust-title">Kenapa 50+ UMKM<br/>Percaya NotaKu?</h2>
-  <div class="trust-grid">
-    <div class="trust-card">
-      <div class="trust-number">01</div>
-      <div class="trust-icon">✅</div>
-      <h4>50+ UMKM Aktif</h4>
-      <p>Pelaku usaha dari Semarang, Jakarta, Surabaya, hingga Medan sudah menggunakan NotaKu.</p>
-    </div>
-    <div class="trust-card">
-      <div class="trust-number">02</div>
-      <div class="trust-icon">⚡</div>
-      <h4>Respon Admin Cepat</h4>
-      <p>Kode premium dikirim dalam 1x24 jam — biasanya kurang dari 1 jam setelah transfer.</p>
-    </div>
-    <div class="trust-card">
-      <div class="trust-number">03</div>
-      <div class="trust-icon">🔒</div>
-      <h4>Privasi Terjaga</h4>
-      <p>Tidak ada data yang disimpan ke server. Semua tersimpan lokal di perangkat Anda.</p>
-    </div>
-    <div class="trust-card">
-      <div class="trust-number">04</div>
-      <div class="trust-icon">🏦</div>
-      <h4>Rekening Terverifikasi</h4>
-      <p>BRI 3593 0100 9186 508 atas nama Ardian Nurraihan — terdaftar dan dapat dicek.</p>
-    </div>
-  </div>
-</section>
+input:not([type=range]):not([type=date]), textarea {
+  width: 100%; padding: 0.72rem 0;
+  border: none; border-bottom: 1.5px solid var(--border);
+  border-radius: 0;
+  font-family: var(--font-body); font-size: 0.9rem;
+  color: var(--ink); background: transparent;
+  transition: border-color 0.25s; outline: none;
+}
+input[type=date] {
+  width: 100%; padding: 0.72rem 0;
+  border: none; border-bottom: 1.5px solid var(--border);
+  font-family: var(--font-mono); font-size: 0.85rem;
+  color: var(--ink); background: transparent;
+  outline: none; cursor: pointer;
+}
+input::placeholder, textarea::placeholder { color: var(--muted-2); }
+.input-line {
+  position: absolute; bottom: 0; left: 0; width: 0; height: 1.5px;
+  background: var(--gold); transition: width 0.3s ease;
+}
+.input-wrap:focus-within .input-line { width: 100%; }
+.input-wrap:focus-within input,
+.input-wrap:focus-within textarea { border-bottom-color: transparent; }
 
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div class="footer-logo">Nota<span>Ku</span><span class="footer-dot">●</span></div>
-      <p>Gratis untuk semua UMKM Indonesia 🇮🇩</p>
-    </div>
-    <div class="footer-mid">
-      <div class="footer-links">
-        <a href="/privacy.html">Kebijakan Privasi</a>
-        <a href="/terms.html">Syarat & Ketentuan</a>
-        <a href="/check-premium.html">Cek Status Premium</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2025 NotaKu</span>
-      <span class="fb-dot">·</span>
-      <span>Tidak ada data disimpan</span>
-      <span class="fb-dot">·</span>
-      <span>100% Privasi</span>
-    </div>
-  </div>
-</footer>
+textarea { resize: vertical; min-height: 75px; padding-top: 0.72rem; line-height: 1.6; }
 
-<!-- MODALS -->
-<div id="saveProductModal" class="modal">
-  <div class="modal-content">
-    <button class="close" onclick="closeSaveProductModal()">✕</button>
-    <h3>💾 Simpan Produk</h3>
-    <div class="input-wrap">
-      <input type="text" id="saveProductName" placeholder="Nama Produk" />
-      <div class="input-line"></div>
-    </div>
-    <div class="input-wrap">
-      <input type="number" id="saveProductPrice" placeholder="Harga (Rp)" />
-      <div class="input-line"></div>
-    </div>
-    <button onclick="saveProduct()">Simpan Produk</button>
-  </div>
-</div>
+/* ITEM ROWS */
+.item-row {
+  display: grid;
+  grid-template-columns: 2.2fr 0.7fr 1.1fr auto;
+  gap: 0.5rem; margin-bottom: 0.5rem;
+  align-items: center;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.75rem 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.item-row:hover { border-color: var(--border-2); box-shadow: 0 2px 8px var(--shadow-sm); }
+.item-row input { border-bottom: none !important; padding: 0 !important; font-size: 0.87rem; }
+.item-row .input-line { display: none; }
 
-<div id="premiumModal" class="modal">
-  <div class="modal-content">
-    <button class="close" onclick="closePremiumModal()">✕</button>
-    <h3>✨ Upgrade ke Premium</h3>
-    <ul class="modal-features">
-      <li>✓ Hapus watermark "NotaKu.id"</li>
-      <li>✓ 8 template eksklusif mewah</li>
-      <li>✓ Tampilan nota lebih profesional</li>
-      <li>✓ Prioritas support</li>
-    </ul>
-    <div class="premium-plans">
-      <div class="plan">
-        <h4>Bulanan</h4>
-        <p class="price">Rp 29.000</p>
-        <button onclick="showPaymentInfo('bulanan', 29000); closePremiumModal();">Pilih</button>
-      </div>
-      <div class="plan">
-        <div class="save-badge">Hemat 53%</div>
-        <h4>Tahunan</h4>
-        <p class="price">Rp 199.000</p>
-        <button onclick="showPaymentInfo('tahunan', 199000); closePremiumModal();">Pilih</button>
-      </div>
-      <div class="plan">
-        <div class="save-badge">3 Bulan</div>
-        <h4>3 BULAN</h4>
-        <p class="price">Rp 69.000</p>
-        <button onclick="showPaymentInfo('3bulan', 69000); closePremiumModal();">Pilih</button>
-      </div>
-    </div>
-    <p class="premium-note">*BRI 3593 0100 9186 508 a.n. Ardian Nurraihan</p>
-  </div>
-</div>
+.remove-btn {
+  background: none; border: none;
+  color: rgba(184,58,24,0.4); font-size: 0.8rem;
+  cursor: pointer; padding: 0.35rem 0.5rem;
+  border-radius: var(--r-sm);
+  transition: all 0.2s; line-height: 1;
+}
+.remove-btn:hover { color: var(--rust); background: rgba(184,58,24,0.08); }
 
-<!-- Cursor glow script -->
-<script>
-  const glow = document.getElementById('cursorGlow');
-  document.addEventListener('mousemove', e => {
-    glow.style.left = e.clientX + 'px';
-    glow.style.top = e.clientY + 'px';
-  });
-</script>
+.add-item-btn {
+  width: 100%; padding: 0.72rem;
+  border: 1.5px dashed rgba(200,145,30,0.35);
+  background: rgba(200,145,30,0.03);
+  color: var(--gold); font-family: var(--font-body);
+  font-size: 0.83rem; font-weight: 600;
+  border-radius: var(--r-md);
+  cursor: pointer; transition: all 0.2s; margin-top: 0.4rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+}
+.add-item-btn:hover { background: rgba(200,145,30,0.08); border-color: var(--gold); transform: translateY(-1px); }
+.add-item-btn.small { font-size: 0.75rem; padding: 0.55rem; }
 
-<script src="premium.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+/* TEMPLATE SELECTOR */
+.template-selector { margin-bottom: 0.5rem; }
+.template-group-label-ui {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.12em; color: var(--muted); margin-bottom: 0.7rem;
+  text-transform: uppercase;
+}
+.premium-label { color: var(--gold); margin-top: 0.9rem; }
+
+.template-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.template-btn {
+  flex: 1; min-width: 80px;
+  padding: 0.55rem 0.8rem;
+  background: var(--paper); border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--font-body); font-size: 0.77rem;
+  font-weight: 500; cursor: pointer;
+  transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+  color: var(--ink);
+}
+.template-btn .tb-icon { font-size: 0.68rem; color: var(--muted); }
+.template-btn.active {
+  background: var(--gold); border-color: var(--gold);
+  color: var(--ink); font-weight: 700;
+  box-shadow: 0 2px 10px rgba(200,145,30,0.25);
+}
+.template-btn:hover:not(.active) { border-color: var(--gold); background: var(--gold-subtle); }
+
+.premium-template {
+  background: linear-gradient(135deg, #181208, #2c1e08);
+  color: rgba(232,168,58,0.9); border: 1px solid rgba(200,145,30,0.35);
+  font-weight: 500;
+}
+.premium-template.active { background: var(--gold); color: var(--ink); }
+.premium-template:hover:not(.active) {
+  background: linear-gradient(135deg, #2c1e08, #3c2c0c);
+  border-color: var(--gold); transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(200,145,30,0.2);
+}
+
+/* SAVED PRODUCTS */
+.saved-products {
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  margin-bottom: 0.5rem; max-height: 130px; overflow-y: auto;
+}
+.saved-product {
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 0.35rem 0.85rem;
+  font-size: 0.77rem; cursor: pointer; transition: all 0.15s;
+}
+.saved-product:hover { background: var(--gold-subtle); border-color: rgba(200,145,30,0.4); transform: translateY(-1px); }
+
+/* GENERATE BTN */
+.generate-btn {
+  width: 100%; padding: 1.1rem 1.5rem;
+  background: var(--ink); color: var(--gold);
+  font-family: var(--font-body); font-size: 0.92rem; font-weight: 700;
+  border: none; border-radius: var(--r-lg);
+  cursor: pointer; letter-spacing: 0.04em;
+  transition: all 0.25s;
+  display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+  margin-top: 0.5rem; position: relative; overflow: hidden;
+}
+.generate-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(200,145,30,0.08), transparent);
+  transform: translateX(-100%); transition: transform 0.5s;
+}
+.generate-btn:hover::after { transform: translateX(100%); }
+.generate-btn:hover { background: var(--ink-2); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(12,10,7,0.25); }
+.generate-btn:active { transform: translateY(0); }
+.gen-icon { color: var(--gold); font-size: 0.9rem; }
+.gen-arrow { margin-left: auto; opacity: 0.4; }
+
+/* ─────────────────────────────────────
+   PREVIEW PANEL
+───────────────────────────────────── */
+.preview-header { margin-bottom: 1.5rem; }
+.preview-actions { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
+
+.action-btn {
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.55rem 1.2rem;
+  background: var(--gold); color: var(--ink);
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 700;
+  border: none; border-radius: var(--r-md);
+  cursor: pointer; transition: all 0.2s;
+}
+.action-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+.action-btn.secondary {
+  background: transparent; border: 1.5px solid var(--border);
+  color: var(--muted);
+}
+.action-btn.secondary:hover { background: var(--cream); color: var(--ink); border-color: var(--border-2); }
+.export-btn { background: var(--green) !important; color: #fff !important; border: none !important; }
+.export-btn:hover { background: #156030 !important; }
+
+/* PLACEHOLDER */
+.preview-placeholder { text-align: center; padding: 5rem 2rem; color: var(--muted); }
+.placeholder-art {
+  position: relative; width: 72px; height: 72px;
+  margin: 0 auto 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.pa-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(200,145,30,0.18);
+  animation: ring-pulse 3.5s ease-in-out infinite;
+}
+.pa-ring-1 { width: 72px; height: 72px; }
+.pa-ring-2 { width: 54px; height: 54px; animation-delay: 0.4s; }
+.pa-ring-3 { width: 36px; height: 36px; animation-delay: 0.8s; }
+@keyframes ring-pulse { 0%,100% { opacity: 0.15; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.06); } }
+.pa-icon { font-size: 1.6rem; position: relative; z-index: 1; }
+.preview-placeholder p { font-size: 0.88rem; line-height: 1.6; color: var(--muted); }
+.ph-sub {
+  display: block; font-family: var(--font-mono); font-size: 0.62rem;
+  color: rgba(122,110,92,0.45); margin-top: 0.4rem; letter-spacing: 0.06em;
+}
+
+/* ─────────────────────────────────────
+   INVOICE TEMPLATES
+───────────────────────────────────── */
+.invoice-template {
+  background: #fff; border: 1px solid #e0d8c8;
+  border-radius: 4px; padding: 2rem;
+  font-family: var(--font-body); color: var(--ink);
+  width: 100%; overflow-x: hidden;
+}
+
+.inv-table { table-layout: fixed; width: 100%; }
+.inv-table th:nth-child(1), .inv-table td:nth-child(1) { width: 40%; }
+.inv-table th:nth-child(2), .inv-table td:nth-child(2) { width: 15%; text-align: center; }
+.inv-table th:nth-child(3), .inv-table td:nth-child(3) { width: 20%; }
+.inv-table th:nth-child(4), .inv-table td:nth-child(4) { width: 25%; text-align: right; }
+
+.inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; }
+.inv-store-name { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; color: var(--ink); letter-spacing: -0.02em; }
+.inv-store-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; font-family: var(--font-mono); }
+.inv-meta { text-align: right; }
+.inv-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+.inv-num  { font-family: var(--font-display); font-size: 1.1rem; font-weight: 400; color: var(--gold); }
+.inv-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
+.inv-divider { height: 1.5px; background: linear-gradient(90deg, var(--gold), rgba(200,145,30,0.1)); margin: 1rem 0; border-radius: 999px; }
+.inv-buyer { margin-bottom: 1.2rem; }
+.inv-buyer-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
+.inv-buyer-name { font-family: var(--font-display); font-size: 1rem; font-weight: 400; margin-top: 0.2rem; }
+.inv-buyer-sub  { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+
+.inv-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-bottom: 1rem; }
+.inv-table th { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); padding: 0.5rem 0.4rem; text-align: left; }
+.inv-table th:last-child, .inv-table td:last-child { text-align: right; }
+.inv-table th:nth-child(2), .inv-table td:nth-child(2) { text-align: center; }
+.inv-table td { padding: 0.58rem 0.4rem; border-bottom: 1px solid #f2ebe0; vertical-align: top; }
+.inv-table tr:last-child td { border-bottom: none; }
+
+.inv-summary { border-top: 1px solid var(--border); padding-top: 0.8rem; margin-bottom: 1rem; }
+.inv-summary-row { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.78rem; padding: 0.28rem 0; color: var(--muted); }
+.inv-summary-row.discount { color: var(--rust); }
+.inv-summary-row.total { font-family: var(--font-display); font-size: 1.1rem; font-weight: 400; color: var(--ink); border-top: 1.5px solid var(--ink); margin-top: 0.3rem; padding-top: 0.5rem; }
+
+.inv-notes { background: var(--cream); border-left: 2px solid var(--gold); padding: 0.8rem 1rem; border-radius: 0 3px 3px 0; font-size: 0.78rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6; }
+.inv-notes-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.3rem; }
+
+.inv-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border); font-size: 0.78rem; color: var(--muted); }
+.inv-sig-space { height: 40px; border-bottom: 1px solid var(--border); width: 100px; margin: 0.8rem 0 0.4rem; }
+.inv-stamp { font-family: var(--font-body); font-size: 1.1rem; font-weight: 800; color: var(--green); border: 2.5px solid var(--green); padding: 0.35rem 0.9rem; border-radius: 3px; transform: rotate(-8deg); opacity: 0.8; letter-spacing: 0.12em; }
+
+.inv-watermark { text-align: center; font-family: var(--font-mono); font-size: 0.58rem; color: #ddd5c5; margin-top: 1rem; }
+.inv-powered { text-align: center; font-family: var(--font-mono); font-size: 0.58rem; color: #c8c0a8; margin-top: 0.5rem; padding-top: 0.8rem; border-top: 1px solid #f2ebe0; }
+
+/* TEMPLATES */
+.template-modern .inv-header { background: linear-gradient(135deg, var(--ink), #2a1c08); color: var(--paper); padding: 1rem; margin: -2rem -2rem 1rem -2rem; border-radius: 0 0 8px 8px; }
+.template-modern .inv-store-name { color: var(--gold); }
+.template-modern .inv-divider { background: var(--gold); height: 2.5px; }
+
+.template-minimal .inv-header { background: linear-gradient(135deg, var(--ink), #2a1c08); color: var(--paper); padding: 1rem; margin: -2rem -2rem 1rem -2rem; border-radius: 0 0 8px 8px; }
+.template-minimal .inv-store-name { color: var(--gold); }
+.template-minimal .inv-table th { border-bottom: 1px solid var(--ink); color: var(--ink); }
+
+/* ─────────────────────────────────────
+   PREMIUM INVOICE TEMPLATES
+───────────────────────────────────── */
+.template-premium-luxury { background: linear-gradient(160deg, #fffcf2, #fff); border: 2px solid var(--gold); box-shadow: 0 8px 40px rgba(200,145,30,0.1); }
+.template-premium-luxury .inv-header { background: linear-gradient(135deg, #b07818, #e0a83a, #b07818); color: #1a1208; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 0 0 14px 14px; position: relative; }
+.template-premium-luxury .inv-header::after { content: "✦ ✦ ✦"; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); background: #fffcf2; padding: 0 1rem; font-size: 0.65rem; color: var(--gold); letter-spacing: 6px; }
+.template-premium-luxury .inv-store-name { font-size: 1.5rem; }
+.template-premium-luxury .inv-divider { background: repeating-linear-gradient(90deg, var(--gold), var(--gold) 10px, var(--gold-pale) 10px, var(--gold-pale) 20px); height: 2px; }
+.template-premium-luxury .inv-table th { background: var(--gold-subtle); color: var(--gold); font-weight: 700; padding: 0.5rem; }
+.template-premium-luxury .inv-summary-row.total { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--ink); padding: 0.5rem 0.8rem; border-radius: 8px; }
+
+.template-premium-elegant { background: linear-gradient(160deg, #f9f6f0, #fff); border: 1px solid #d4c5b0; }
+.template-premium-elegant .inv-header { background: linear-gradient(135deg, #5c4b3a, #3d2a1a); color: #e8d5b5; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 0 0 22px 22px; border-bottom: 2.5px solid var(--gold); }
+.template-premium-elegant .inv-store-name { color: #e8d5b5; font-style: italic; }
+.template-premium-elegant .inv-table { border-collapse: separate; border-spacing: 0 4px; }
+.template-premium-elegant .inv-table th { background: #e8d5b5; color: #3d2a1a; padding: 0.7rem 0.5rem; border-radius: 4px; border: none; }
+.template-premium-elegant .inv-table td { background: #fefcf8; border-radius: 4px; border: none; }
+.template-premium-elegant .inv-stamp { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border: none; transform: rotate(-5deg); }
+
+.template-premium-dark { background: #111; border: 1px solid var(--gold); color: #e0e0e0; }
+.template-premium-dark .inv-header { background: #0a0a0a; border-bottom: 2px solid var(--gold); padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; }
+.template-premium-dark .inv-store-name { color: var(--gold); text-transform: uppercase; letter-spacing: 3px; font-size: 1.15rem; }
+.template-premium-dark .inv-store-sub { color: #555; }
+.template-premium-dark .inv-label { color: var(--gold); }
+.template-premium-dark .inv-num { color: var(--gold-light); }
+.template-premium-dark .inv-date { color: #666; }
+.template-premium-dark .inv-divider { background: var(--gold); box-shadow: 0 0 6px rgba(200,145,30,0.3); }
+.template-premium-dark .inv-buyer-name { color: var(--gold-light); }
+.template-premium-dark .inv-table th { background: #1e1e1e; color: var(--gold); border-bottom: 1px solid var(--gold); }
+.template-premium-dark .inv-table td { border-bottom-color: #222; color: #bbb; }
+.template-premium-dark .inv-summary-row { color: #888; }
+.template-premium-dark .inv-summary-row.discount { color: #e07060; }
+.template-premium-dark .inv-summary-row.total { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #111; padding: 0.5rem 0.8rem; border-radius: 8px; }
+.template-premium-dark .inv-notes { background: #1e1e1e; border-left-color: var(--gold); color: #999; }
+.template-premium-dark .inv-footer { border-top-color: #2a2a2a; color: #555; }
+.template-premium-dark .inv-stamp { border-color: var(--gold); color: var(--gold); }
+.template-premium-dark .inv-powered { color: #444; border-top-color: #222; }
+.template-premium-dark .inv-watermark { color: #333; }
+
+.template-premium-art { background: #fdfbf7; border: 2px double #8b6914; }
+.template-premium-art .inv-header { background: linear-gradient(135deg, #f5e6c8, #fdfbf7); padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-bottom: 3px double #8b6914; position: relative; }
+.template-premium-art .inv-header::before { content: "❖ ❖ ❖"; position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%); background: #fdfbf7; padding: 0 1rem; color: #8b6914; font-size: 0.62rem; letter-spacing: 4px; }
+.template-premium-art .inv-store-name { color: #8b6914; font-size: 1.5rem; }
+.template-premium-art .inv-divider { background: repeating-linear-gradient(90deg, #8b6914, #8b6914 5px, transparent 5px, transparent 15px); height: 2px; }
+.template-premium-art .inv-table th { color: #8b6914; border-bottom: 2px dotted #8b6914; }
+.template-premium-art .inv-stamp { border: 2px solid #8b6914; color: #8b6914; font-style: italic; }
+
+.template-premium-nature { background: linear-gradient(160deg, #e8f5e8, #f0f8f0); border: 1px solid #1e6e3a; }
+.template-premium-nature .inv-header { background: linear-gradient(135deg, #1e6e3a, #2e8e50); color: #fff; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 0 0 12px 12px; }
+.template-premium-nature .inv-store-name { color: #fff; }
+.template-premium-nature .inv-store-sub { color: rgba(255,255,255,0.65); }
+.template-premium-nature .inv-label { color: rgba(255,255,255,0.6); }
+.template-premium-nature .inv-num { color: #fff; }
+.template-premium-nature .inv-divider { background: var(--green); width: 50px; margin: 1rem auto; }
+.template-premium-nature .inv-table th { background: #d4ecd4; color: var(--green); border: none; padding: 0.5rem; }
+.template-premium-nature .inv-table td { border-bottom-color: #c8e0c8; }
+.template-premium-nature .inv-summary-row.total { background: var(--green); color: #fff; padding: 0.5rem 0.8rem; border-radius: 8px; }
+.template-premium-nature .inv-notes { background: #d4ecd4; border-left-color: var(--green); }
+.template-premium-nature .inv-stamp { background: var(--green); color: #fff; border: none; transform: rotate(0deg); }
+
+.template-premium-neon { background: #080a12; border: 1px solid #00d4ff; color: #c8e8ff; }
+.template-premium-neon .inv-header { background: linear-gradient(135deg, #0a0e1c, #0d1428); border-bottom: 2px solid #00d4ff; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; }
+.template-premium-neon .inv-store-name { color: #00d4ff; text-transform: uppercase; letter-spacing: 4px; font-size: 1.1rem; }
+.template-premium-neon .inv-store-sub { color: #406080; }
+.template-premium-neon .inv-label { color: #00d4ff; opacity: 0.6; }
+.template-premium-neon .inv-num { color: #7b2fff; }
+.template-premium-neon .inv-date { color: #406080; }
+.template-premium-neon .inv-divider { height: 1px; background: linear-gradient(90deg, transparent, #00d4ff, #7b2fff, transparent); }
+.template-premium-neon .inv-buyer-name { color: #00d4ff; }
+.template-premium-neon .inv-buyer-label { color: #406080; }
+.template-premium-neon .inv-buyer-sub { color: #406080; }
+.template-premium-neon .inv-table th { background: rgba(0,212,255,0.06); color: #00d4ff; border-bottom: 1px solid rgba(0,212,255,0.2); border-top: none; border-left: none; border-right: none; font-size: 0.52rem; }
+.template-premium-neon .inv-table td { border-bottom-color: rgba(0,212,255,0.08); color: #a0c8e0; }
+.template-premium-neon .inv-summary-row { color: #406080; }
+.template-premium-neon .inv-summary-row.discount { color: #ff5566; }
+.template-premium-neon .inv-summary-row.total { background: linear-gradient(135deg, #7b2fff, #00d4ff); color: #fff; padding: 0.5rem 0.8rem; border-radius: 8px; }
+.template-premium-neon .inv-notes { background: rgba(0,212,255,0.05); border-left-color: #00d4ff; color: #406080; }
+.template-premium-neon .inv-footer { border-top-color: rgba(0,212,255,0.1); color: #406080; }
+.template-premium-neon .inv-stamp { border: 2px solid #00d4ff; color: #00d4ff; transform: rotate(-6deg); }
+.template-premium-neon .inv-powered { color: #253040; border-top-color: rgba(0,212,255,0.08); }
+.template-premium-neon .inv-watermark { color: #1a2030; }
+
+.template-premium-sakura { background: linear-gradient(160deg, #fff0f6, #fff8fb); border: 1px solid #e88aaa; }
+.template-premium-sakura .inv-header { background: linear-gradient(135deg, #e8527a, #f08aaa); color: #fff; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; border-radius: 0 0 36px 36px; }
+.template-premium-sakura .inv-store-name { color: #fff; font-style: italic; }
+.template-premium-sakura .inv-store-sub { color: rgba(255,255,255,0.7); }
+.template-premium-sakura .inv-label { color: rgba(255,255,255,0.6); }
+.template-premium-sakura .inv-num { color: #fff; }
+.template-premium-sakura .inv-divider { background: linear-gradient(90deg, #e8527a, #f5b8ce, #e8527a); height: 1.5px; }
+.template-premium-sakura .inv-buyer-name { color: #c83060; }
+.template-premium-sakura .inv-buyer-label { color: #e88aaa; }
+.template-premium-sakura .inv-table th { background: #ffe0ec; color: #c83060; border-bottom: 1.5px solid #f0b0c8; border-top: none; border-left: none; border-right: none; padding: 0.5rem; font-size: 0.55rem; }
+.template-premium-sakura .inv-table td { border-bottom-color: #ffe8f0; }
+.template-premium-sakura .inv-summary-row { color: #c080a0; }
+.template-premium-sakura .inv-summary-row.total { background: linear-gradient(135deg, #e8527a, #f08aaa); color: #fff; padding: 0.5rem 0.8rem; border-radius: 10px; }
+.template-premium-sakura .inv-notes { background: #ffe8f4; border-left-color: #e8527a; color: #c080a0; }
+.template-premium-sakura .inv-footer { border-top-color: #ffe0ec; color: #d0a0b8; }
+.template-premium-sakura .inv-stamp { border: 2px solid #e8527a; color: #e8527a; transform: rotate(-5deg); }
+.template-premium-sakura .inv-watermark { color: #f5d0e0; }
+.template-premium-sakura .inv-powered { color: #e8c8d8; border-top-color: #ffe0ec; }
+
+.template-premium-royal { background: linear-gradient(160deg, #f8f5ff, #f2eefc); border: 2px solid #6b3fa0; }
+.template-premium-royal .inv-header { background: linear-gradient(135deg, #3a1f6e, #6b3fa0); color: #e8d8ff; padding: 1.5rem; margin: -2rem -2rem 1.5rem -2rem; }
+.template-premium-royal .inv-store-name { color: #dcc8ff; }
+.template-premium-royal .inv-store-sub { color: rgba(220,200,255,0.6); }
+.template-premium-royal .inv-label { color: rgba(220,200,255,0.6); }
+.template-premium-royal .inv-num { color: #c8a0ff; }
+.template-premium-royal .inv-date { color: rgba(220,200,255,0.5); }
+.template-premium-royal .inv-divider { background: linear-gradient(90deg, transparent, #6b3fa0, transparent); height: 1.5px; }
+.template-premium-royal .inv-buyer-name { color: #4a1f80; }
+.template-premium-royal .inv-buyer-label { color: #9060c8; }
+.template-premium-royal .inv-table th { background: #e8d8ff; color: #4a1f80; border-bottom: 1.5px solid #c8a8f0; border-top: none; border-left: none; border-right: none; padding: 0.5rem; }
+.template-premium-royal .inv-table td { border-bottom-color: #f0e8ff; }
+.template-premium-royal .inv-summary-row { color: #9060c8; }
+.template-premium-royal .inv-summary-row.total { background: linear-gradient(135deg, #3a1f6e, #6b3fa0); color: #e8d8ff; padding: 0.5rem 0.8rem; border-radius: 8px; }
+.template-premium-royal .inv-notes { background: #f0e8ff; border-left-color: #6b3fa0; color: #9060c8; }
+.template-premium-royal .inv-footer { border-top-color: #e8d8ff; color: #b090e0; }
+.template-premium-royal .inv-stamp { border: 2px solid #6b3fa0; color: #6b3fa0; font-style: italic; transform: rotate(-4deg); }
+.template-premium-royal .inv-watermark { color: #e8d8ff; }
+.template-premium-royal .inv-powered { color: #d0c0f0; border-top-color: #f0e8ff; }
+
+.template-premium-luxury .inv-powered::before,
+.template-premium-elegant .inv-powered::before,
+.template-premium-dark .inv-powered::before,
+.template-premium-art .inv-powered::before,
+.template-premium-nature .inv-powered::before,
+.template-premium-neon .inv-powered::before,
+.template-premium-sakura .inv-powered::before,
+.template-premium-royal .inv-powered::before { content: "👑 PREMIUM · "; color: var(--gold); font-weight: bold; }
+
+/* ─────────────────────────────────────
+   STATISTICS
+───────────────────────────────────── */
+.stats-section { max-width: 1240px; margin: 3.5rem auto 0; padding: 0 5rem; }
+.stats-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.stats-container { padding: 2.5rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.stat-card {
+  background: var(--paper); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 1.5rem;
+  text-align: center; transition: all 0.22s;
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px var(--shadow-sm); border-color: var(--border-2); }
+.stat-icon { font-size: 1.4rem; margin-bottom: 0.6rem; }
+.stat-label { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+.stat-value { font-family: var(--font-display); font-size: 1.55rem; font-weight: 400; color: var(--gold); }
+.reset-stats-btn { padding: 0.5rem 1.1rem; background: transparent; color: var(--rust); border: 1.5px solid rgba(184,58,24,0.4); border-radius: var(--r-md); cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; transition: all 0.2s; }
+.reset-stats-btn:hover { background: var(--rust); color: #fff; border-color: var(--rust); }
+
+/* ─────────────────────────────────────
+   PREMIUM SECTION
+───────────────────────────────────── */
+.premium-section {
+  background: var(--ink); padding: 9rem 5rem 7rem;
+  margin-top: 7rem; position: relative; overflow: hidden;
+}
+.premium-bg-art {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 85% 15%, rgba(200,145,30,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 50% at 8% 85%, rgba(200,145,30,0.04) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.premium-hero { text-align: center; max-width: 680px; margin: 0 auto 5rem; }
+.prem-eyebrow { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.18em; color: var(--gold); text-transform: uppercase; margin-bottom: 1.5rem; }
+.prem-title { font-family: var(--font-display); font-size: clamp(2.6rem, 5vw, 4.2rem); font-weight: 400; color: var(--paper); line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 1.5rem; }
+.prem-title em { font-style: italic; color: var(--gold); }
+.prem-title span { -webkit-text-stroke: 1.5px rgba(250,247,242,0.22); color: transparent; }
+.prem-sub { font-size: 0.98rem; color: rgba(250,247,242,0.38); line-height: 1.75; }
+
+/* TEMPLATE SHOWCASE */
+.template-showcase {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.5rem; max-width: 1240px; margin: 0 auto 5rem;
+}
+
+.ts-card {
+  border-radius: var(--r-xl); overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.ts-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
+
+.ts-tag { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.05em; color: rgba(250,247,242,0.45); padding: 0.8rem 1rem; background: rgba(0,0,0,0.3); display: flex; align-items: center; gap: 0.5rem; }
+.new-tag { color: rgba(250,247,242,0.45); }
+.new-badge { background: var(--rust); color: #fff; font-size: 0.48rem; padding: 0.15rem 0.4rem; border-radius: 999px; }
+
+.ts-preview { padding: 1.1rem; font-family: var(--font-body); font-size: 0.73rem; }
+.ts-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; padding-bottom: 0.55rem; }
+.ts-sname { font-weight: 700; font-size: 0.78rem; }
+.ts-badge { font-family: var(--font-mono); font-size: 0.52rem; letter-spacing: 0.1em; padding: 0.14rem 0.38rem; border: 1px solid currentColor; border-radius: 2px; }
+.ts-item-row { display: flex; justify-content: space-between; padding: 0.22rem 0; opacity: 0.65; }
+.ts-total { display: flex; justify-content: space-between; font-weight: 700; margin-top: 0.5rem; padding-top: 0.45rem; font-size: 0.75rem; }
+.ts-stamp { display: inline-block; font-size: 0.58rem; font-weight: 700; border: 1.5px solid currentColor; padding: 0.14rem 0.45rem; border-radius: 2px; transform: rotate(-6deg); margin-top: 0.5rem; opacity: 0.8; }
+
+/* TS card themes - same as original, kept intact */
+.ts-luxury { background: linear-gradient(135deg, #2d2210, #1a1208); }
+.ts-luxury .ts-header { border-bottom: 1px solid rgba(200,145,30,0.3); }
+.gold-grad { background: linear-gradient(135deg, #b07818, #e0a83a); border-radius: 4px; padding: 0.4rem 0.6rem; }
+.gold-text  { color: var(--gold); }
+.gold-stamp { color: var(--gold); }
+.ts-dark { background: #0a0a0a; }
+.dark-bg { background: #111; }
+.dark-header { background: #0a0a0a; border-bottom: 1px solid rgba(200,145,30,0.3); padding: 0.4rem 0.6rem; border-radius: 4px; }
+.dark-row { color: #888; }
+.dark-total { color: var(--gold); border-top: 1px solid #2a2a2a; }
+.dark-stamp { color: var(--gold); }
+.gold-text-sm { color: var(--gold); font-size: 0.68rem; letter-spacing: 2px; }
+.gold-badge { color: var(--gold); }
+.ts-neon { background: #06080f; }
+.neon-bg { background: #06080f; }
+.neon-header { background: rgba(0,212,255,0.05); border-bottom: 1px solid rgba(0,212,255,0.2); padding: 0.4rem 0.6rem; border-radius: 4px; }
+.neon-name  { color: #00d4ff; letter-spacing: 2px; font-size: 0.68rem; }
+.neon-badge { color: #7b2fff; }
+.neon-row   { color: #405060; }
+.neon-total { color: #00d4ff; border-top: 1px solid rgba(0,212,255,0.1); }
+.neon-stamp { color: #00d4ff; }
+.ts-sakura { background: linear-gradient(135deg, #3a1028, #1e0818); }
+.sakura-bg { background: linear-gradient(160deg, #fff0f6, #fff8fb); }
+.sakura-header { background: linear-gradient(135deg, #e8527a, #f08aaa); border-radius: 8px; padding: 0.4rem 0.7rem; }
+.sakura-name { color: #fff; font-style: italic; }
+.sakura-badge { color: rgba(255,255,255,0.8); }
+.sakura-row { color: #c080a0; }
+.sakura-total { color: #e8527a; border-top: 1px solid #ffe0ec; }
+.sakura-stamp { color: #e8527a; }
+.ts-royal { background: linear-gradient(135deg, #1a0e30, #0e0820); }
+.royal-bg { background: linear-gradient(160deg, #f8f5ff, #f2eefc); }
+.royal-header { background: linear-gradient(135deg, #3a1f6e, #6b3fa0); border-radius: 8px; padding: 0.4rem 0.7rem; }
+.royal-name { color: #dcc8ff; }
+.royal-badge { color: rgba(220,200,255,0.7); }
+.royal-row { color: #b090d8; }
+.royal-total { color: #6b3fa0; border-top: 1px solid #e8d8ff; }
+.royal-stamp { color: #6b3fa0; font-style: italic; }
+.ts-nature { background: linear-gradient(135deg, #0e2018, #0a1a10); }
+.nature-bg { background: linear-gradient(160deg, #e8f5e8, #f0f8f0); }
+.nature-header { background: linear-gradient(135deg, #1e6e3a, #2e8e50); border-radius: 8px; padding: 0.4rem 0.7rem; }
+.nature-name { color: #fff; }
+.nature-badge { color: rgba(255,255,255,0.8); }
+.nature-row { color: #507060; }
+.nature-total { color: #1e6e3a; border-top: 1px solid #c8e0c8; }
+.nature-stamp { color: #1e6e3a; }
+
+/* PRICING — redesigned */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  max-width: 860px;
+  margin: 0 auto 3.5rem;
+}
+.pricing-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: var(--r-xl);
+  padding: 2.2rem 2rem;
+  text-align: center;
+  transition: all 0.3s;
+  position: relative;
+}
+.pricing-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-5px); }
+.pricing-featured {
+  background: rgba(200,145,30,0.07);
+  border: 1px solid rgba(200,145,30,0.35);
+}
+.pricing-featured:hover { background: rgba(200,145,30,0.11); }
+
+.pc-badge { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 1.2rem; }
+.featured-badge { color: var(--gold); }
+.pc-price { font-family: var(--font-display); font-size: 2.1rem; font-weight: 400; color: var(--paper); margin-bottom: 0.3rem; letter-spacing: -0.02em; }
+.pc-price span { font-family: var(--font-body); font-size: 0.78rem; color: var(--muted); font-weight: 400; }
+.pc-per { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); margin-bottom: 1.6rem; }
+.pc-features { list-style: none; text-align: left; margin-bottom: 2rem; }
+.pc-features li { font-size: 0.83rem; color: rgba(250,247,242,0.5); padding: 0.38rem 0; font-family: var(--font-body); border-bottom: 1px solid rgba(255,255,255,0.04); }
+.pc-features li:last-child { border-bottom: none; }
+.pc-btn { width: 100%; padding: 0.88rem; background: rgba(255,255,255,0.07); color: var(--paper); border: 1px solid rgba(255,255,255,0.14); border-radius: var(--r-md); cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 0.87rem; transition: all 0.2s; letter-spacing: 0.02em; }
+.pc-btn:hover { background: rgba(255,255,255,0.13); }
+.pc-btn-gold { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+.pc-btn-gold:hover { background: var(--gold-light); border-color: var(--gold-light); }
+
+/* Payment info */
+.payment-info {
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(200,145,30,0.18);
+  padding: 2rem; border-radius: var(--r-xl);
+  margin: 2.5rem auto; max-width: 500px; text-align: center;
+}
+.payment-info h4 { color: var(--gold); font-family: var(--font-display); margin-bottom: 1.2rem; font-size: 1.05rem; font-weight: 400; letter-spacing: -0.01em; }
+.payment-info p { color: rgba(250,247,242,0.5); font-size: 0.84rem; margin: 0.4rem 0; line-height: 1.6; }
+.bank-account { font-family: var(--font-mono); font-size: 1.05rem; background: rgba(0,0,0,0.4); padding: 0.55rem 1.2rem; border-radius: var(--r-sm); display: inline-block; color: var(--paper) !important; letter-spacing: 0.08em; }
+.payment-info strong { color: var(--paper); }
+.wa-confirm { font-size: 0.78rem; margin-top: 0.9rem; }
+.wa-confirm a { color: var(--gold); text-decoration: underline; }
+.copy-btn { background: var(--gold); border: none; padding: 0.6rem 1.3rem; border-radius: var(--r-sm); cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 0.8rem; margin-top: 1rem; transition: all 0.2s; }
+.copy-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+/* Activation */
+.premium-activation { text-align: center; margin-bottom: 3.5rem; }
+.premium-activation h4 { color: rgba(250,247,242,0.4); font-family: var(--font-body); font-size: 0.83rem; margin-bottom: 0.9rem; font-weight: 500; }
+.activation-input { display: flex; gap: 0.5rem; max-width: 320px; margin: 0 auto; }
+.activation-input input { flex: 1; padding: 0.72rem 1rem; border-radius: var(--r-sm); border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: var(--paper); font-family: var(--font-body); font-size: 0.84rem; outline: none; transition: border-color 0.2s; }
+.activation-input input:focus { border-color: rgba(200,145,30,0.5); }
+.activation-input button { background: var(--gold); border: none; padding: 0.72rem 1.2rem; border-radius: var(--r-sm); cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 0.84rem; color: var(--ink); transition: all 0.2s; white-space: nowrap; }
+.activation-input button:hover { background: var(--gold-light); }
+.premium-status { font-family: var(--font-mono); font-size: 0.7rem; color: rgba(250,247,242,0.35); margin-top: 0.6rem; line-height: 1.6; }
+
+/* Guarantee */
+.guarantee-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 900px; margin: 0 auto; }
+.guarantee-box {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  padding: 1.5rem; border-radius: var(--r-xl);
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.7rem;
+}
+.guarantee-icon { font-size: 1.8rem; }
+.guarantee-text { font-size: 0.78rem; color: rgba(250,247,242,0.4); line-height: 1.55; }
+.guarantee-text strong { color: rgba(250,247,242,0.65); display: block; margin-bottom: 0.3rem; }
+
+/* ─────────────────────────────────────
+   TRUST SECTION
+───────────────────────────────────── */
+.trust-section { padding: 8rem 5rem; background: var(--paper); }
+.trust-title { font-family: var(--font-display); font-size: clamp(2.2rem, 4vw, 3.2rem); font-weight: 400; color: var(--ink); line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 4rem; }
+.trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1240px; }
+.trust-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--r-xl); padding: 2rem;
+  position: relative; transition: all 0.25s;
+}
+.trust-card:hover { transform: translateY(-4px); box-shadow: 0 14px 40px var(--shadow-md); border-color: var(--border-2); }
+.trust-number { position: absolute; top: 1.5rem; right: 1.5rem; font-family: var(--font-display); font-size: 2.5rem; font-weight: 400; color: rgba(12,10,7,0.04); line-height: 1; }
+.trust-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+.trust-card h4 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 400; color: var(--ink); margin-bottom: 0.6rem; letter-spacing: -0.01em; }
+.trust-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+/* ─────────────────────────────────────
+   FOOTER
+───────────────────────────────────── */
+.footer { background: var(--ink); padding: 4rem 5rem; }
+.footer-inner { max-width: 1240px; margin: 0 auto; }
+.footer-top { display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; }
+.footer-logo { font-family: var(--font-display); font-size: 1.9rem; font-weight: 400; color: var(--paper); letter-spacing: -0.02em; }
+.footer-logo span { color: var(--gold); }
+.footer-dot { font-size: 0.4em; color: var(--gold); margin-left: 0.15em; opacity: 0.6; }
+.footer-top p { color: rgba(250,247,242,0.28); font-size: 0.84rem; }
+.footer-mid { margin-bottom: 2rem; }
+.footer-links { display: flex; gap: 2rem; }
+.footer-links a { color: rgba(250,247,242,0.28); text-decoration: none; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; transition: color 0.2s; }
+.footer-links a:hover { color: var(--gold); }
+.footer-bottom { display: flex; align-items: center; gap: 1rem; font-family: var(--font-mono); font-size: 0.62rem; color: rgba(250,247,242,0.18); letter-spacing: 0.06em; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; }
+.fb-dot { color: rgba(250,247,242,0.08); }
+
+/* ─────────────────────────────────────
+   MODALS
+───────────────────────────────────── */
+.modal { display: none; position: fixed; z-index: 2000; inset: 0; background: rgba(12,10,7,0.75); backdrop-filter: blur(6px); }
+.modal-content {
+  background: #fff; margin: 9% auto; padding: 2.5rem;
+  border-radius: var(--r-2xl); width: 90%; max-width: 500px;
+  position: relative; box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+  border: 1px solid var(--border);
+}
+.close { position: absolute; right: 1.2rem; top: 1.2rem; background: var(--paper); border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all 0.2s; }
+.close:hover { background: var(--cream); color: var(--ink); }
+.modal-content h3 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+.modal-content button:not(.close):not(.sp-del) { width: 100%; padding: 0.9rem; background: var(--gold); border: none; border-radius: var(--r-md); font-family: var(--font-body); font-weight: 700; cursor: pointer; font-size: 0.9rem; color: var(--ink); transition: all 0.2s; }
+.modal-content button:not(.close):not(.sp-del):hover { background: var(--gold-light); transform: translateY(-1px); }
+.modal-features { list-style: none; margin-bottom: 1.5rem; }
+.modal-features li { font-size: 0.84rem; color: var(--muted); padding: 0.38rem 0; border-bottom: 1px solid var(--border); }
+.modal-features li:last-child { border-bottom: none; }
+.premium-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0 1.5rem; }
+.plan { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.1rem; text-align: center; position: relative; transition: all 0.2s; }
+.plan:hover { border-color: var(--gold); background: var(--gold-subtle); }
+.plan h4 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 400; margin-bottom: 0.4rem; }
+.plan .price { color: var(--gold); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.6rem; }
+.plan button { padding: 0.6rem !important; font-size: 0.8rem !important; }
+.save-badge { position: absolute; top: -10px; right: -8px; background: var(--rust); color: #fff; font-size: 0.52rem; padding: 0.18rem 0.5rem; border-radius: 999px; }
+.premium-note { font-size: 0.7rem; color: var(--muted); text-align: center; }
+
+/* ─────────────────────────────────────
+   DARK MODE
+───────────────────────────────────── */
+body.dark-mode {
+  --ink:    #faf7f2;
+  --paper:  #0e0c09;
+  --cream:  #1c1812;
+  --muted:  #a09080;
+  --border: #2a221a;
+  --border-2: #3a2e22;
+}
+body.dark-mode .glass-panel,
+body.dark-mode .stats-container,
+body.dark-mode .trust-card,
+body.dark-mode .modal-content,
+body.dark-mode .invoice-template,
+body.dark-mode .item-row { background: rgba(22,18,12,0.96); border-color: var(--border); }
+body.dark-mode .stat-card,
+body.dark-mode .saved-product,
+body.dark-mode .plan { background: #1a1510; border-color: var(--border); }
+body.dark-mode .inv-table td { border-bottom-color: #2a221a; }
+body.dark-mode .inv-notes { background: #1c1812; }
+body.dark-mode .inv-powered { border-top-color: #2a221a; color: #555; }
+
+/* ─────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────── */
+@media (max-width: 1100px) {
+  .navbar { padding: 1.5rem 2.5rem; }
+  .hero-body { padding: 2rem 2.5rem 4rem; gap: 3rem; }
+  .app-section { padding: 5rem 2.5rem 3rem; }
+  .stats-section { padding: 0 2.5rem; }
+  .premium-section { padding: 7rem 2.5rem 5rem; }
+  .trust-section { padding: 7rem 2.5rem; }
+  .footer { padding: 4rem 2.5rem; }
+  .pricing-grid { grid-template-columns: 1fr 1fr; max-width: 600px; }
+  .trust-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .navbar { padding: 1.2rem 1.5rem; flex-wrap: wrap; gap: 0.8rem; }
+  .logo { font-size: 1.6rem; }
+  .nav-right { gap: 0.6rem; }
+  .nav-tag { font-size: 0.62rem; padding: 0.32rem 0.7rem; }
+  .nav-premium-btn { font-size: 0.74rem; padding: 0.38rem 0.9rem; }
+
+  .hero-body { flex-direction: column; padding: 1.5rem 1.5rem 4rem; gap: 2.5rem; align-items: flex-start; }
+  .hero-content { max-width: 100%; }
+  .hero-title { font-size: clamp(2.8rem, 11vw, 4.5rem); }
+  .hero-ctas { flex-wrap: wrap; gap: 1rem; }
+  .cta-primary { width: 100%; justify-content: center; }
+  .cta-ghost { width: 100%; text-align: center; }
+  .hero-visual { display: none; }
+
+  .app-section { padding: 4rem 1.2rem 2rem; }
+  .app-container { grid-template-columns: 1fr; gap: 1.5rem; }
+  .glass-panel { padding: 1.8rem 1.4rem; border-radius: var(--r-xl); }
+
+  .item-row { grid-template-columns: 1fr 0.6fr; grid-template-rows: auto auto; }
+  .item-row .item-name { grid-column: 1 / -1; }
+  .item-row .remove-btn { grid-column: 1 / -1; margin-left: auto; }
+
+  .stats-section { padding: 0 1.2rem; margin-top: 2rem; }
+  .stats-container { padding: 1.5rem 1.2rem; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+  .stat-card { padding: 1rem 0.6rem; }
+  .stat-value { font-size: 1.1rem; }
+
+  .premium-section { padding: 5rem 1.5rem 4rem; margin-top: 4rem; }
+  .template-showcase { display: flex; overflow-x: auto; gap: 1rem; padding-bottom: 1rem; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .template-showcase::-webkit-scrollbar { display: none; }
+  .ts-card { min-width: 215px; flex-shrink: 0; scroll-snap-align: start; }
+
+  .pricing-grid { grid-template-columns: 1fr; max-width: 100%; gap: 1rem; }
+  .guarantee-row { grid-template-columns: 1fr; gap: 0.8rem; }
+  .guarantee-box { flex-direction: row; text-align: left; gap: 1rem; }
+
+  .trust-section { padding: 4rem 1.5rem; }
+  .trust-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .footer { padding: 3rem 1.5rem; }
+  .footer-top { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+  .footer-links { flex-wrap: wrap; gap: 0.8rem 1.5rem; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+  .fb-dot { display: none; }
+
+  .modal-content { margin: 5% auto; padding: 2rem 1.5rem; max-height: 90vh; overflow-y: auto; }
+  .premium-plans { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .navbar { padding: 1rem 1.2rem; flex-wrap: nowrap; }
+  .logo { font-size: 1.4rem; }
+  .logo-dot { display: none; }
+  .nav-tag { display: none; }
+  .nav-premium-btn { font-size: 0.68rem; padding: 0.36rem 0.75rem; white-space: nowrap; }
+
+  .hero-body { padding: 1.2rem 1.2rem 3.5rem; gap: 2rem; }
+  .hero-title { font-size: clamp(2.4rem, 12vw, 3.5rem); }
+  .hero-sub { font-size: 0.84rem; }
+  .cta-primary { padding: 0.85rem 1.4rem; font-size: 0.84rem; }
+  .hero-stats { justify-content: space-between; width: 100%; }
+  .h-stat { flex: 1; text-align: center; }
+  .h-stat-div { width: 1px; height: 22px; }
+  .h-stat-num { font-size: 1.1rem; }
+  .h-stat-lab { font-size: 0.52rem; }
+
+  .app-section { padding: 3rem 1rem 2rem; }
+  .glass-panel { padding: 1.5rem 1.1rem; border-radius: var(--r-lg); }
+  .panel-title { font-size: 1.1rem; }
+  .input-row { grid-template-columns: 1fr 1fr; }
+
+  .item-row { display: flex; flex-direction: column; gap: 0.7rem; padding: 0.9rem; margin-bottom: 0.7rem; }
+  .item-row input { padding: 0 !important; }
+  .item-row .remove-btn { align-self: flex-end; background: rgba(184,58,24,0.08); border-radius: 6px; padding: 0.3rem 0.8rem; }
+
+  .stats-section { padding: 0 1rem; margin-top: 1.5rem; }
+  .stats-container { padding: 1.3rem 1rem; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+  .stat-card { padding: 0.8rem 0.4rem; border-radius: var(--r-md); }
+  .stat-icon { font-size: 1rem; }
+  .stat-value { font-size: 0.95rem; }
+  .stat-label { font-size: 0.5rem; }
+
+  .premium-section { padding: 4rem 1.2rem 3rem; margin-top: 3rem; }
+  .prem-title { font-size: clamp(1.9rem, 9vw, 2.8rem); }
+  .pricing-card { padding: 1.8rem 1.4rem; }
+  .pc-price { font-size: 1.55rem; }
+
+  .trust-section { padding: 3.5rem 1.2rem; }
+  .trust-title { font-size: clamp(1.6rem, 6vw, 2rem); margin-bottom: 2rem; }
+  .trust-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+  .trust-card { display: flex; align-items: flex-start; gap: 1rem; padding: 1.3rem 1.1rem; }
+  .trust-icon { font-size: 1.4rem; flex-shrink: 0; margin-bottom: 0; }
+  .trust-card h4 { font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .trust-card p { font-size: 0.78rem; }
+
+  .footer { padding: 2.5rem 1.2rem; }
+  .modal-content { margin: 3% auto; width: 95%; padding: 1.8rem 1.3rem; }
+}
+
+@media (max-width: 360px) {
+  .hero-title { font-size: 2.2rem; }
+  .glass-panel { padding: 1.2rem 0.9rem; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .stat-card { display: flex; align-items: center; gap: 0.8rem; text-align: left; }
+  .stat-icon { margin-bottom: 0; flex-shrink: 0; }
+}
+
+/* ─────────────────────────────────────
+   TOAST
+───────────────────────────────────── */
+.nk-toast {
+  position: fixed !important;
+  bottom: 2rem !important; right: 2rem !important;
+  font-family: var(--font-body) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22) !important;
+}
