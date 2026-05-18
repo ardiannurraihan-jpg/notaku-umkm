@@ -980,6 +980,7 @@ function copyPaymentInfo() {
     .sp-del:hover { background: rgba(192,67,26,0.1); color: var(--rust); }
   `;
   document.head.appendChild(style);
+})();
   // ============================================
 //   FITUR KIRIM NOTA KE WHATSAPP
 // ============================================
@@ -1100,4 +1101,3 @@ async function sendToWhatsApp() {
     showToast('❌ Gagal kirim ke WA. Coba download PDF dulu.', 'error');
   }
 }
-})();
