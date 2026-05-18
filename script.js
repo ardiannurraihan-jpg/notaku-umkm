@@ -535,6 +535,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadData();
   loadLastInvoice();
   checkPremiumStatus();
+  loadStockData();
 
   document.querySelectorAll('.template-btn').forEach(btn => {
     btn.addEventListener('click', () => {
