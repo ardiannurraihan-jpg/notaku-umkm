@@ -429,6 +429,92 @@
   </div>
 </main>
 
+<!-- MANAJEMEN STOK -->
+<div class="stats-section" style="margin-top: 2rem;">
+  <div class="section-label">/ Manajemen Stok</div>
+  <div class="glass-panel stats-container">
+    <div class="stats-header">
+      <h2 class="panel-title">📦 Stok Produk</h2>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="reset-stats-btn" onclick="showAddStockModal()" style="background: #2a7a4b; border-color: #2a7a4b; color: white;">➕ Tambah Stok</button>
+        <button class="reset-stats-btn" onclick="exportStockData()" style="background: #c9952a; border-color: #c9952a;">📊 Export Stok</button>
+      </div>
+    </div>
+    
+    <!-- Ringkasan Stok -->
+    <div class="stats-grid" style="margin-bottom: 1.5rem;">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-label">Total Produk</div>
+        <div class="stat-value" id="totalProducts">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-label">Stok Menipis</div>
+        <div class="stat-value" id="lowStockCount" style="color: #c0431a;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Stok Aman</div>
+        <div class="stat-value" id="safeStockCount" style="color: #2a7a4b;">0</div>
+      </div>
+    </div>
+    
+    <!-- Tabel Stok -->
+    <div style="overflow-x: auto;">
+      <table id="stockTable" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+        <thead>
+          <tr style="background: var(--cream); border-bottom: 2px solid var(--gold);">
+            <th style="padding: 0.8rem; text-align: left;">Produk</th>
+            <th style="padding: 0.8rem; text-align: center;">Stok</th>
+            <th style="padding: 0.8rem; text-align: center;">Min Stok</th>
+            <th style="padding: 0.8rem; text-align: center;">Status</th>
+            <th style="padding: 0.8rem; text-align: center;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="stockTableBody">
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--muted);">Belum ada data stok. Klik "Tambah Stok" untuk mulai.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tambah/Edit Stok -->
+<div id="stockModal" class="modal">
+  <div class="modal-content">
+    <button class="close" onclick="closeStockModal()">✕</button>
+    <h3 id="stockModalTitle">📦 Tambah Stok Produk</h3>
+    
+    <div class="input-wrap" style="margin-bottom: 1rem;">
+      <select id="stockProductSelect" style="width: 100%; padding: 0.8rem; border: 1.5px solid var(--border); border-radius: 8px; background: var(--paper);">
+        <option value="">Pilih produk dari daftar favorit...</option>
+      </select>
+      <div class="input-line"></div>
+    </div>
+    
+    <div class="input-wrap" style="margin-bottom: 1rem;">
+      <input type="text" id="stockProductName" placeholder="Atau masukkan nama produk baru" />
+      <div class="input-line"></div>
+    </div>
+    
+    <div class="input-row" style="margin-bottom: 1rem;">
+      <div class="input-wrap">
+        <input type="number" id="stockQuantity" placeholder="Jumlah Stok" min="0" value="0" />
+        <div class="input-line"></div>
+      </div>
+      <div class="input-wrap">
+        <input type="number" id="stockMin" placeholder="Min Stok (peringatan)" min="0" value="5" />
+        <div class="input-line"></div>
+      </div>
+    </div>
+    
+    <button onclick="saveStock()">Simpan Stok</button>
+  </div>
+</div>
+  
 <!-- PREMIUM SECTION -->
 <section id="premium" class="premium-section">
   <div class="premium-bg-art"></div>
