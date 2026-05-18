@@ -809,21 +809,94 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Dark Mode Toggle
-  const toggleBtn = document.getElementById('darkModeToggle');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      toggleBtn.innerHTML = isDark ? '☀️ Terang' : '🌙 Mode';
-      localStorage.setItem('notaku_dark_mode', isDark);
-    });
-    if (localStorage.getItem('notaku_dark_mode') === 'true') {
-      document.body.classList.add('dark-mode');
-      toggleBtn.innerHTML = '☀️ Terang';
-    }
+/* ============================================
+   TAMBAHAN UNTUK DARK MODE TOGGLE
+   ============================================ */
+
+/* Tombol dark mode yang lebih rapi */
+.dark-mode-toggle {
+  background: transparent;
+  border: 1px solid rgba(201,149,42,0.4);
+  color: var(--paper);
+  padding: 0.45rem 1.2rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.dark-mode-toggle:hover {
+  background: rgba(201,149,42,0.1);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+/* Dark mode class untuk tombol (script.js akan mengubah isi tombol) */
+body.dark-mode .dark-mode-toggle {
+  background: rgba(201,149,42,0.15);
+  border-color: var(--gold);
+}
+
+/* Perbaikan untuk item row di HP - memastikan tidak bentrok */
+@media (max-width: 480px) {
+  .item-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
   }
-});
+  
+  .item-row input {
+    width: 100%;
+    padding: 0.8rem 0;
+    font-size: 16px;
+  }
+  
+  .item-row .item-name {
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+  
+  .item-row .item-qty,
+  .item-row .item-price {
+    font-size: 0.9rem;
+  }
+  
+  .item-row .remove-btn {
+    align-self: flex-end;
+    width: auto;
+    padding: 0.4rem 1rem;
+    margin-top: 0.2rem;
+    background: rgba(192,67,26,0.1);
+    border-radius: 8px;
+  }
+  
+  /* Pastikan tombol generate tetap bagus di HP */
+  .generate-btn {
+    padding: 0.9rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Statistik grid di HP */
+  .stats-grid {
+    gap: 0.8rem;
+  }
+  
+  .stat-card {
+    padding: 0.8rem 0.5rem;
+  }
+  
+  .stat-value {
+    font-size: 1rem;
+  }
+}
 
 // ── STYLE TAMBAHAN ───────────────────────────
 (function injectDynamicStyles() {
