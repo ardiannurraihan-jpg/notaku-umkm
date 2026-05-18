@@ -1468,18 +1468,24 @@ function updateProfitReport() {
   // Hitung total pendapatan
   const totalRevenue = filteredTransactions.reduce((sum, t) => sum + t.total, 0);
   
-  // Untuk HPP, kita perlu detail items dari tiap transaksi
-  // Karena kita tidak menyimpan items detail, kita estimasi dari produk favorit
-  // Untuk versi lengkap, kita perlu simpan items di transactionHistory
-  
-  // Sementara: estimasi HPP dari data yang ada
-  // Ini akan disempurnakan nanti
-  
+  // Hitung HPP REAL dari data transaksi (jika ada items)
   let totalHpp = 0;
-  // Estimasi: asumsikan margin rata-rata 40%
-  // Ini hanya sementara, akan diperbaiki di langkah berikutnya
-  const estimatedMargin = 0.4;
-  totalHpp = totalRevenue * (1 - estimatedMargin);
+  let hasRealData = false;
+  
+  filteredTransactions.forEach(t => {
+    if (t.items && t.items.length > 0) {
+      hasRealData = true;
+      t.items.forEach(item => {
+        const hpp = hppData[item.name] || 0;
+        totalHpp += hpp * item.qty;
+      });
+    }
+  });
+  
+  // Jika tidak ada data real, fallback ke estimasi (40% margin)
+  if (!hasRealData && totalRevenue > 0) {
+    totalHpp = totalRevenue * 0.6; // asumsi margin 40%
+  }
   
   const profit = totalRevenue - totalHpp;
   const margin = totalRevenue > 0 ? (profit / totalRevenue * 100) : 0;
@@ -1508,23 +1514,35 @@ function updateProfitTable(transactions) {
     return;
   }
   
-  // Untuk sementara, tampilkan estimasi
-  // Ini akan diperbaiki dengan data real nanti
   tbody.innerHTML = transactions.slice().reverse().map(t => {
-    const estimatedHpp = t.total * 0.6; // Estimasi sementara
-    const profit = t.total - estimatedHpp;
+    // Hitung HPP REAL untuk transaksi ini
+    let realHpp = 0;
+    if (t.items && t.items.length > 0) {
+      t.items.forEach(item => {
+        const hpp = hppData[item.name] || 0;
+        realHpp += hpp * item.qty;
+      });
+    }
+    
+    // Jika tidak ada data real, estimasi dari total (asumsi margin 40%)
+    if (realHpp === 0 && t.total > 0) {
+      realHpp = t.total * 0.6;
+    }
+    
+    const profit = t.total - realHpp;
     const margin = t.total > 0 ? (profit / t.total * 100) : 0;
     const date = new Date(t.date).toLocaleDateString('id-ID');
+    const invoiceNumber = t.invoiceNumber || '-';
     
     return `
       <tr style="border-bottom: 1px solid var(--border);">
         <td style="padding: 0.8rem;">${date}</td>
-        <td style="padding: 0.8rem;">${t.invoiceNumber || '-'}</td>
+        <td style="padding: 0.8rem;">${invoiceNumber}</td>
         <td style="padding: 0.8rem; text-align: center;">${formatRupiah(t.total)}</td>
-        <td style="padding: 0.8rem; text-align: center; color: #c0431a;">${formatRupiah(estimatedHpp)}</td>
+        <td style="padding: 0.8rem; text-align: center; color: #c0431a;">${formatRupiah(realHpp)}</td>
         <td style="padding: 0.8rem; text-align: center; color: #2a7a4b;">${formatRupiah(profit)}</td>
         <td style="padding: 0.8rem; text-align: center;">${margin.toFixed(1)}%</td>
-      </tr>
+       </tr>
     `;
   }).join('');
 }
