@@ -1932,14 +1932,29 @@ function updateTopProductsList(transactions) {
 }
 
 function exportDashboard() {
-  // Fitur gratis untuk semua
-  html2canvas(document.querySelector('.stats-section .glass-panel')).then(canvas => {
+  // Cari element Dashboard Premium
+  const dashboardSection = document.querySelector('#dashboardSection');
+  const dashboardPanel = dashboardSection ? dashboardSection.querySelector('.glass-panel') : null;
+  
+  if (!dashboardPanel) {
+    showToast('⚠️ Dashboard tidak ditemukan!', 'warn');
+    return;
+  }
+  
+  showToast('⏳ Menyiapkan screenshot...', 'info');
+  
+  html2canvas(dashboardPanel, {
+    scale: 2,
+    backgroundColor: '#ffffff',
+    logging: false
+  }).then(canvas => {
     const link = document.createElement('a');
     link.download = `dashboard-notaku-${new Date().toISOString().split('T')[0]}.png`;
     link.href = canvas.toDataURL();
     link.click();
     showToast('✅ Dashboard berhasil di-download sebagai gambar!', 'success');
-  }).catch(() => {
+  }).catch(err => {
+    console.error('Export error:', err);
     showToast('📸 Ambil screenshot manual dengan Print Screen', 'info');
   });
 }
