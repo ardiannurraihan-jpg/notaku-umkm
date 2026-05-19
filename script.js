@@ -1932,20 +1932,14 @@ function updateTopProductsList(transactions) {
 }
 
 function exportDashboard() {
-  // Cek premium
-  const isPremium = window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
-  
-  if (!isPremium) {
-    showToast('👑 Fitur ini eksklusif untuk member Premium! Upgrade sekarang.', 'warn');
-    const premSec = document.getElementById('premium');
-    if (premSec) premSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    return;
-  }
-  
-  showToast('📸 Screenshot dashboard menggunakan tombol print screen', 'info');
+  // Fitur gratis untuk semua
+  html2canvas(document.querySelector('.stats-section .glass-panel')).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `dashboard-notaku-${new Date().toISOString().split('T')[0]}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+    showToast('✅ Dashboard berhasil di-download sebagai gambar!', 'success');
+  }).catch(() => {
+    showToast('📸 Ambil screenshot manual dengan Print Screen', 'info');
+  });
 }
-
-// Panggil updateDashboard saat halaman dimuat dan saat ada transaksi baru
-// Tambahkan di dalam generateInvoice setelah updateStats()
-// Dan di DOMContentLoaded tambahkan:
-// setTimeout(updateDashboard, 200);
