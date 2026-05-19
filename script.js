@@ -1932,8 +1932,7 @@ function updateTopProductsList(transactions) {
 }
 
 function exportDashboard() {
-  // Cari element Dashboard Premium
-  const dashboardSection = document.querySelector('#dashboardSection');
+  const dashboardSection = document.getElementById('dashboardSection');
   const dashboardPanel = dashboardSection ? dashboardSection.querySelector('.glass-panel') : null;
   
   if (!dashboardPanel) {
