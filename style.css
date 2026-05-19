@@ -1591,7 +1591,7 @@ body.dark-mode .inv-powered {
   background: rgba(201,149,42,0.2) !important;
 }
 
-/* STRUK THERMAL 58mm UNTUK PRINTER KASIR */
+/* STRUK THERMAL 58mm UNTUK PRINTER KASIR - DIPERBAIKI */
 @media print {
   body * {
     visibility: hidden;
@@ -1605,10 +1605,12 @@ body.dark-mode .inv-powered {
     left: 0;
     width: 58mm;
     margin: 0;
-    padding: 0;
-    font-family: 'Courier New', 'Fira Code', monospace;
-    font-size: 10px;
-    line-height: 1.3;
+    padding: 2mm 2mm 4mm 2mm;
+    font-family: 'Courier New', 'Fira Code', 'Lucida Console', monospace;
+    font-size: 9px;
+    line-height: 1.25;
+    background: white;
+    color: black;
   }
   @page {
     size: 58mm auto;
@@ -1618,10 +1620,10 @@ body.dark-mode .inv-powered {
 
 .thermal-struk {
   width: 58mm;
-  padding: 4px 6px;
-  font-family: 'Courier New', 'Fira Code', monospace;
-  font-size: 10px;
-  line-height: 1.3;
+  padding: 2mm 2mm 4mm 2mm;
+  font-family: 'Courier New', 'Fira Code', 'Lucida Console', monospace;
+  font-size: 9px;
+  line-height: 1.25;
   background: white;
   color: black;
   display: none;
@@ -1635,18 +1637,23 @@ body.dark-mode .inv-powered {
 }
 
 .thermal-struk .struk-store-name {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
-  margin-bottom: 2px;
+  letter-spacing: 1px;
 }
 
 .thermal-struk .struk-store-address {
-  font-size: 8px;
-  color: #555;
+  font-size: 7px;
+  color: #333;
 }
 
 .thermal-struk .struk-divider {
   border-top: 1px dotted #000;
+  margin: 4px 0;
+}
+
+.thermal-struk .struk-divider-dashed {
+  border-top: 1px dashed #000;
   margin: 4px 0;
 }
 
@@ -1656,20 +1663,35 @@ body.dark-mode .inv-powered {
   margin: 2px 0;
 }
 
+.thermal-struk .struk-item-line {
+  margin: 3px 0;
+}
+
 .thermal-struk .struk-item-name {
-  flex: 2;
+  display: inline-block;
+  width: 65%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 8px;
 }
 
 .thermal-struk .struk-item-qty {
-  width: 30px;
-  text-align: center;
+  display: inline-block;
+  width: 15%;
+  text-align: right;
 }
 
 .thermal-struk .struk-item-price {
-  width: 50px;
+  display: inline-block;
+  width: 20%;
+  text-align: right;
+}
+
+.thermal-struk .struk-subtotal-line {
+  padding-left: 8px;
+  font-size: 7px;
+  color: #555;
   text-align: right;
 }
 
@@ -1686,13 +1708,21 @@ body.dark-mode .inv-powered {
   margin-top: 8px;
   padding-top: 4px;
   border-top: 1px dashed #000;
-  font-size: 8px;
+  font-size: 7px;
 }
 
 .thermal-struk .struk-thanks {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: bold;
   margin: 4px 0;
+  text-align: center;
+}
+
+.thermal-struk .text-right {
+  text-align: right;
+}
+
+.thermal-struk .text-center {
   text-align: center;
 }
 
