@@ -2,40 +2,44 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Kebijakan Privasi - NotaKu</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Lora', serif;
-      background: #faf7f0;
-      color: #1a1208;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background: #faf8f3;
+      color: #0d0b08;
       line-height: 1.6;
       padding: 2rem;
     }
     .container {
       max-width: 800px;
       margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 2px 20px rgba(26,18,8,0.1);
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid #e0d4bc;
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 30px rgba(13,11,8,0.1);
     }
     h1 {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Playfair Display', Georgia, serif;
       color: #c9952a;
-      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
     h2 {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 1.2rem;
       margin: 1.5rem 0 0.5rem 0;
-      color: #1a1208;
+      color: #1a1510;
     }
     p, li {
-      color: #4a3e2e;
+      color: #7a6e5e;
       margin-bottom: 0.5rem;
+      font-size: 0.95rem;
     }
     ul { margin-left: 1.5rem; margin-bottom: 1rem; }
     .back-link {
@@ -43,23 +47,32 @@
       margin-top: 2rem;
       color: #c9952a;
       text-decoration: none;
+      font-weight: 600;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
     }
     .back-link:hover { text-decoration: underline; }
-    hr { margin: 1rem 0; border: none; border-top: 1px solid #ddd3bb; }
+    hr { margin: 1rem 0; border: none; border-top: 1px solid #e0d4bc; }
+    .last-updated {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      color: #a99e8e;
+      margin-bottom: 1.5rem;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🔒 Kebijakan Privasi NotaKu</h1>
-    <p>Terakhir diperbarui: 5 Mei 2026</p>
+    <h1>🔒 Kebijakan Privasi</h1>
+    <p class="last-updated">Terakhir diperbarui: 19 Mei 2026</p>
     
     <h2>1. Informasi yang Kami Kumpulkan</h2>
     <p>✅ NotaKu <strong>TIDAK</strong> menyimpan data pribadi Anda di server manapun.</p>
     <p>✅ Semua data transaksi disimpan di browser Anda sendiri (localStorage).</p>
-    <p>✅ Data yang disimpan di browser: nama toko, nama pembeli, daftar produk, dan riwayat transaksi.</p>
+    <p>✅ Data yang disimpan di browser: nama toko, nama pembeli, daftar produk, riwayat transaksi, stok, dan harga beli produk.</p>
     
     <h2>2. Bagaimana Data Digunakan?</h2>
-    <p>Data hanya digunakan untuk menampilkan nota dan statistik penjualan di perangkat Anda sendiri. Tidak ada pihak ketiga yang dapat mengakses data tersebut.</p>
+    <p>Data hanya digunakan untuk menampilkan nota, statistik penjualan, laporan laba/rugi, dan manajemen stok di perangkat Anda sendiri. Tidak ada pihak ketiga yang dapat mengakses data tersebut.</p>
     
     <h2>3. Keamanan Data</h2>
     <p>✅ Website dilindungi dengan SSL/HTTPS (koneksi aman terenkripsi).</p>
@@ -67,13 +80,18 @@
     <p>✅ Data hanya bisa diakses oleh Anda (tidak ada pihak ketiga).</p>
     
     <h2>4. Pembayaran Premium</h2>
-    <p>✅ Transfer pembayaran hanya melalui rekening BRI atas nama Ardian Nurraihan.</p>
+    <p>✅ Harga Premium: <strong>Rp 10.000/bulan, Rp 25.000/3 bulan, Rp 60.000/tahun</strong>.</p>
+    <p>✅ Transfer pembayaran hanya melalui rekening BRI 3593-0100-9186-508 atas nama <strong>Ardian Nurraihan</strong>.</p>
     <p>✅ Kami tidak menyimpan data kartu kredit atau informasi pembayaran lainnya.</p>
     <p>✅ Bukti transfer yang dikirim via WhatsApp hanya untuk verifikasi dan akan dihapus setelah kode dikirim.</p>
     
     <h2>5. Cookie dan Tracking</h2>
     <p>✅ Website menggunakan Google Analytics untuk statistik pengunjung (anonim).</p>
     <p>✅ Tidak ada cookie pelacakan dari pihak ketiga lainnya.</p>
+    
+    <h2>6. Backup & Restore Data</h2>
+    <p>✅ NotaKu menyediakan fitur backup data ke file JSON.</p>
+    <p>✅ File backup disimpan di perangkat Anda, bukan di server kami.</p>
     
     <hr>
     <a href="/" class="back-link">← Kembali ke NotaKu</a>
