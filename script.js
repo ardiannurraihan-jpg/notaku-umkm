@@ -1968,17 +1968,35 @@ function printThermalStruk() {
     return;
   }
   
-  // Ambil data dari nota
-  const storeName = document.getElementById('inv-storeName')?.textContent || 'Toko Kami';
-  const storeAddress = document.getElementById('inv-storeAddress')?.textContent || '';
-  const storePhone = document.getElementById('inv-storePhone')?.textContent || '';
-  const buyerName = document.getElementById('inv-buyerName')?.textContent || 'Pelanggan';
-  const invoiceNumber = document.getElementById('inv-number')?.textContent || '';
-  const invoiceDate = document.getElementById('inv-date')?.textContent || '';
-  const subtotal = document.getElementById('inv-subtotal')?.textContent || 'Rp 0';
-  const discount = document.getElementById('inv-discount')?.textContent || '';
-  const tax = document.getElementById('inv-tax')?.textContent || '';
-  const total = document.getElementById('inv-total')?.textContent || 'Rp 0';
+  // Ambil data dari nota dengan format bersih
+  const storeName = document.getElementById('inv-storeName')?.textContent?.trim() || 'TOKO ANDA';
+  const storeAddress = document.getElementById('inv-storeAddress')?.textContent?.trim() || '';
+  const storePhone = document.getElementById('inv-storePhone')?.textContent?.replace('☎', '').trim() || '';
+  const buyerName = document.getElementById('inv-buyerName')?.textContent?.trim() || 'PELANGGAN';
+  const invoiceNumber = document.getElementById('inv-number')?.textContent?.trim() || '';
+  const invoiceDate = document.getElementById('inv-date')?.textContent?.trim() || '';
+  
+  // Ambil subtotal (bersihkan dari "Rp")
+  let subtotalRaw = document.getElementById('inv-subtotal')?.textContent?.trim() || 'Rp 0';
+  let subtotal = subtotalRaw.replace('Rp', '').trim();
+  
+  // Ambil diskon
+  let discountRaw = document.getElementById('inv-discount')?.textContent?.trim() || '';
+  let discount = discountRaw.replace('Rp', '').replace('-', '').trim();
+  
+  // Ambil pajak
+  let taxRaw = document.getElementById('inv-tax')?.textContent?.trim() || '';
+  let tax = taxRaw.replace('Rp', '').replace('+', '').trim();
+  // Pisahkan nominal dari persen
+  let taxAmount = tax.split(' ')[0] || '0';
+  let taxPercent = '';
+  if (tax.includes('(')) {
+    taxPercent = tax.match(/\(([^)]+)\)/)?.[1] || '';
+  }
+  
+  // Ambil total
+  let totalRaw = document.getElementById('inv-total')?.textContent?.trim() || 'Rp 0';
+  let total = totalRaw.replace('Rp', '').trim();
   
   // Ambil items dari tabel
   const items = [];
@@ -1987,60 +2005,80 @@ function printThermalStruk() {
     tbody.querySelectorAll('tr').forEach(row => {
       const cols = row.querySelectorAll('td');
       if (cols.length >= 4) {
-        items.push({
-          name: cols[0]?.textContent?.trim() || '',
-          qty: cols[1]?.textContent?.trim() || '0',
-          price: cols[2]?.textContent?.trim() || '',
-          subtotal: cols[3]?.textContent?.trim() || ''
-        });
+        let name = cols[0]?.textContent?.trim() || '';
+        let qty = cols[1]?.textContent?.trim() || '0';
+        let price = cols[2]?.textContent?.trim() || '';
+        let subtotalItem = cols[3]?.textContent?.trim() || '';
+        
+        // Bersihkan harga dari "Rp"
+        price = price.replace('Rp', '').trim();
+        subtotalItem = subtotalItem.replace('Rp', '').trim();
+        
+        items.push({ name, qty, price, subtotal: subtotalItem });
       }
     });
   }
   
-  // Buat HTML struk
-// Buat HTML struk dengan format lebih rapi
-const strukHTML = `
-<div class="thermal-struk" id="thermalStruk">
-  <div class="struk-header">
-    <div class="struk-store-name">${escapeHtml(storeName)}</div>
-    <div class="struk-store-address">${escapeHtml(storeAddress)}</div>
-    <div class="struk-store-address">${escapeHtml(storePhone)}</div>
-    <div class="struk-divider"></div>
-    <div>${invoiceNumber}</div>
-    <div>${invoiceDate}</div>
-  </div>
+  // Helper untuk format angka dengan padding
+  function formatNumber(num) {
+    let str = num.toString().replace(/\./g, '');
+    let result = '';
+    for (let i = str.length - 1, j = 0; i >= 0; i--, j++) {
+      if (j > 0 && j % 3 === 0) result = '.' + result;
+      result = str[i] + result;
+    }
+    return result;
+  }
   
-  <div>${escapeHtml(buyerName)}</div>
-  <div class="struk-divider"></div>
+  // Build HTML struk dengan format rapi
+  let itemsHTML = '';
+  items.forEach(item => {
+    itemsHTML += `
+      <div class="struk-item-line">
+        <span class="struk-item-name">${escapeHtml(item.name)}</span>
+        <span class="struk-item-qty">${item.qty}x</span>
+        <span class="struk-item-price">${formatNumber(item.price)}</span>
+      </div>
+      <div class="struk-subtotal-line">  ${formatNumber(item.subtotal)}</div>
+    `;
+  });
   
-  ${items.map(item => `
-    <div class="struk-item-line">
-      <span class="struk-item-name">${escapeHtml(item.name)}</span>
-      <span class="struk-item-qty">${item.qty}x</span>
-      <span class="struk-item-price">${item.price}</span>
+  const strukHTML = `
+    <div class="thermal-struk" id="thermalStruk">
+      <div class="struk-header">
+        <div class="struk-store-name">${escapeHtml(storeName.toUpperCase())}</div>
+        <div class="struk-store-address">${escapeHtml(storeAddress)}</div>
+        <div class="struk-store-address">📞 ${escapeHtml(storePhone)}</div>
+        <div class="struk-divider"></div>
+        <div>${invoiceNumber}</div>
+        <div>${invoiceDate}</div>
+      </div>
+      
+      <div>${escapeHtml(buyerName.toUpperCase())}</div>
+      <div class="struk-divider"></div>
+      
+      ${itemsHTML}
+      
+      <div class="struk-divider"></div>
+      
+      <div class="struk-row">
+        <span>Subtotal</span>
+        <span>${formatNumber(subtotal)}</span>
+      </div>
+      ${discount && discount !== '0' ? `<div class="struk-row"><span>Diskon</span><span>-${formatNumber(discount)}</span></div>` : ''}
+      ${taxAmount && taxAmount !== '0' ? `<div class="struk-row"><span>Pajak ${taxPercent}</span><span>+${formatNumber(taxAmount)}</span></div>` : ''}
+      <div class="struk-row struk-total">
+        <span>TOTAL</span>
+        <span>${formatNumber(total)}</span>
+      </div>
+      
+      <div class="struk-footer">
+        <div>Terima kasih telah berbelanja!</div>
+        <div>NotaKu.id</div>
+        <div>${new Date().toLocaleString('id-ID')}</div>
+      </div>
     </div>
-    <div class="struk-subtotal-line">  ${item.subtotal}</div>
-  `).join('')}
-  
-  <div class="struk-divider"></div>
-  
-  <div class="struk-row">
-    <span>Subtotal</span>
-    <span>${subtotal}</span>
-  </div>
-  ${discount ? `<div class="struk-row"><span>Diskon</span><span>${discount}</span></div>` : ''}
-  ${tax ? `<div class="struk-row"><span>Pajak</span><span>${tax}</span></div>` : ''}
-  <div class="struk-row struk-total">
-    <span>TOTAL</span>
-    <span>${total}</span>
-  </div>
-  
-  <div class="struk-footer">
-    <div>Terima kasih telah berbelanja!</div>
-    <div>NotaKu.id</div>
-    <div>${new Date().toLocaleString('id-ID')}</div>
-  </div>
-</div>`;
+  `;
   
   // Cek apakah sudah ada element struk
   let strukElement = document.getElementById('thermalStruk');
@@ -2053,7 +2091,7 @@ const strukHTML = `
   
   // Print struk
   const printContent = document.getElementById('thermalStruk').outerHTML;
-  const printWindow = window.open('', '_blank', 'width=300,height=400');
+  const printWindow = window.open('', '_blank', 'width=300,height=500');
   printWindow.document.write(`
     <!DOCTYPE html>
     <html>
@@ -2066,25 +2104,30 @@ const strukHTML = `
           box-sizing: border-box;
         }
         body {
-          font-family: 'Courier New', monospace;
+          font-family: 'Courier New', 'Fira Code', monospace;
           font-size: 10px;
           line-height: 1.3;
-          padding: 4px;
+          padding: 2mm;
+          background: white;
         }
         .thermal-struk {
           width: 58mm;
           margin: 0 auto;
+          font-family: 'Courier New', monospace;
+          font-size: 9px;
         }
-        .struk-header { text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #000; }
-        .struk-store-name { font-size: 14px; font-weight: bold; }
-        .struk-store-address { font-size: 8px; color: #555; }
+        .struk-header { text-align: center; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px dotted #000; }
+        .struk-store-name { font-size: 12px; font-weight: bold; }
+        .struk-store-address { font-size: 7px; color: #333; }
         .struk-divider { border-top: 1px dotted #000; margin: 4px 0; }
+        .struk-item-line { margin: 2px 0; }
+        .struk-item-name { display: inline-block; width: 60%; }
+        .struk-item-qty { display: inline-block; width: 15%; text-align: right; }
+        .struk-item-price { display: inline-block; width: 25%; text-align: right; }
+        .struk-subtotal-line { text-align: right; font-size: 8px; margin-bottom: 4px; padding-right: 4px; }
         .struk-row { display: flex; justify-content: space-between; margin: 2px 0; }
-        .struk-item-name { flex: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .struk-item-qty { width: 30px; text-align: center; }
-        .struk-item-price { width: 50px; text-align: right; }
         .struk-total { font-weight: bold; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 0; margin: 4px 0; }
-        .struk-footer { text-align: center; margin-top: 8px; padding-top: 4px; border-top: 1px dashed #000; font-size: 8px; }
+        .struk-footer { text-align: center; margin-top: 8px; padding-top: 4px; border-top: 1px dotted #000; font-size: 7px; }
         @page { size: 58mm auto; margin: 0mm; }
         @media print { body { margin: 0; padding: 0; } }
       </style>
@@ -2102,7 +2145,6 @@ const strukHTML = `
   `);
   printWindow.document.close();
   
-  // Hapus element struk setelah print
   setTimeout(() => {
     const el = document.getElementById('thermalStruk');
     if (el) el.remove();
@@ -2110,11 +2152,9 @@ const strukHTML = `
   
   showToast('🖨️ Membuka jendela cetak untuk struk thermal...', 'info');
   
-  // Catat event ke Google Analytics
   if (typeof gtag === 'function') {
     gtag('event', 'print_thermal_struk', {
-      event_category: 'engagement',
-      event_label: storeName
+      event_category: 'engagement'
     });
   }
 }
