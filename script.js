@@ -1961,6 +1961,11 @@ function exportDashboard() {
 //   CETAK STRUK THERMAL 58mm
 // ============================================
 
+/**
+ * printThermalStruk()
+ * Universal thermal receipt — supports 58mm
+ * Branded layout: logo teks besar + slogan + modern styling
+ */
 function printThermalStruk() {
   const invoice = document.getElementById('invoicePreview');
   if (!invoice || invoice.style.display === 'none') {
@@ -1968,285 +1973,277 @@ function printThermalStruk() {
     return;
   }
 
-  // ── Helper: ambil teks elemen ──────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────────────
   const getText = (id, fallback = '') =>
     document.getElementById(id)?.textContent?.trim() || fallback;
 
-  // ── Helper: ekstrak angka dari format "Rp 1.500.000" ─────────────────
   function extractNumber(str) {
     if (!str) return 0;
-    const clean = str.replace(/[^\d]/g, '');
-    return parseInt(clean) || 0;
+    const match = str.match(/[\d.,]+/);
+    if (!match) return 0;
+    return parseInt(match[0].replace(/\./g, '').replace(/,/g, '')) || 0;
   }
 
-  // ── Helper: format angka ke "1.500.000" ───────────────────────────────
   function fmt(num) {
     if (!num || isNaN(num)) return '0';
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
-  // ── Helper: potong teks jika terlalu panjang ──────────────────────────
   function truncate(str, max) {
+    if (!str) return '';
     return str.length > max ? str.substring(0, max - 1) + '…' : str;
   }
 
-  // ── Ambil data header ─────────────────────────────────────────────────
+  // ── Ambil data nota ───────────────────────────────────────────────────
   const storeName    = getText('inv-storeName', 'TOKO ANDA');
-  const storeAddress = getText('inv-storeAddress');
-  const storePhone   = getText('inv-storePhone').replace(/[☎\s]/g, ' ').trim();
-  const buyerName    = getText('inv-buyerName', 'PELANGGAN');
-  const invoiceNo    = getText('inv-number');
-  const invoiceDate  = getText('inv-date');
+  const storeAddress = getText('inv-storeAddress', '');
+  const storePhone   = getText('inv-storePhone', '').replace(/[☎✆📞]/g, '').trim();
+  const buyerName    = getText('inv-buyerName', '');
+  const invoiceNo    = getText('inv-number', '');
+  const invoiceDate  = getText('inv-date', '');
 
-  // ── Ambil ringkasan keuangan ──────────────────────────────────────────
   const subtotal  = extractNumber(getText('inv-subtotal'));
   const discount  = extractNumber(getText('inv-discount'));
 
-  // Parsing pajak: "PPN 11% : Rp 15.000" → percent=11, amount=15000
   const taxRaw    = getText('inv-tax');
   let taxPercent  = 0;
   let taxAmount   = 0;
   const taxPct    = taxRaw.match(/(\d+)\s*%/);
   const taxAmt    = taxRaw.match(/Rp\s*([\d.,]+)/);
-  if (taxPct)  taxPercent = parseInt(taxPct[1]);
-  if (taxAmt)  taxAmount  = extractNumber(taxAmt[1]);
+  if (taxPct) taxPercent = parseInt(taxPct[1]);
+  if (taxAmt) taxAmount = extractNumber(taxAmt[1]);
 
-  const total     = extractNumber(getText('inv-total'));
+  const total = extractNumber(getText('inv-total'));
 
-  // Bayar & kembalian (opsional — tampilkan jika ada)
-  const paidRaw   = getText('inv-paid');
-  const changeRaw = getText('inv-change');
-  const paid      = extractNumber(paidRaw);
-  const change    = extractNumber(changeRaw);
-
-  // ── Ambil item dari tabel nota ────────────────────────────────────────
+  // ── Ambil items ───────────────────────────────────────────────────────
   const items = [];
   document.getElementById('inv-items')?.querySelectorAll('tr').forEach(row => {
     const cols = row.querySelectorAll('td');
     if (cols.length < 4) return;
+    const rawName = cols[0]?.textContent?.trim() || '';
+    const qty = parseInt(cols[1]?.textContent?.trim()) || 1;
+    const priceRaw = cols[2]?.textContent?.trim() || '';
+    const subtotRaw = cols[3]?.textContent?.trim() || '';
 
-    const rawName     = cols[0]?.textContent?.trim() || '';
-    const qty         = parseInt(cols[1]?.textContent?.trim()) || 1;
-    const priceRaw    = cols[2]?.textContent?.trim() || '';
-    const subtotRaw   = cols[3]?.textContent?.trim() || '';
-
-    let finalPrice      = extractNumber(priceRaw);
+    let finalPrice = extractNumber(priceRaw);
     let discountPercent = 0;
-    let subtotalItem    = extractNumber(subtotRaw);
+    let subtotalItem = extractNumber(subtotRaw);
 
-    // Deteksi harga dengan diskon per item: "Rp 10.000 → Rp 8.500 (-15%)"
     if (priceRaw.includes('→')) {
       const afterArrow = priceRaw.match(/→\s*Rp\s*([\d.,]+)/);
       if (afterArrow) finalPrice = extractNumber(afterArrow[1]);
       const discMatch = priceRaw.match(/\(-\s*([\d.]+)%\)/);
-      if (discMatch)  discountPercent = parseFloat(discMatch[1]);
+      if (discMatch) discountPercent = parseFloat(discMatch[1]);
       subtotalItem = finalPrice * qty;
     }
 
-    items.push({ name: rawName, qty, price: finalPrice, subtotal: subtotalItem, discountPercent });
+    items.push({ 
+      name: rawName, 
+      qty, 
+      price: finalPrice, 
+      subtotal: subtotalItem, 
+      discountPercent 
+    });
   });
 
-  // ── Build baris item ──────────────────────────────────────────────────
-  // Layout 58mm ≈ 32 karakter monospace
-  // Kolom: [nama 18ch] [qty 4ch] [harga 10ch]
-  const COL_NAME  = 18;
-  const COL_QTY   =  4;
-  const COL_PRICE = 10;
-
-  let itemsHTML = '';
-  items.forEach(item => {
-    const nameDisplay  = escapeHtml(truncate(item.name, COL_NAME));
-    const priceDisplay = fmt(item.price);
-    const subtotDisplay = fmt(item.subtotal);
-
-    itemsHTML += `
-      <div class="s-row s-item-head">
-        <span class="s-name">${nameDisplay}</span>
-        <span class="s-qty">${item.qty}x</span>
-        <span class="s-price">${priceDisplay}</span>
-      </div>`;
-
-    if (item.discountPercent > 0) {
-      itemsHTML += `
-      <div class="s-row s-disc-row">
-        <span class="s-disc-label">  diskon ${item.discountPercent}%</span>
-        <span class="s-disc-subtot">${subtotDisplay}</span>
-      </div>`;
-    } else {
-      itemsHTML += `
-      <div class="s-row s-subtot-row">
-        <span></span>
-        <span class="s-subtot">${subtotDisplay}</span>
-      </div>`;
-    }
-  });
-
-  // ── Build HTML struk lengkap ──────────────────────────────────────────
-  const strukHTML = `
-<div class="struk" id="thermalStruk">
-
-  <div class="s-center s-bold s-store">${escapeHtml(storeName.toUpperCase())}</div>
-  ${storeAddress ? `<div class="s-center s-small">${escapeHtml(storeAddress)}</div>` : ''}
-  ${storePhone   ? `<div class="s-center s-small">Telp: ${escapeHtml(storePhone)}</div>` : ''}
-
-  <div class="s-div-dot"></div>
-
-  <div class="s-row">
-    <span>No</span>
-    <span>${escapeHtml(invoiceNo)}</span>
-  </div>
-  <div class="s-row">
-    <span>Tgl</span>
-    <span>${escapeHtml(invoiceDate)}</span>
-  </div>
-  <div class="s-row">
-    <span>Pembeli</span>
-    <span>${escapeHtml(truncate(buyerName.toUpperCase(), 16))}</span>
-  </div>
-
-  <div class="s-div-dot"></div>
-
-  <div class="s-row s-header-row">
-    <span class="s-name">Item</span>
-    <span class="s-qty">Qty</span>
-    <span class="s-price">Harga</span>
-  </div>
-  <div class="s-div-line"></div>
-
-  ${itemsHTML}
-
-  <div class="s-div-dash"></div>
-
-  <div class="s-row">
-    <span>Subtotal</span>
-    <span>${fmt(subtotal)}</span>
-  </div>
-  ${discount > 0 ? `
-  <div class="s-row s-disc-global">
-    <span>Diskon</span>
-    <span>- ${fmt(discount)}</span>
-  </div>` : ''}
-  ${taxAmount > 0 ? `
-  <div class="s-row">
-    <span>Pajak${taxPercent > 0 ? ' ' + taxPercent + '%' : ''}</span>
-    <span>+ ${fmt(taxAmount)}</span>
-  </div>` : ''}
-
-  <div class="s-div-solid"></div>
-  <div class="s-row s-total">
-    <span>TOTAL</span>
-    <span>${fmt(total)}</span>
-  </div>
-  <div class="s-div-solid"></div>
-
-  ${paid > 0 ? `
-  <div class="s-row">
-    <span>Bayar</span>
-    <span>${fmt(paid)}</span>
-  </div>
-  <div class="s-row s-bold">
-    <span>Kembali</span>
-    <span>${fmt(change)}</span>
-  </div>` : ''}
-
-  <div class="s-footer">
-    <div>* Terima kasih telah berbelanja *</div>
-    <div>Barang yang sudah dibeli</div>
-    <div>tidak dapat dikembalikan</div>
-    <div class="s-div-dot" style="margin:4px 0"></div>
-    <div>NotaKu.id</div>
-    <div>${new Date().toLocaleString('id-ID', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    })}</div>
-  </div>
-
-</div>`;
-
-  // ── CSS untuk jendela cetak ───────────────────────────────────────────
+  // ── CSS untuk 58mm thermal printer ────────────────────────────────────
   const css = `
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   background: #fff;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 8.5pt;
-  line-height: 1.3;
-}
-.struk {
-  width: 54mm;
-  margin: 0 auto;
-  padding: 3mm 1mm;
+  font-size: 9pt;
+  line-height: 1.35;
   color: #000;
+  padding: 2mm 3mm;
+}
+.struk { width: 100%; max-width: 58mm; margin: 0 auto; }
+
+.brand-box {
+  text-align: center;
+  padding-bottom: 6px;
+  margin-bottom: 5px;
+  border-bottom: 2px solid #000;
+}
+.brand-name {
+  font-size: 14pt;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.brand-tagline {
+  font-size: 7pt;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #555;
+  margin-top: 2px;
+}
+.brand-sub {
+  font-size: 7pt;
+  color: #444;
+  margin-top: 2px;
 }
 
-/* ── Teks ── */
-.s-bold   { font-weight: bold; }
-.s-small  { font-size: 7pt; }
-.s-store  { font-size: 11pt; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 2px; }
-.s-center { text-align: center; }
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5pt;
+  margin: 2px 0;
+}
+.meta-label { color: #555; }
+.meta-value { font-weight: bold; text-align: right; max-width: 60%; overflow: hidden; white-space: nowrap; }
 
-/* ── Pembatas ── */
-.s-div-dot  { border-top: 1px dotted #000; margin: 4px 0; }
-.s-div-dash { border-top: 1px dashed #000; margin: 4px 0; }
-.s-div-line { border-top: 1px solid #000;  margin: 2px 0; }
-.s-div-solid{ border-top: 2px solid #000;  margin: 3px 0; }
+.div-dot  { border-top: 1px dotted #999; margin: 4px 0; }
+.div-dash { border-top: 1px dashed #666; margin: 4px 0; }
+.div-bold { border-top: 2px solid #000; margin: 4px 0; }
 
-/* ── Baris dua kolom ── */
-.s-row {
+.item-header {
+  display: flex;
+  font-size: 7pt;
+  font-weight: bold;
+  padding: 3px 0;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  margin: 4px 0 2px;
+}
+.item-row {
+  display: flex;
+  align-items: baseline;
+  margin: 2px 0 0;
+  font-size: 8.5pt;
+}
+.item-sub-row {
+  text-align: right;
+  font-size: 7pt;
+  color: #444;
+  margin-bottom: 2px;
+}
+.item-disc-row {
+  text-align: right;
+  font-size: 7pt;
+  color: #c0431a;
+  margin-bottom: 2px;
+}
+
+.col-name  { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.col-qty   { flex: 0 0 15%; text-align: right; }
+.col-price { flex: 0 0 28%; text-align: right; }
+
+.sum-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8pt;
+  margin: 2px 0;
+}
+.sum-disc { color: #555; }
+
+.total-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 4px;
-  margin: 1.5px 0;
-}
-
-/* ── Header kolom item ── */
-.s-header-row { font-size: 7.5pt; font-weight: bold; }
-
-/* ── Kolom item ── */
-.s-name  { flex: 0 0 55%; overflow: hidden; white-space: nowrap; }
-.s-qty   { flex: 0 0 15%; text-align: right; }
-.s-price { flex: 0 0 30%; text-align: right; }
-
-/* ── Baris subtotal item ── */
-.s-subtot-row  { font-size: 7.5pt; color: #333; }
-.s-subtot      { text-align: right; }
-
-/* ── Diskon per item ── */
-.s-disc-row    { font-size: 7pt; }
-.s-disc-label  { color: #555; }
-.s-disc-subtot { text-align: right; }
-
-/* ── Diskon global ── */
-.s-disc-global { color: #333; }
-
-/* ── Baris total ── */
-.s-total {
-  font-size: 10.5pt;
+  padding: 4px 0;
+  font-size: 11pt;
   font-weight: bold;
-  padding: 2px 0;
 }
 
-/* ── Footer ── */
-.s-footer {
+.footer-box {
   text-align: center;
   margin-top: 6px;
   padding-top: 4px;
-  font-size: 7.5pt;
-  line-height: 1.5;
+  border-top: 1px dotted #999;
+  font-size: 7pt;
+  line-height: 1.6;
 }
+.footer-thanks {
+  font-size: 8pt;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.footer-note { color: #555; }
+.footer-brand { color: #888; margin-top: 2px; }
 
-/* ── Print ── */
 @page { size: 58mm auto; margin: 0; }
 @media print {
-  body { padding: 0; }
-  .struk { padding: 2mm 0.5mm; }
-}`;
+  body { padding: 1mm 2mm; }
+}
+  `;
 
-  // ── Buka jendela cetak ────────────────────────────────────────────────
-  const printWin = window.open('', '_blank', 'width=320,height=600');
+  // ── Item rows HTML ────────────────────────────────────────────────────
+  let itemsHTML = '';
+  items.forEach(item => {
+    const nameDisp = escapeHtml(truncate(item.name, 22));
+    const priceDisp = fmt(item.price);
+    const subtDisp = fmt(item.subtotal);
+
+    itemsHTML += `
+      <div class="item-row">
+        <span class="col-name">${nameDisp}</span>
+        <span class="col-qty">${item.qty}x</span>
+        <span class="col-price">${priceDisp}</span>
+      </div>`;
+
+    if (item.discountPercent > 0) {
+      itemsHTML += `<div class="item-disc-row">↳ diskon ${item.discountPercent}% → ${subtDisp}</div>`;
+    } else {
+      itemsHTML += `<div class="item-sub-row">${subtDisp}</div>`;
+    }
+  });
+
+  // ── Slogan default ────────────────────────────────────────────────────
+  const slogan = 'Melayani dengan sepenuh hati';
+
+  // ── Struk HTML ────────────────────────────────────────────────────────
+  const strukHTML = `
+<div class="struk">
+  <div class="brand-box">
+    <div class="brand-name">${escapeHtml(storeName.toUpperCase())}</div>
+    <div class="brand-tagline">${escapeHtml(slogan)}</div>
+    ${storeAddress ? `<div class="brand-sub">${escapeHtml(storeAddress)}</div>` : ''}
+    ${storePhone ? `<div class="brand-sub">T. ${escapeHtml(storePhone)}</div>` : ''}
+  </div>
+
+  <div class="meta-row"><span class="meta-label">No. Nota</span><span class="meta-value">${escapeHtml(invoiceNo)}</span></div>
+  <div class="meta-row"><span class="meta-label">Tanggal</span><span class="meta-value">${escapeHtml(invoiceDate)}</span></div>
+  ${buyerName ? `<div class="meta-row"><span class="meta-label">Pelanggan</span><span class="meta-value">${escapeHtml(truncate(buyerName, 20))}</span></div>` : ''}
+
+  <div class="item-header">
+    <span class="col-name">Item</span>
+    <span class="col-qty">Qty</span>
+    <span class="col-price">Harga</span>
+  </div>
+
+  ${itemsHTML || '<div class="item-row"><span class="col-name">- tidak ada item -</span></div>'}
+
+  <div class="div-dash"></div>
+
+  <div class="sum-row"><span>Subtotal</span><span>Rp ${fmt(subtotal)}</span></div>
+  ${discount > 0 ? `<div class="sum-row sum-disc"><span>Diskon</span><span>-Rp ${fmt(discount)}</span></div>` : ''}
+  ${taxAmount > 0 ? `<div class="sum-row"><span>Pajak${taxPercent > 0 ? ' ' + taxPercent + '%' : ''}</span><span>+Rp ${fmt(taxAmount)}</span></div>` : ''}
+
+  <div class="div-bold"></div>
+  <div class="total-row">
+    <span>TOTAL</span>
+    <span>Rp ${fmt(total)}</span>
+  </div>
+  <div class="div-bold"></div>
+
+  <div class="footer-box">
+    <div class="footer-thanks">★ TERIMA KASIH ★</div>
+    <div>Semoga hari Anda menyenangkan!</div>
+    <div class="footer-note">Barang yang dibeli tidak dapat dikembalikan</div>
+    <div class="div-dot"></div>
+    <div class="footer-brand">NotaKu.id</div>
+    <div class="footer-brand">${new Date().toLocaleString('id-ID', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    })}</div>
+  </div>
+</div>`;
+
+  // ── Buka window cetak ─────────────────────────────────────────────────
+  const printWin = window.open('', '_blank', 'width=350,height=600');
   if (!printWin) {
-    showToast('⚠️ Pop-up diblokir browser, izinkan pop-up untuk mencetak.', 'warn');
+    showToast('⚠️ Pop-up diblokir. Izinkan pop-up untuk mencetak.', 'warn');
     return;
   }
 
@@ -2254,19 +2251,19 @@ body {
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Struk — ${escapeHtml(storeName)}</title>
+  <title>Struk - ${escapeHtml(storeName)}</title>
   <style>${css}</style>
 </head>
 <body>
   ${strukHTML}
   <script>
     window.onload = function() {
-      setTimeout(function() { window.print(); window.close(); }, 150);
+      setTimeout(function() { window.print(); window.close(); }, 200);
     };
   <\/script>
 </body>
 </html>`);
   printWin.document.close();
 
-  showToast('🖨️ Membuka jendela cetak struk thermal...', 'info');
+  showToast('🖨️ Membuka jendela cetak struk...', 'info');
 }
