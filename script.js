@@ -58,7 +58,6 @@ function loadLastInvoice() {
       itemsContainer.innerHTML = '';
       itemCount = 0;
       data.items.forEach(item => {
-        addItem(item.name, parseFloat(item.qty), parseFloat(item.price));
         addItem(item.name, parseFloat(item.qty), parseFloat(item.price), parseFloat(item.discount || 0));
       });
     }
