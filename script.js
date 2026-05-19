@@ -1998,51 +1998,49 @@ function printThermalStruk() {
   }
   
   // Buat HTML struk
-  const strukHTML = `
-    <div class="thermal-struk" id="thermalStruk">
-      <div class="struk-header">
-        <div class="struk-store-name">${escapeHtml(storeName)}</div>
-        <div class="struk-store-address">${escapeHtml(storeAddress)}</div>
-        <div class="struk-store-address">${escapeHtml(storePhone)}</div>
-        <div class="struk-divider"></div>
-        <div>${invoiceNumber}</div>
-        <div>${invoiceDate}</div>
-      </div>
-      
-      <div>Pelanggan: ${escapeHtml(buyerName)}</div>
-      <div class="struk-divider"></div>
-      
-      ${items.map(item => `
-        <div class="struk-row">
-          <span class="struk-item-name">${escapeHtml(item.name)}</span>
-          <span class="struk-item-qty">${item.qty}x</span>
-          <span class="struk-item-price">${item.price}</span>
-        </div>
-        <div class="struk-row" style="font-size:8px; margin-top:-2px;">
-          <span style="padding-left:4px;">${item.subtotal}</span>
-        </div>
-      `).join('')}
-      
-      <div class="struk-divider"></div>
-      
-      <div class="struk-row">
-        <span>Subtotal</span>
-        <span>${subtotal}</span>
-      </div>
-      ${discount ? `<div class="struk-row"><span>Diskon</span><span>${discount}</span></div>` : ''}
-      ${tax ? `<div class="struk-row"><span>Pajak</span><span>${tax}</span></div>` : ''}
-      <div class="struk-row struk-total">
-        <span>TOTAL</span>
-        <span>${total}</span>
-      </div>
-      
-      <div class="struk-footer">
-        <div>Terima kasih telah berbelanja!</div>
-        <div>Nota ini dicetak dari NotaKu.id</div>
-        <div style="font-size:7px;">${new Date().toLocaleString('id-ID')}</div>
-      </div>
+// Buat HTML struk dengan format lebih rapi
+const strukHTML = `
+<div class="thermal-struk" id="thermalStruk">
+  <div class="struk-header">
+    <div class="struk-store-name">${escapeHtml(storeName)}</div>
+    <div class="struk-store-address">${escapeHtml(storeAddress)}</div>
+    <div class="struk-store-address">${escapeHtml(storePhone)}</div>
+    <div class="struk-divider"></div>
+    <div>${invoiceNumber}</div>
+    <div>${invoiceDate}</div>
+  </div>
+  
+  <div>${escapeHtml(buyerName)}</div>
+  <div class="struk-divider"></div>
+  
+  ${items.map(item => `
+    <div class="struk-item-line">
+      <span class="struk-item-name">${escapeHtml(item.name)}</span>
+      <span class="struk-item-qty">${item.qty}x</span>
+      <span class="struk-item-price">${item.price}</span>
     </div>
-  `;
+    <div class="struk-subtotal-line">  ${item.subtotal}</div>
+  `).join('')}
+  
+  <div class="struk-divider"></div>
+  
+  <div class="struk-row">
+    <span>Subtotal</span>
+    <span>${subtotal}</span>
+  </div>
+  ${discount ? `<div class="struk-row"><span>Diskon</span><span>${discount}</span></div>` : ''}
+  ${tax ? `<div class="struk-row"><span>Pajak</span><span>${tax}</span></div>` : ''}
+  <div class="struk-row struk-total">
+    <span>TOTAL</span>
+    <span>${total}</span>
+  </div>
+  
+  <div class="struk-footer">
+    <div>Terima kasih telah berbelanja!</div>
+    <div>NotaKu.id</div>
+    <div>${new Date().toLocaleString('id-ID')}</div>
+  </div>
+</div>`;
   
   // Cek apakah sudah ada element struk
   let strukElement = document.getElementById('thermalStruk');
