@@ -1967,217 +1967,306 @@ function printThermalStruk() {
     showToast('⚠️ Generate nota terlebih dahulu!', 'warn');
     return;
   }
-  
-  // Ambil data dari nota
-  const storeName = document.getElementById('inv-storeName')?.textContent?.trim() || 'TOKO ANDA';
-  const storeAddress = document.getElementById('inv-storeAddress')?.textContent?.trim() || '';
-  let storePhone = document.getElementById('inv-storePhone')?.textContent?.trim() || '';
-  storePhone = storePhone.replace('☎', '').trim();
-  const buyerName = document.getElementById('inv-buyerName')?.textContent?.trim() || 'PELANGGAN';
-  const invoiceNumber = document.getElementById('inv-number')?.textContent?.trim() || '';
-  const invoiceDate = document.getElementById('inv-date')?.textContent?.trim() || '';
-  
-  // Ambil nilai numerik dari format Rupiah
-  function extractNumber(rpString) {
-    if (!rpString) return 0;
-    const match = rpString.match(/[\d.,]+/);
-    if (!match) return 0;
-    return parseInt(match[0].replace(/\./g, '').replace(/,/g, ''));
+
+  // ── Helper: ambil teks elemen ──────────────────────────────────────────
+  const getText = (id, fallback = '') =>
+    document.getElementById(id)?.textContent?.trim() || fallback;
+
+  // ── Helper: ekstrak angka dari format "Rp 1.500.000" ─────────────────
+  function extractNumber(str) {
+    if (!str) return 0;
+    const clean = str.replace(/[^\d]/g, '');
+    return parseInt(clean) || 0;
   }
-  
-  // Format angka ke Rupiah tanpa desimal
-  function formatRupiahShort(num) {
-    if (num === 0 || isNaN(num)) return '0';
-    let str = num.toString();
-    let result = '';
-    for (let i = str.length - 1, j = 0; i >= 0; i--, j++) {
-      if (j > 0 && j % 3 === 0) result = '.' + result;
-      result = str[i] + result;
-    }
-    return result;
+
+  // ── Helper: format angka ke "1.500.000" ───────────────────────────────
+  function fmt(num) {
+    if (!num || isNaN(num)) return '0';
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
-  
-  // Subtotal
-  const subtotalRaw = document.getElementById('inv-subtotal')?.textContent || 'Rp 0';
-  const subtotal = extractNumber(subtotalRaw);
-  
-  // Diskon global
-  const discountRaw = document.getElementById('inv-discount')?.textContent || '';
-  const discount = extractNumber(discountRaw);
-  
-  // Pajak
-  const taxRaw = document.getElementById('inv-tax')?.textContent || '';
-  let taxAmount = 0;
-  let taxPercent = 0;
-  const taxMatch = taxRaw.match(/(\d+)/g);
-  if (taxMatch) {
-    if (taxMatch.length >= 2) {
-      taxAmount = parseInt(taxMatch[1]);
-      taxPercent = parseInt(taxMatch[2]);
-    } else if (taxMatch.length === 1) {
-      taxAmount = parseInt(taxMatch[0]);
-    }
+
+  // ── Helper: potong teks jika terlalu panjang ──────────────────────────
+  function truncate(str, max) {
+    return str.length > max ? str.substring(0, max - 1) + '…' : str;
   }
-  
-  // Total
-  const totalRaw = document.getElementById('inv-total')?.textContent || 'Rp 0';
-  const total = extractNumber(totalRaw);
-  
-  // Ambil items
+
+  // ── Ambil data header ─────────────────────────────────────────────────
+  const storeName    = getText('inv-storeName', 'TOKO ANDA');
+  const storeAddress = getText('inv-storeAddress');
+  const storePhone   = getText('inv-storePhone').replace(/[☎\s]/g, ' ').trim();
+  const buyerName    = getText('inv-buyerName', 'PELANGGAN');
+  const invoiceNo    = getText('inv-number');
+  const invoiceDate  = getText('inv-date');
+
+  // ── Ambil ringkasan keuangan ──────────────────────────────────────────
+  const subtotal  = extractNumber(getText('inv-subtotal'));
+  const discount  = extractNumber(getText('inv-discount'));
+
+  // Parsing pajak: "PPN 11% : Rp 15.000" → percent=11, amount=15000
+  const taxRaw    = getText('inv-tax');
+  let taxPercent  = 0;
+  let taxAmount   = 0;
+  const taxPct    = taxRaw.match(/(\d+)\s*%/);
+  const taxAmt    = taxRaw.match(/Rp\s*([\d.,]+)/);
+  if (taxPct)  taxPercent = parseInt(taxPct[1]);
+  if (taxAmt)  taxAmount  = extractNumber(taxAmt[1]);
+
+  const total     = extractNumber(getText('inv-total'));
+
+  // Bayar & kembalian (opsional — tampilkan jika ada)
+  const paidRaw   = getText('inv-paid');
+  const changeRaw = getText('inv-change');
+  const paid      = extractNumber(paidRaw);
+  const change    = extractNumber(changeRaw);
+
+  // ── Ambil item dari tabel nota ────────────────────────────────────────
   const items = [];
-  const tbody = document.getElementById('inv-items');
-  if (tbody) {
-    tbody.querySelectorAll('tr').forEach(row => {
-      const cols = row.querySelectorAll('td');
-      if (cols.length >= 4) {
-        let name = cols[0]?.textContent?.trim() || '';
-        let qty = parseInt(cols[1]?.textContent?.trim()) || 1;
-        let priceRaw = cols[2]?.textContent?.trim() || '';
-        let subtotalItemRaw = cols[3]?.textContent?.trim() || '';
-        
-        // Cek apakah ada diskon per produk
-        let discountPercent = 0;
-        let finalPrice = extractNumber(priceRaw);
-        let subtotalItem = extractNumber(subtotalItemRaw);
-        
-        // Jika harga mengandung diskon
-        if (priceRaw.includes('→')) {
-          const priceMatch = priceRaw.match(/→\s*Rp\s*([\d.,]+)/);
-          if (priceMatch) {
-            finalPrice = extractNumber(priceMatch[1]);
-          }
-          const discountMatch = priceRaw.match(/\(-([\d.]+)%\)/);
-          if (discountMatch) {
-            discountPercent = parseFloat(discountMatch[1]);
-          }
-          subtotalItem = finalPrice * qty;
-        }
-        
-        items.push({
-          name: name,
-          qty: qty,
-          price: finalPrice,
-          subtotal: subtotalItem,
-          discountPercent: discountPercent
-        });
-      }
-    });
-  }
-  
-  // Build items HTML
+  document.getElementById('inv-items')?.querySelectorAll('tr').forEach(row => {
+    const cols = row.querySelectorAll('td');
+    if (cols.length < 4) return;
+
+    const rawName     = cols[0]?.textContent?.trim() || '';
+    const qty         = parseInt(cols[1]?.textContent?.trim()) || 1;
+    const priceRaw    = cols[2]?.textContent?.trim() || '';
+    const subtotRaw   = cols[3]?.textContent?.trim() || '';
+
+    let finalPrice      = extractNumber(priceRaw);
+    let discountPercent = 0;
+    let subtotalItem    = extractNumber(subtotRaw);
+
+    // Deteksi harga dengan diskon per item: "Rp 10.000 → Rp 8.500 (-15%)"
+    if (priceRaw.includes('→')) {
+      const afterArrow = priceRaw.match(/→\s*Rp\s*([\d.,]+)/);
+      if (afterArrow) finalPrice = extractNumber(afterArrow[1]);
+      const discMatch = priceRaw.match(/\(-\s*([\d.]+)%\)/);
+      if (discMatch)  discountPercent = parseFloat(discMatch[1]);
+      subtotalItem = finalPrice * qty;
+    }
+
+    items.push({ name: rawName, qty, price: finalPrice, subtotal: subtotalItem, discountPercent });
+  });
+
+  // ── Build baris item ──────────────────────────────────────────────────
+  // Layout 58mm ≈ 32 karakter monospace
+  // Kolom: [nama 18ch] [qty 4ch] [harga 10ch]
+  const COL_NAME  = 18;
+  const COL_QTY   =  4;
+  const COL_PRICE = 10;
+
   let itemsHTML = '';
   items.forEach(item => {
-    const priceDisplay = formatRupiahShort(item.price);
-    const subtotalDisplay = formatRupiahShort(item.subtotal);
+    const nameDisplay  = escapeHtml(truncate(item.name, COL_NAME));
+    const priceDisplay = fmt(item.price);
+    const subtotDisplay = fmt(item.subtotal);
+
     itemsHTML += `
-      <div class="struk-item-line">
-        <span class="struk-item-name">${escapeHtml(item.name)}</span>
-        <span class="struk-item-qty">${item.qty}x</span>
-        <span class="struk-item-price">${priceDisplay}</span>
-      </div>
-      <div class="struk-subtotal-line">  ${subtotalDisplay}</div>
-    `;
+      <div class="s-row s-item-head">
+        <span class="s-name">${nameDisplay}</span>
+        <span class="s-qty">${item.qty}x</span>
+        <span class="s-price">${priceDisplay}</span>
+      </div>`;
+
     if (item.discountPercent > 0) {
-      itemsHTML += `<div class="struk-discount-line">    diskon ${item.discountPercent}%</div>`;
+      itemsHTML += `
+      <div class="s-row s-disc-row">
+        <span class="s-disc-label">  diskon ${item.discountPercent}%</span>
+        <span class="s-disc-subtot">${subtotDisplay}</span>
+      </div>`;
+    } else {
+      itemsHTML += `
+      <div class="s-row s-subtot-row">
+        <span></span>
+        <span class="s-subtot">${subtotDisplay}</span>
+      </div>`;
     }
   });
-  
-  // Build struk HTML
+
+  // ── Build HTML struk lengkap ──────────────────────────────────────────
   const strukHTML = `
-    <div class="thermal-struk" id="thermalStruk">
-      <div class="struk-header">
-        <div class="struk-store-name">${escapeHtml(storeName.toUpperCase())}</div>
-        <div class="struk-store-address">${escapeHtml(storeAddress)}</div>
-        <div class="struk-store-address">${escapeHtml(storePhone)}</div>
-        <div class="struk-divider"></div>
-        <div>${invoiceNumber}</div>
-        <div>${invoiceDate}</div>
-      </div>
-      
-      <div>${escapeHtml(buyerName.toUpperCase())}</div>
-      <div class="struk-divider"></div>
-      
-      ${itemsHTML}
-      
-      <div class="struk-divider-dashed"></div>
-      
-      <div class="struk-row">
-        <span>Subtotal</span>
-        <span>${formatRupiahShort(subtotal)}</span>
-      </div>
-      ${discount > 0 ? `<div class="struk-row"><span>Diskon</span><span>-${formatRupiahShort(discount)}</span></div>` : ''}
-      ${taxAmount > 0 ? `<div class="struk-row"><span>Pajak ${taxPercent}%</span><span>+${formatRupiahShort(taxAmount)}</span></div>` : ''}
-      <div class="struk-total-line">
-        <span class="struk-total-label">TOTAL</span>
-        <span class="struk-total-value">${formatRupiahShort(total)}</span>
-      </div>
-      
-      <div class="struk-footer">
-        <div>Terima kasih telah berbelanja!</div>
-        <div>NotaKu.id</div>
-        <div>${new Date().toLocaleString('id-ID')}</div>
-      </div>
-    </div>
-  `;
-  
-  // Hapus struk lama jika ada
-  let strukElement = document.getElementById('thermalStruk');
-  if (strukElement) strukElement.remove();
-  
-  document.body.insertAdjacentHTML('beforeend', strukHTML);
-  
-  const printWindow = window.open('', '_blank', 'width=350,height=500');
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Cetak Struk - NotaKu</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-          font-family: 'Courier New', 'Fira Code', monospace;
-          background: white;
-          padding: 2mm;
-        }
-        .thermal-struk {
-          width: 58mm;
-          margin: 0 auto;
-          font-family: 'Courier New', monospace;
-          font-size: 9px;
-          line-height: 1.25;
-        }
-        .struk-header { text-align: center; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px dotted #000; }
-        .struk-store-name { font-size: 12px; font-weight: bold; }
-        .struk-store-address { font-size: 7px; color: #333; }
-        .struk-divider { border-top: 1px dotted #000; margin: 4px 0; }
-        .struk-divider-dashed { border-top: 1px dashed #000; margin: 4px 0; }
-        .struk-item-line { margin: 2px 0; }
-        .struk-item-name { display: inline-block; width: 60%; font-size: 8px; }
-        .struk-item-qty { display: inline-block; width: 15%; text-align: right; }
-        .struk-item-price { display: inline-block; width: 25%; text-align: right; }
-        .struk-subtotal-line { text-align: right; font-size: 7px; margin-bottom: 2px; padding-right: 4px; }
-        .struk-discount-line { text-align: right; font-size: 6px; color: #c0431a; margin-bottom: 4px; }
-        .struk-row { display: flex; justify-content: space-between; margin: 2px 0; }
-        .struk-total-line { display: flex; justify-content: space-between; margin: 4px 0; padding: 4px 0; border-top: 1px solid #000; border-bottom: 1px solid #000; font-weight: bold; }
-        .struk-footer { text-align: center; margin-top: 8px; padding-top: 4px; border-top: 1px dotted #000; font-size: 7px; }
-        @page { size: 58mm auto; margin: 0mm; }
-        @media print { body { margin: 0; padding: 0; } }
-      </style>
-    </head>
-    <body>
-      ${strukHTML}
-      <script>
-        window.onload = () => { window.print(); window.close(); };
-      <\/script>
-    </body>
-    </html>
-  `);
-  printWindow.document.close();
-  
-  setTimeout(() => {
-    const el = document.getElementById('thermalStruk');
-    if (el) el.remove();
-  }, 1000);
-  
-  showToast('🖨️ Membuka jendela cetak untuk struk thermal...', 'info');
+<div class="struk" id="thermalStruk">
+
+  <div class="s-center s-bold s-store">${escapeHtml(storeName.toUpperCase())}</div>
+  ${storeAddress ? `<div class="s-center s-small">${escapeHtml(storeAddress)}</div>` : ''}
+  ${storePhone   ? `<div class="s-center s-small">Telp: ${escapeHtml(storePhone)}</div>` : ''}
+
+  <div class="s-div-dot"></div>
+
+  <div class="s-row">
+    <span>No</span>
+    <span>${escapeHtml(invoiceNo)}</span>
+  </div>
+  <div class="s-row">
+    <span>Tgl</span>
+    <span>${escapeHtml(invoiceDate)}</span>
+  </div>
+  <div class="s-row">
+    <span>Pembeli</span>
+    <span>${escapeHtml(truncate(buyerName.toUpperCase(), 16))}</span>
+  </div>
+
+  <div class="s-div-dot"></div>
+
+  <div class="s-row s-header-row">
+    <span class="s-name">Item</span>
+    <span class="s-qty">Qty</span>
+    <span class="s-price">Harga</span>
+  </div>
+  <div class="s-div-line"></div>
+
+  ${itemsHTML}
+
+  <div class="s-div-dash"></div>
+
+  <div class="s-row">
+    <span>Subtotal</span>
+    <span>${fmt(subtotal)}</span>
+  </div>
+  ${discount > 0 ? `
+  <div class="s-row s-disc-global">
+    <span>Diskon</span>
+    <span>- ${fmt(discount)}</span>
+  </div>` : ''}
+  ${taxAmount > 0 ? `
+  <div class="s-row">
+    <span>Pajak${taxPercent > 0 ? ' ' + taxPercent + '%' : ''}</span>
+    <span>+ ${fmt(taxAmount)}</span>
+  </div>` : ''}
+
+  <div class="s-div-solid"></div>
+  <div class="s-row s-total">
+    <span>TOTAL</span>
+    <span>${fmt(total)}</span>
+  </div>
+  <div class="s-div-solid"></div>
+
+  ${paid > 0 ? `
+  <div class="s-row">
+    <span>Bayar</span>
+    <span>${fmt(paid)}</span>
+  </div>
+  <div class="s-row s-bold">
+    <span>Kembali</span>
+    <span>${fmt(change)}</span>
+  </div>` : ''}
+
+  <div class="s-footer">
+    <div>* Terima kasih telah berbelanja *</div>
+    <div>Barang yang sudah dibeli</div>
+    <div>tidak dapat dikembalikan</div>
+    <div class="s-div-dot" style="margin:4px 0"></div>
+    <div>NotaKu.id</div>
+    <div>${new Date().toLocaleString('id-ID', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    })}</div>
+  </div>
+
+</div>`;
+
+  // ── CSS untuk jendela cetak ───────────────────────────────────────────
+  const css = `
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #fff;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 8.5pt;
+  line-height: 1.3;
+}
+.struk {
+  width: 54mm;
+  margin: 0 auto;
+  padding: 3mm 1mm;
+  color: #000;
+}
+
+/* ── Teks ── */
+.s-bold   { font-weight: bold; }
+.s-small  { font-size: 7pt; }
+.s-store  { font-size: 11pt; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 2px; }
+.s-center { text-align: center; }
+
+/* ── Pembatas ── */
+.s-div-dot  { border-top: 1px dotted #000; margin: 4px 0; }
+.s-div-dash { border-top: 1px dashed #000; margin: 4px 0; }
+.s-div-line { border-top: 1px solid #000;  margin: 2px 0; }
+.s-div-solid{ border-top: 2px solid #000;  margin: 3px 0; }
+
+/* ── Baris dua kolom ── */
+.s-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px;
+  margin: 1.5px 0;
+}
+
+/* ── Header kolom item ── */
+.s-header-row { font-size: 7.5pt; font-weight: bold; }
+
+/* ── Kolom item ── */
+.s-name  { flex: 0 0 55%; overflow: hidden; white-space: nowrap; }
+.s-qty   { flex: 0 0 15%; text-align: right; }
+.s-price { flex: 0 0 30%; text-align: right; }
+
+/* ── Baris subtotal item ── */
+.s-subtot-row  { font-size: 7.5pt; color: #333; }
+.s-subtot      { text-align: right; }
+
+/* ── Diskon per item ── */
+.s-disc-row    { font-size: 7pt; }
+.s-disc-label  { color: #555; }
+.s-disc-subtot { text-align: right; }
+
+/* ── Diskon global ── */
+.s-disc-global { color: #333; }
+
+/* ── Baris total ── */
+.s-total {
+  font-size: 10.5pt;
+  font-weight: bold;
+  padding: 2px 0;
+}
+
+/* ── Footer ── */
+.s-footer {
+  text-align: center;
+  margin-top: 6px;
+  padding-top: 4px;
+  font-size: 7.5pt;
+  line-height: 1.5;
+}
+
+/* ── Print ── */
+@page { size: 58mm auto; margin: 0; }
+@media print {
+  body { padding: 0; }
+  .struk { padding: 2mm 0.5mm; }
+}`;
+
+  // ── Buka jendela cetak ────────────────────────────────────────────────
+  const printWin = window.open('', '_blank', 'width=320,height=600');
+  if (!printWin) {
+    showToast('⚠️ Pop-up diblokir browser, izinkan pop-up untuk mencetak.', 'warn');
+    return;
+  }
+
+  printWin.document.write(`<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Struk — ${escapeHtml(storeName)}</title>
+  <style>${css}</style>
+</head>
+<body>
+  ${strukHTML}
+  <script>
+    window.onload = function() {
+      setTimeout(function() { window.print(); window.close(); }, 150);
+    };
+  <\/script>
+</body>
+</html>`);
+  printWin.document.close();
+
+  showToast('🖨️ Membuka jendela cetak struk thermal...', 'info');
 }
