@@ -1957,3 +1957,166 @@ function exportDashboard() {
     showToast('📸 Ambil screenshot manual dengan Print Screen', 'info');
   });
 }
+// ============================================
+//   CETAK STRUK THERMAL 58mm
+// ============================================
+
+function printThermalStruk() {
+  const invoice = document.getElementById('invoicePreview');
+  if (!invoice || invoice.style.display === 'none') {
+    showToast('⚠️ Generate nota terlebih dahulu!', 'warn');
+    return;
+  }
+  
+  // Ambil data dari nota
+  const storeName = document.getElementById('inv-storeName')?.textContent || 'Toko Kami';
+  const storeAddress = document.getElementById('inv-storeAddress')?.textContent || '';
+  const storePhone = document.getElementById('inv-storePhone')?.textContent || '';
+  const buyerName = document.getElementById('inv-buyerName')?.textContent || 'Pelanggan';
+  const invoiceNumber = document.getElementById('inv-number')?.textContent || '';
+  const invoiceDate = document.getElementById('inv-date')?.textContent || '';
+  const subtotal = document.getElementById('inv-subtotal')?.textContent || 'Rp 0';
+  const discount = document.getElementById('inv-discount')?.textContent || '';
+  const tax = document.getElementById('inv-tax')?.textContent || '';
+  const total = document.getElementById('inv-total')?.textContent || 'Rp 0';
+  
+  // Ambil items dari tabel
+  const items = [];
+  const tbody = document.getElementById('inv-items');
+  if (tbody) {
+    tbody.querySelectorAll('tr').forEach(row => {
+      const cols = row.querySelectorAll('td');
+      if (cols.length >= 4) {
+        items.push({
+          name: cols[0]?.textContent?.trim() || '',
+          qty: cols[1]?.textContent?.trim() || '0',
+          price: cols[2]?.textContent?.trim() || '',
+          subtotal: cols[3]?.textContent?.trim() || ''
+        });
+      }
+    });
+  }
+  
+  // Buat HTML struk
+  const strukHTML = `
+    <div class="thermal-struk" id="thermalStruk">
+      <div class="struk-header">
+        <div class="struk-store-name">${escapeHtml(storeName)}</div>
+        <div class="struk-store-address">${escapeHtml(storeAddress)}</div>
+        <div class="struk-store-address">${escapeHtml(storePhone)}</div>
+        <div class="struk-divider"></div>
+        <div>${invoiceNumber}</div>
+        <div>${invoiceDate}</div>
+      </div>
+      
+      <div>Pelanggan: ${escapeHtml(buyerName)}</div>
+      <div class="struk-divider"></div>
+      
+      ${items.map(item => `
+        <div class="struk-row">
+          <span class="struk-item-name">${escapeHtml(item.name)}</span>
+          <span class="struk-item-qty">${item.qty}x</span>
+          <span class="struk-item-price">${item.price}</span>
+        </div>
+        <div class="struk-row" style="font-size:8px; margin-top:-2px;">
+          <span style="padding-left:4px;">${item.subtotal}</span>
+        </div>
+      `).join('')}
+      
+      <div class="struk-divider"></div>
+      
+      <div class="struk-row">
+        <span>Subtotal</span>
+        <span>${subtotal}</span>
+      </div>
+      ${discount ? `<div class="struk-row"><span>Diskon</span><span>${discount}</span></div>` : ''}
+      ${tax ? `<div class="struk-row"><span>Pajak</span><span>${tax}</span></div>` : ''}
+      <div class="struk-row struk-total">
+        <span>TOTAL</span>
+        <span>${total}</span>
+      </div>
+      
+      <div class="struk-footer">
+        <div>Terima kasih telah berbelanja!</div>
+        <div>Nota ini dicetak dari NotaKu.id</div>
+        <div style="font-size:7px;">${new Date().toLocaleString('id-ID')}</div>
+      </div>
+    </div>
+  `;
+  
+  // Cek apakah sudah ada element struk
+  let strukElement = document.getElementById('thermalStruk');
+  if (strukElement) {
+    strukElement.remove();
+  }
+  
+  // Tambahkan struk ke body
+  document.body.insertAdjacentHTML('beforeend', strukHTML);
+  
+  // Print struk
+  const printContent = document.getElementById('thermalStruk').outerHTML;
+  const printWindow = window.open('', '_blank', 'width=300,height=400');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Cetak Struk - NotaKu</title>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: 'Courier New', monospace;
+          font-size: 10px;
+          line-height: 1.3;
+          padding: 4px;
+        }
+        .thermal-struk {
+          width: 58mm;
+          margin: 0 auto;
+        }
+        .struk-header { text-align: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #000; }
+        .struk-store-name { font-size: 14px; font-weight: bold; }
+        .struk-store-address { font-size: 8px; color: #555; }
+        .struk-divider { border-top: 1px dotted #000; margin: 4px 0; }
+        .struk-row { display: flex; justify-content: space-between; margin: 2px 0; }
+        .struk-item-name { flex: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .struk-item-qty { width: 30px; text-align: center; }
+        .struk-item-price { width: 50px; text-align: right; }
+        .struk-total { font-weight: bold; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 0; margin: 4px 0; }
+        .struk-footer { text-align: center; margin-top: 8px; padding-top: 4px; border-top: 1px dashed #000; font-size: 8px; }
+        @page { size: 58mm auto; margin: 0mm; }
+        @media print { body { margin: 0; padding: 0; } }
+      </style>
+    </head>
+    <body>
+      ${printContent}
+      <script>
+        window.onload = () => {
+          window.print();
+          window.close();
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+  
+  // Hapus element struk setelah print
+  setTimeout(() => {
+    const el = document.getElementById('thermalStruk');
+    if (el) el.remove();
+  }, 1000);
+  
+  showToast('🖨️ Membuka jendela cetak untuk struk thermal...', 'info');
+  
+  // Catat event ke Google Analytics
+  if (typeof gtag === 'function') {
+    gtag('event', 'print_thermal_struk', {
+      event_category: 'engagement',
+      event_label: storeName
+    });
+  }
+}
