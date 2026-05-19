@@ -340,6 +340,9 @@
           <button class="action-btn secondary" onclick="shareInvoice()" style="background: #128C7E; color: white; border: none;">
             📤 Share
           </button>
+          <button class="action-btn email-btn" onclick="showEmailModal()" style="background: #6b3fa0; color: white; border: none;">
+            📧 Email ke Pelanggan
+          </button>
         </div>
       </div>
 
@@ -931,6 +934,36 @@
   </div>
 </div>
 
+<!-- Modal Kirim Email -->
+<div id="emailModal" class="modal">
+  <div class="modal-content">
+    <button class="close" onclick="closeEmailModal()">✕</button>
+    <h3>📧 Kirim Nota ke Email</h3>
+    <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem;">Nota akan dikirim sebagai PDF ke email pelanggan</p>
+    
+    <div class="input-wrap" style="margin-bottom: 1rem;">
+      <input type="email" id="emailAddress" placeholder="Email pelanggan" />
+      <div class="input-line"></div>
+    </div>
+    
+    <div class="input-wrap" style="margin-bottom: 1rem;">
+      <input type="text" id="emailSubject" placeholder="Subjek email (opsional)" value="Nota Pembelian dari Toko Kami" />
+      <div class="input-line"></div>
+    </div>
+    
+    <div class="input-wrap" style="margin-bottom: 1rem;">
+      <textarea id="emailMessage" placeholder="Pesan tambahan (opsional)" rows="3">Terima kasih telah berbelanja di toko kami. Berikut nota pembelian Anda terlampir.</textarea>
+      <div class="input-line"></div>
+    </div>
+    
+    <button onclick="sendEmailWithInvoice()" style="background: #6b3fa0;">📧 Kirim Email</button>
+    <p style="font-size: 0.65rem; color: var(--muted); margin-top: 0.8rem; text-align: center;">
+      ⚡ Catatan: Untuk demo, email akan disalin ke clipboard. <br/>
+      ✨ Fitur ini akan aktif sepenuhnya di versi Premium.
+    </p>
+  </div>
+</div>
+  
 <script src="premium.js"></script>
 <script src="script.js"></script>
 </body>
