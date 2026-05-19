@@ -575,8 +575,7 @@ if (typeof updateProfitReport === 'function') {
   }
 });
 
-// ── ITEM MANAGEMENT ──────────────────────────
-function addItem(name = '', qty = 1, price = 0) {
+function addItem(name = '', qty = 1, price = 0, discount = 0) {
   itemCount++;
   const id   = itemCount;
   const list = document.getElementById('itemsList');
@@ -588,7 +587,8 @@ function addItem(name = '', qty = 1, price = 0) {
   row.innerHTML = `
     <input type="text"   placeholder="Nama produk / jasa" class="item-name"  value="${escapeHtml(name)}" enterkeyhint="next" />
     <input type="text"   placeholder="Qty"                class="item-qty"   inputmode="numeric" pattern="[0-9]*" value="${qty}" enterkeyhint="next" />
-    <input type="text"   placeholder="Harga (Rp)"         class="item-price" inputmode="numeric" pattern="[0-9]*" value="${price}" enterkeyhint="done" />
+    <input type="text"   placeholder="Harga (Rp)"         class="item-price" inputmode="numeric" pattern="[0-9]*" value="${price}" enterkeyhint="next" />
+    <input type="text"   placeholder="Diskon (%)"         class="item-discount" inputmode="numeric" pattern="[0-9]*" value="${discount}" enterkeyhint="done" style="width: 80px;" />
     <button class="remove-btn" onclick="removeItem(${id})" title="Hapus">✕</button>
   `;
   list.appendChild(row);
@@ -732,16 +732,27 @@ function incrementInvoiceNumber() {
 // ── GENERATE INVOICE ──────────────────────────
 function generateInvoice() {
   const rows  = document.querySelectorAll('.item-row');
-  const items = [];
-
-  rows.forEach(row => {
-    const name  = row.querySelector('.item-name')?.value.trim();
-    const qty   = parseFloat(row.querySelector('.item-qty')?.value)   || 0;
-    const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
-    if (name && price > 0 && qty > 0) {
-      items.push({ name: name, qty, price, subtotal: qty * price });
-    }
-  });
+ const items = [];
+rows.forEach(row => {
+  const name = row.querySelector('.item-name')?.value.trim();
+  const qty = parseFloat(row.querySelector('.item-qty')?.value) || 0;
+  const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
+  const discountPercent = parseFloat(row.querySelector('.item-discount')?.value) || 0;
+  if (name && price > 0 && qty > 0) {
+    const discountAmount = (price * discountPercent / 100) * qty;
+    const finalPrice = price * (1 - discountPercent / 100);
+    const subtotal = finalPrice * qty;
+    items.push({ 
+      name: name, 
+      qty, 
+      price, 
+      discountPercent,
+      discountAmount,
+      finalPrice,
+      subtotal 
+    });
+  }
+});
 
   if (items.length === 0) {
     showToast('⚠️ Tambahkan minimal 1 produk terlebih dahulu!', 'warn');
