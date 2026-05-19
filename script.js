@@ -1977,6 +1977,10 @@ function printThermalStruk() {
   const getText = (id, fallback = '') =>
     document.getElementById(id)?.textContent?.trim() || fallback;
 
+  function getInputValue(id, fallback = '') {
+    return document.getElementById(id)?.value?.trim() || fallback;
+  }
+
   function extractNumber(str) {
     if (!str) return 0;
     const match = str.match(/[\d.,]+/);
@@ -2001,6 +2005,10 @@ function printThermalStruk() {
   const buyerName    = getText('inv-buyerName', '');
   const invoiceNo    = getText('inv-number', '');
   const invoiceDate  = getText('inv-date', '');
+  
+  // ── AMBIL DATA DARI FORM INPUT (No. Meja & Kasir) ─────────────────────
+  const tableNumber  = getInputValue('tableNumber', '');
+  const cashierName  = getInputValue('cashierName', '');
 
   const subtotal  = extractNumber(getText('inv-subtotal'));
   const discount  = extractNumber(getText('inv-discount'));
@@ -2192,7 +2200,7 @@ body {
   // ── Slogan default ────────────────────────────────────────────────────
   const slogan = 'Melayani dengan sepenuh hati';
 
-  // ── Struk HTML ────────────────────────────────────────────────────────
+  // ── Struk HTML dengan No. Meja & Kasir ─────────────────────────────────
   const strukHTML = `
 <div class="struk">
   <div class="brand-box">
@@ -2204,6 +2212,8 @@ body {
 
   <div class="meta-row"><span class="meta-label">No. Nota</span><span class="meta-value">${escapeHtml(invoiceNo)}</span></div>
   <div class="meta-row"><span class="meta-label">Tanggal</span><span class="meta-value">${escapeHtml(invoiceDate)}</span></div>
+  ${tableNumber ? `<div class="meta-row"><span class="meta-label">No. Meja</span><span class="meta-value">${escapeHtml(tableNumber)}</span></div>` : ''}
+  ${cashierName ? `<div class="meta-row"><span class="meta-label">Kasir</span><span class="meta-value">${escapeHtml(cashierName)}</span></div>` : ''}
   ${buyerName ? `<div class="meta-row"><span class="meta-label">Pelanggan</span><span class="meta-value">${escapeHtml(truncate(buyerName, 20))}</span></div>` : ''}
 
   <div class="item-header">
