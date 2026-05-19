@@ -628,6 +628,30 @@ textarea {
 .add-item-btn:hover { background: rgba(201,149,42,0.1); border-color: var(--gold); }
 .add-item-btn.small { font-size: 0.75rem; padding: 0.5rem; }
 
+.item-row {
+  display: grid;
+  grid-template-columns: 2fr 0.6fr 1fr 0.8fr auto;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.item-discount {
+  width: 80px;
+  text-align: center;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+  .item-row {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  .item-discount {
+    width: 100%;
+  }
+}
+
 /* TEMPLATE SELECTOR */
 .template-selector { margin-bottom: 0.5rem; }
 .template-group-label-ui {
