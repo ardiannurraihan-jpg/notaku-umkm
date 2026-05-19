@@ -1590,6 +1590,112 @@ body.dark-mode .inv-powered {
 .dark-toggle:hover {
   background: rgba(201,149,42,0.2) !important;
 }
+
+/* STRUK THERMAL 58mm UNTUK PRINTER KASIR */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #thermalStruk, #thermalStruk * {
+    visibility: visible;
+  }
+  #thermalStruk {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 58mm;
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', 'Fira Code', monospace;
+    font-size: 10px;
+    line-height: 1.3;
+  }
+  @page {
+    size: 58mm auto;
+    margin: 0mm;
+  }
+}
+
+.thermal-struk {
+  width: 58mm;
+  padding: 4px 6px;
+  font-family: 'Courier New', 'Fira Code', monospace;
+  font-size: 10px;
+  line-height: 1.3;
+  background: white;
+  color: black;
+  display: none;
+}
+
+.thermal-struk .struk-header {
+  text-align: center;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed #000;
+}
+
+.thermal-struk .struk-store-name {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.thermal-struk .struk-store-address {
+  font-size: 8px;
+  color: #555;
+}
+
+.thermal-struk .struk-divider {
+  border-top: 1px dotted #000;
+  margin: 4px 0;
+}
+
+.thermal-struk .struk-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 2px 0;
+}
+
+.thermal-struk .struk-item-name {
+  flex: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thermal-struk .struk-item-qty {
+  width: 30px;
+  text-align: center;
+}
+
+.thermal-struk .struk-item-price {
+  width: 50px;
+  text-align: right;
+}
+
+.thermal-struk .struk-total {
+  font-weight: bold;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 4px 0;
+  margin: 4px 0;
+}
+
+.thermal-struk .struk-footer {
+  text-align: center;
+  margin-top: 8px;
+  padding-top: 4px;
+  border-top: 1px dashed #000;
+  font-size: 8px;
+}
+
+.thermal-struk .struk-thanks {
+  font-size: 10px;
+  font-weight: bold;
+  margin: 4px 0;
+  text-align: center;
+}
+
 /* ============================================
    RESPONSIVE MOBILE STYLES
    Untuk tampilan HP yang rapi & nyaman digunakan
