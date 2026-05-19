@@ -1,0 +1,53 @@
+{
+  "name": "NotaKu - Generator Nota UMKM",
+  "short_name": "NotaKu",
+  "description": "Buat nota profesional gratis untuk UMKM Indonesia. Download PDF, pilih template eksklusif, simpan produk favorit, dan pantau penjualan.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#c9952a",
+  "background_color": "#0d0b08",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
