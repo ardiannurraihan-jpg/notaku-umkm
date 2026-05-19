@@ -773,6 +773,14 @@ textarea {
   border: 1.5px solid var(--border);
   color: var(--muted);
 }
+.action-btn.email-btn {
+  background: #6b3fa0;
+  color: white;
+  border: none;
+}
+.action-btn.email-btn:hover {
+  background: #8b5fc0;
+}
 .action-btn.secondary:hover { background: var(--cream); color: var(--ink); }
 
 /* PLACEHOLDER */
