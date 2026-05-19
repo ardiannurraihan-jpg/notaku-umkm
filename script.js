@@ -538,6 +538,8 @@ window.addEventListener('DOMContentLoaded', () => {
   checkPremiumStatus();
   loadStockData();
   loadHppData();
+  setTimeout(updateDashboard, 200);
+  
 
   document.querySelectorAll('.template-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -801,6 +803,9 @@ const transactionDetail = {
 transactionHistory.push(transactionDetail);
 localStorage.setItem('notaku_stats', JSON.stringify(transactionHistory));
 updateStats();
+ if (typeof updateDashboard === 'function') {
+  setTimeout(updateDashboard, 100);
+}
   // Update stok setelah membuat nota
 if (typeof updateStockAfterSale === 'function') {
   updateStockAfterSale(items);
@@ -1725,3 +1730,222 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+// ============================================
+//   DASHBOARD VISUAL PREMIUM
+// ============================================
+
+let productsPieChart = null;
+let salesBarChart = null;
+
+function updateDashboard() {
+  const period = document.getElementById('dashboardPeriod')?.value || 'month';
+  const now = new Date();
+  let startDate;
+  
+  switch(period) {
+    case 'week':
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 7);
+      break;
+    case 'month':
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+    case 'year':
+      startDate = new Date(now.getFullYear(), 0, 1);
+      break;
+    case 'all':
+      startDate = new Date(2000, 0, 1);
+      break;
+    default:
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+  
+  // Filter transaksi berdasarkan periode
+  const filteredTransactions = transactionHistory.filter(t => {
+    const tDate = new Date(t.date);
+    return tDate >= startDate;
+  });
+  
+  // Hitung total pendapatan dan laba
+  const totalRevenue = filteredTransactions.reduce((sum, t) => sum + t.total, 0);
+  
+  // Hitung total laba (dari HPP)
+  let totalProfit = 0;
+  filteredTransactions.forEach(t => {
+    if (t.items && t.items.length > 0) {
+      t.items.forEach(item => {
+        const hpp = hppData[item.name] || 0;
+        totalProfit += (item.price - hpp) * item.qty;
+      });
+    } else {
+      totalProfit += t.total * 0.4; // estimasi
+    }
+  });
+  
+  // Update KPI
+  const revenueEl = document.getElementById('dashboardRevenue');
+  const profitEl = document.getElementById('dashboardProfit');
+  const transEl = document.getElementById('dashboardTransactions');
+  
+  if (revenueEl) revenueEl.textContent = formatRupiah(totalRevenue);
+  if (profitEl) profitEl.textContent = formatRupiah(totalProfit);
+  if (transEl) transEl.textContent = filteredTransactions.length;
+  
+  // Update grafik
+  updateProductsPieChart(filteredTransactions);
+  updateSalesBarChart(filteredTransactions);
+  updateTopProductsList(filteredTransactions);
+}
+
+function updateProductsPieChart(transactions) {
+  const canvas = document.getElementById('productsPieChart');
+  if (!canvas) return;
+  
+  // Kumpulkan data penjualan per produk
+  const productSales = {};
+  
+  transactions.forEach(t => {
+    if (t.items && t.items.length > 0) {
+      t.items.forEach(item => {
+        const name = item.name;
+        const revenue = item.subtotal || (item.price * item.qty);
+        productSales[name] = (productSales[name] || 0) + revenue;
+      });
+    }
+  });
+  
+  const labels = Object.keys(productSales).slice(0, 5);
+  const data = labels.map(l => productSales[l]);
+  
+  if (productsPieChart) productsPieChart.destroy();
+  
+  productsPieChart = new Chart(canvas.getContext('2d'), {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: ['#c9952a', '#2a7a4b', '#c0431a', '#6b3fa0', '#00d4ff'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 10 } } },
+        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatRupiah(ctx.raw)}` } }
+      }
+    }
+  });
+}
+
+function updateSalesBarChart(transactions) {
+  const canvas = document.getElementById('salesBarChart');
+  if (!canvas) return;
+  
+  // Kelompokkan berdasarkan tanggal
+  const dailySales = {};
+  
+  transactions.forEach(t => {
+    const date = new Date(t.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    dailySales[date] = (dailySales[date] || 0) + t.total;
+  });
+  
+  // Ambil 7 hari terakhir atau semua
+  let labels = Object.keys(dailySales);
+  let data = labels.map(l => dailySales[l]);
+  
+  if (labels.length > 7) {
+    labels = labels.slice(-7);
+    data = data.slice(-7);
+  }
+  
+  if (salesBarChart) salesBarChart.destroy();
+  
+  salesBarChart = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Penjualan (Rp)',
+        data: data,
+        backgroundColor: '#c9952a',
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (ctx) => formatRupiah(ctx.raw) } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: (v) => 'Rp ' + (v/1000).toFixed(0) + 'k' } }
+      }
+    }
+  });
+}
+
+function updateTopProductsList(transactions) {
+  const container = document.getElementById('topProductsList');
+  if (!container) return;
+  
+  // Kumpulkan data produk
+  const productQty = {};
+  const productRevenue = {};
+  
+  transactions.forEach(t => {
+    if (t.items && t.items.length > 0) {
+      t.items.forEach(item => {
+        const name = item.name;
+        const qty = item.qty;
+        const revenue = item.subtotal || (item.price * qty);
+        productQty[name] = (productQty[name] || 0) + qty;
+        productRevenue[name] = (productRevenue[name] || 0) + revenue;
+      });
+    }
+  });
+  
+  const sorted = Object.entries(productRevenue).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  
+  if (sorted.length === 0) {
+    container.innerHTML = '<p style="text-align: center; color: var(--muted);">Belum ada data penjualan</p>';
+    return;
+  }
+  
+  container.innerHTML = sorted.map(([name, revenue], index) => {
+    const qty = productQty[name] || 0;
+    return `
+      <div style="display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+        <div style="width: 30px; height: 30px; background: #c9952a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">${index + 1}</div>
+        <div style="flex: 1;">
+          <div style="font-weight: 600;">${escapeHtml(name)}</div>
+          <div style="font-size: 0.7rem; color: var(--muted);">${qty} terjual</div>
+        </div>
+        <div style="font-weight: 700; color: #c9952a;">${formatRupiah(revenue)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function exportDashboard() {
+  // Cek premium
+  const isPremium = window.PremiumAPI && window.PremiumAPI.isPremium() && !window.PremiumAPI.isExpired();
+  
+  if (!isPremium) {
+    showToast('👑 Fitur ini eksklusif untuk member Premium! Upgrade sekarang.', 'warn');
+    const premSec = document.getElementById('premium');
+    if (premSec) premSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  
+  showToast('📸 Screenshot dashboard menggunakan tombol print screen', 'info');
+}
+
+// Panggil updateDashboard saat halaman dimuat dan saat ada transaksi baru
+// Tambahkan di dalam generateInvoice setelah updateStats()
+// Dan di DOMContentLoaded tambahkan:
+// setTimeout(updateDashboard, 200);
