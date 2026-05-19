@@ -25,12 +25,13 @@ function saveCurrentInvoice() {
     items: []
   };
 
-  document.querySelectorAll('.item-row').forEach(row => {
-    const name = row.querySelector('.item-name')?.value || '';
-    const qty = row.querySelector('.item-qty')?.value || '1';
-    const price = row.querySelector('.item-price')?.value || '0';
-    if (name) invoiceData.items.push({ name, qty, price });
-  });
+document.querySelectorAll('.item-row').forEach(row => {
+  const name = row.querySelector('.item-name')?.value || '';
+  const qty = row.querySelector('.item-qty')?.value || '1';
+  const price = row.querySelector('.item-price')?.value || '0';
+  const discount = row.querySelector('.item-discount')?.value || '0';
+  if (name) invoiceData.items.push({ name, qty, price, discount });
+});
 
   localStorage.setItem('notaku_last_invoice', JSON.stringify(invoiceData));
 }
@@ -58,6 +59,7 @@ function loadLastInvoice() {
       itemCount = 0;
       data.items.forEach(item => {
         addItem(item.name, parseFloat(item.qty), parseFloat(item.price));
+        addItem(item.name, parseFloat(item.qty), parseFloat(item.price), parseFloat(item.discount || 0));
       });
     }
   } catch(e) { console.warn("Gagal memuat nota terakhir:", e); }
@@ -819,17 +821,21 @@ if (typeof updateStockAfterSale === 'function') {
 
   const tbody = document.getElementById('inv-items');
   if (tbody) {
-    tbody.innerHTML = '';
-    items.forEach(item => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${escapeHtml(item.name)}</td>
-        <td style="text-align:center">${item.qty}</td>
-        <td>${formatRupiah(item.price)}</td>
-        <td style="text-align:right;font-weight:600">${formatRupiah(item.subtotal)}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+tbody.innerHTML = '';
+items.forEach(item => {
+  const tr = document.createElement('tr');
+  let priceDisplay = formatRupiah(item.price);
+  if (item.discountPercent > 0) {
+    priceDisplay = `${formatRupiah(item.price)} <span style="font-size:0.7rem;color:#c0431a;">(-${item.discountPercent}%)</span><br><span style="font-size:0.7rem;">→ ${formatRupiah(item.finalPrice)}</span>`;
+  }
+  tr.innerHTML = `
+    <td>${escapeHtml(item.name)}</td>
+    <td style="text-align:center">${item.qty}</td>
+    <td style="text-align:left">${priceDisplay}</td>
+    <td style="text-align:right;font-weight:600">${formatRupiah(item.subtotal)}</td>
+  `;
+  tbody.appendChild(tr);
+});
   }
 
   set('inv-subtotal', formatRupiah(subtotal));
