@@ -1585,10 +1585,112 @@ function exportProfitReport() {
   
   showToast('✅ Laporan laba/rugi berhasil diexport!', 'success');
 }
+// ============================================
+//   FITUR EMAIL NOTA
+// ============================================
 
-// Update fungsi generateInvoice untuk menyimpan detail items
-// Modifikasi fungsi generateInvoice yang sudah ada
-// Cari baris saveTransaction(total); lalu tambahkan kode ini setelahnya:
+function showEmailModal() {
+  const invoice = document.getElementById('invoicePreview');
+  if (!invoice || invoice.style.display === 'none') {
+    showToast('⚠️ Generate nota terlebih dahulu!', 'warn');
+    return;
+  }
+  
+  // Isi email subject dengan nomor nota
+  const invoiceNumber = document.getElementById('inv-number')?.textContent || '';
+  const storeName = document.getElementById('inv-storeName')?.textContent || 'Toko Kami';
+  const buyerName = document.getElementById('inv-buyerName')?.textContent || 'Pelanggan';
+  
+  document.getElementById('emailSubject').value = `Nota Pembelian ${invoiceNumber} dari ${storeName}`;
+  document.getElementById('emailMessage').value = `Yth. ${buyerName},\n\nTerima kasih telah berbelanja di ${storeName}. Berikut nota pembelian Anda terlampir.\n\nSalam hangat,\n${storeName}`;
+  document.getElementById('emailAddress').value = '';
+  
+  document.getElementById('emailModal').style.display = 'block';
+}
 
-// NOTE: Untuk versi lebih akurat, kita perlu simpan detail items
-// Sementara ini fungsi di atas sudah cukup untuk demo
+function closeEmailModal() {
+  document.getElementById('emailModal').style.display = 'none';
+}
+
+async function sendEmailWithInvoice() {
+  const invoice = document.getElementById('invoicePreview');
+  const email = document.getElementById('emailAddress')?.value.trim();
+  const subject = document.getElementById('emailSubject')?.value || 'Nota Pembelian';
+  const message = document.getElementById('emailMessage')?.value || '';
+  
+  if (!email) {
+    showToast('⚠️ Masukkan alamat email pelanggan!', 'warn');
+    return;
+  }
+  
+  if (!email.includes('@') || !email.includes('.')) {
+    showToast('⚠️ Masukkan email yang valid!', 'warn');
+    return;
+  }
+  
+  showToast('⏳ Menyiapkan email...', 'info');
+  
+  try {
+    // Capture nota jadi gambar
+    const originalWidth = invoice.style.width;
+    const originalMaxWidth = invoice.style.maxWidth;
+    const originalMargin = invoice.style.margin;
+    
+    invoice.style.width = '600px';
+    invoice.style.maxWidth = '600px';
+    invoice.style.margin = '0';
+    
+    await new Promise(r => setTimeout(r, 200));
+    
+    const canvas = await html2canvas(invoice, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: 600
+    });
+    
+    invoice.style.width = originalWidth;
+    invoice.style.maxWidth = originalMaxWidth;
+    invoice.style.margin = originalMargin;
+    
+    // Konversi ke base64
+    const imgData = canvas.toDataURL('image/png');
+    
+    // Data untuk dikirim
+    const invoiceNumber = document.getElementById('inv-number')?.textContent || '';
+    const storeName = document.getElementById('inv-storeName')?.textContent || 'Toko Kami';
+    const total = document.getElementById('inv-total')?.textContent || 'Rp 0';
+    
+    // Format pesan email
+    const emailBody = `${message}\n\n---\n📋 Detail Nota:\nNomor: ${invoiceNumber}\nTotal: ${total}\n\nNota terlampir dalam bentuk gambar.\n\n---\nDibuat dengan NotaKu.id - Generator Nota Gratis untuk UMKM Indonesia`;
+    
+    // Karena tidak ada server backend, kita gunakan mailto:
+    // Ini akan membuka aplikasi email default pengguna
+    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+    
+    // Buka mailto link
+    window.location.href = mailtoLink;
+    
+    // Download gambar nota sebagai backup
+    const link = document.createElement('a');
+    link.download = `nota-${invoiceNumber.replace(/\//g, '-')}.png`;
+    link.href = imgData;
+    link.click();
+    
+    showToast('✅ Email client terbuka! Lampirkan gambar nota yang sudah didownload.', 'success');
+    
+    // Catat event ke Google Analytics
+    if (typeof gtag === 'function') {
+      gtag('event', 'send_email', {
+        event_category: 'engagement',
+        event_label: storeName
+      });
+    }
+    
+    closeEmailModal();
+    
+  } catch (err) {
+    console.error('Email Error:', err);
+    showToast('❌ Gagal menyiapkan email. Coba download PDF lalu kirim manual.', 'error');
+  }
+}
