@@ -1110,6 +1110,29 @@ textarea {
   text-align: center;
   transition: transform 0.2s;
 }
+
+/* DASHBOARD PREMIUM */
+.premium-card {
+  position: relative;
+  overflow: hidden;
+}
+.premium-card::after {
+  content: "👑";
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  font-size: 1.5rem;
+  opacity: 0.15;
+  pointer-events: none;
+}
+.premium-only {
+  position: relative;
+}
+.premium-only::before {
+  content: "👑 ";
+  font-size: 0.7rem;
+}
+
 .stat-card:hover { transform: translateY(-3px); }
 .stat-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
 .stat-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
