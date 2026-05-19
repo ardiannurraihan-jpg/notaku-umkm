@@ -2,40 +2,44 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Syarat & Ketentuan - NotaKu</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Lora', serif;
-      background: #faf7f0;
-      color: #1a1208;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background: #faf8f3;
+      color: #0d0b08;
       line-height: 1.6;
       padding: 2rem;
     }
     .container {
       max-width: 800px;
       margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 2px 20px rgba(26,18,8,0.1);
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid #e0d4bc;
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 4px 30px rgba(13,11,8,0.1);
     }
     h1 {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Playfair Display', Georgia, serif;
       color: #c9952a;
-      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
     h2 {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 1.2rem;
       margin: 1.5rem 0 0.5rem 0;
-      color: #1a1208;
+      color: #1a1510;
     }
     p, li {
-      color: #4a3e2e;
+      color: #7a6e5e;
       margin-bottom: 0.5rem;
+      font-size: 0.95rem;
     }
     ul { margin-left: 1.5rem; margin-bottom: 1rem; }
     .back-link {
@@ -43,44 +47,90 @@
       margin-top: 2rem;
       color: #c9952a;
       text-decoration: none;
+      font-weight: 600;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
     }
     .back-link:hover { text-decoration: underline; }
-    hr { margin: 1rem 0; border: none; border-top: 1px solid #ddd3bb; }
-    .warning { background: #fff3cd; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+    hr { margin: 1rem 0; border: none; border-top: 1px solid #e0d4bc; }
+    .warning {
+      background: #f5e6c0;
+      border-left: 4px solid #c9952a;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    .last-updated {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      color: #a99e8e;
+      margin-bottom: 1.5rem;
+    }
+    .feature-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    .feature-badge {
+      background: #c9952a;
+      color: #0d0b08;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📋 Syarat & Ketentuan NotaKu</h1>
-    <p>Terakhir diperbarui: 5 Mei 2026</p>
+    <h1>📋 Syarat & Ketentuan</h1>
+    <p class="last-updated">Terakhir diperbarui: 19 Mei 2026</p>
     
     <h2>1. Layanan Gratis</h2>
-    <p>✅ NotaKu menyediakan layanan generator nota secara GRATIS untuk UMKM Indonesia.</p>
+    <p>✅ NotaKu menyediakan layanan generator nota secara <strong>GRATIS</strong> untuk UMKM Indonesia.</p>
     <p>✅ Fitur gratis dapat digunakan tanpa batasan waktu dan tanpa biaya.</p>
+    <div class="feature-list">
+      <span class="feature-badge">11 Template</span>
+      <span class="feature-badge">Statistik Penjualan</span>
+      <span class="feature-badge">Manajemen Stok</span>
+      <span class="feature-badge">Laporan Laba/Rugi</span>
+      <span class="feature-badge">Backup Data</span>
+    </div>
     
     <h2>2. Layanan Premium</h2>
-    <p>✅ Fitur Premium (hapus watermark + 5 template eksklusif) dapat diakses setelah membayar.</p>
-    <p>✅ Harga premium: Rp 49.000/bulan atau Rp 499.000/tahun.</p>
-    <p>✅ Setelah transfer, kode premium akan dikirim dalam 1x24 jam (biasanya <1 jam).</p>
+    <p>✅ Fitur Premium (hapus watermark + 8 template eksklusif) dapat diakses setelah membayar.</p>
+    <p><strong>💎 Harga Premium:</strong></p>
+    <ul>
+      <li>Bulanan: <strong>Rp 10.000</strong></li>
+      <li>3 Bulan: <strong>Rp 25.000</strong> (≈ Rp 8.000/bulan, hemat 58%)</li>
+      <li>Tahunan: <strong>Rp 60.000</strong> (≈ Rp 5.000/bulan, hemat 83%)</li>
+    </ul>
+    <p>✅ Setelah transfer, kode premium akan dikirim dalam 1x24 jam (biasanya &lt;1 jam).</p>
     
     <h2>3. Garansi Uang Kembali</h2>
     <div class="warning">
-      <strong>💰 100% Garansi Uang Kembali</strong><br>
+      <strong>💰 100% Garansi Uang Kembali</strong><br/>
       Jika kode premium tidak dikirim dalam 24 jam setelah transfer terbukti, uang Anda akan dikembalikan penuh.
     </div>
     
     <h2>4. Batasan Tanggung Jawab</h2>
     <p>✅ NotaKu tidak bertanggung jawab atas kesalahan input data oleh pengguna.</p>
     <p>✅ NotaKu tidak bertanggung jawab jika data hilang karena pengguna menghapus cache browser.</p>
-    <p>✅ Kami sarankan untuk selalu mengekspor data statistik secara berkala.</p>
+    <p>✅ Kami sarankan untuk selalu mengekspor data statistik dan backup secara berkala.</p>
     
-    <h2>5. Perubahan Layanan</h2>
+    <h2>5. Privasi Data</h2>
+    <p>✅ Semua data disimpan di browser Anda (localStorage).</p>
+    <p>✅ Tidak ada data yang dikirim atau disimpan di server kami.</p>
+    <p>✅ Baca kebijakan privasi lengkap <a href="/privacy.html" style="color:#c9952a;">di sini</a>.</p>
+    
+    <h2>6. Perubahan Layanan</h2>
     <p>✅ NotaKu berhak mengubah fitur, harga, atau ketentuan layanan sewaktu-waktu.</p>
     <p>✅ Perubahan akan diumumkan di website.</p>
     
-    <h2>6. Kontak</h2>
-    <p>📱 WhatsApp: 0821-3485-8510</p>
-    <p>📧 Email: support@notaku.com</p>
+    <h2>7. Kontak</h2>
+    <p>📱 <strong>WhatsApp Admin:</strong> <a href="https://wa.me/6282134858510" style="color:#c9952a;">0821-3485-8510</a></p>
+    <p>🏦 <strong>Rekening BRI:</strong> 3593-0100-9186-508 a.n. Ardian Nurraihan</p>
     
     <hr>
     <a href="/" class="back-link">← Kembali ke NotaKu</a>
